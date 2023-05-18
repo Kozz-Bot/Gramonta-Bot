@@ -1,0 +1,28 @@
+{
+	"name": "gramonta-bot",
+	"version": "2.0.0",
+	"description": "Second iteration of the Gramonta-Bot, using the Kozz-bot framework",
+	"main": "./dist",
+	"license": "MIT",
+	"scripts": {
+		"dev": "tsc && link-module-alias && concurrently \"tsc --watch\" \"nodemon dist/index.js\"",
+		"start": "tsc && link-module-alias && node dist/index.js",
+		"test": "jest",
+		"docs": "typedoc ./src/index.ts"
+	},
+	"devDependencies": {
+		"@types/jest": "^29.2.5",
+		"concurrently": "^7.5.0",
+		"nodemon": "^2.0.22",
+		"typedoc": "^0.23.21",
+		"typescript": "^5.0.4"
+	},
+	"dependencies": {
+		"dotenv": "^16.0.3",
+		"kozz-handler-maker": "/home/guigalleta/Projects/Kozz/kozz-handler-maker",
+		"link-module-alias": "^1.2.0"
+	},
+	"_moduleAliases": {
+		"src": "dist"
+	}
+}
