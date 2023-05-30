@@ -2,7 +2,7 @@
 
 # Instruções!
 
-Envie um video ou imagem com `!s` na legenda, _ou_ responda um video ou imagem com `!s`.
+Envie um video ou imagem com _*!s*_ na legenda, _ou_ responda um video ou imagem com _*!s*_.
 
 > ---
 

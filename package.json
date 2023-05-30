@@ -9,19 +9,27 @@
 		"start": "tsc && link-module-alias && node dist/index.js",
 		"test": "jest",
 		"docs": "typedoc ./src/index.ts",
-		"postman": "node ./scripts/postman_signature postman-test"
+		"postman": "node ./scripts/postman_signature postman-test",
+		"postinstall": "npx patch-package"
 	},
 	"devDependencies": {
+		"@types/fluent-ffmpeg": "^2.1.21",
+		"@types/he": "^1.2.0",
 		"@types/jest": "^29.2.5",
 		"concurrently": "^7.5.0",
 		"nodemon": "^2.0.22",
+		"patch-package": "^7.0.0",
 		"typedoc": "^0.23.21",
 		"typescript": "^5.0.4"
 	},
 	"dependencies": {
 		"dotenv": "^16.0.3",
+		"fluent-ffmpeg": "^2.1.2",
+		"he": "^1.2.0",
 		"kozz-handler-maker": "/home/guigalleta/Projects/Kozz/kozz-handler-maker",
-		"link-module-alias": "^1.2.0"
+		"link-module-alias": "^1.2.0",
+		"youtube-search": "^1.1.6",
+		"ytdl-core": "^4.11.4"
 	},
 	"_moduleAliases": {
 		"src": "dist"
