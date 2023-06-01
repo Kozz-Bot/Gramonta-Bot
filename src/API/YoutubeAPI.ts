@@ -11,7 +11,7 @@ type DownloadType = 'video' | 'audio';
  * @param {string} id
  * @returns {string} mp3 path
  */
-export const downloadMp3FromId = async (id: string): Promise<string> => {
+export const downloadMp3FromId = async (id: string): Promise<string | undefined> => {
 	const ytUrl = `https://www.youtube.com/watch?v=${id}`;
 
 	return downloadMp3FromUrl(ytUrl);
@@ -23,7 +23,7 @@ export const downloadMp3FromId = async (id: string): Promise<string> => {
  * @param savePath
  * @returns {string} mp3 path
  */
-export const downloadMp3FromUrl = (url: string): Promise<string> => {
+export const downloadMp3FromUrl = (url: string): Promise<string | undefined> => {
 	const path = './media/ytSongs/song.webm';
 	return ytDownload('audio', url, path);
 };
@@ -34,7 +34,7 @@ export const downloadMp3FromUrl = (url: string): Promise<string> => {
  * @param savePath
  * @returns {string} mp4 path
  */
-export const downloadVideoFromId = (id: string): Promise<string> => {
+export const downloadVideoFromId = (id: string): Promise<string | undefined> => {
 	const path = './media/ytVideos/video.mp4';
 
 	const ytUrl = `https://www.youtube.com/watch?v=${id}`;
@@ -47,7 +47,7 @@ export const downloadVideoFromId = (id: string): Promise<string> => {
  * @param savePath
  * @returns {string} mp4 path
  */
-export const downloadVideoFromUrl = (url: string): Promise<string> => {
+export const downloadVideoFromUrl = (url: string): Promise<string | undefined> => {
 	const path = './media/ytVideos/video.mp4';
 	return ytDownload('video', url, path);
 };
@@ -63,28 +63,32 @@ const ytDownload = async (
 	type: DownloadType,
 	url: string,
 	savePath: string
-): Promise<string> => {
-	const quality = type === 'video' ? '18' : 'highestaudio';
+): Promise<string | undefined> => {
+	try {
+		const quality = type === 'video' ? '18' : 'highestaudio';
 
-	const filePath: string = await new Promise((resolve, reject) => {
-		const download = ytdl(url, {
-			quality,
-		}).pipe(oldFs.createWriteStream(savePath));
+		const filePath: string = await new Promise((resolve, reject) => {
+			const download = ytdl(url, {
+				quality,
+			}).pipe(oldFs.createWriteStream(savePath));
 
-		download.once('close', () => {
-			resolve(savePath);
+			download.once('close', () => {
+				resolve(savePath);
+			});
+
+			download.once('error', err => {
+				reject(err);
+			});
 		});
 
-		download.once('error', err => {
-			reject(err);
-		});
-	});
+		if (type === 'video') {
+			return filePath;
+		}
 
-	if (type === 'video') {
-		return filePath;
+		return convertPathToPath(filePath, 'mp3');
+	} catch (e) {
+		return undefined;
 	}
-
-	return convertPathToPath(filePath, 'mp3');
 };
 
 export const searchResults = async (
