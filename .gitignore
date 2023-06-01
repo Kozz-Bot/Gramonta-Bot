@@ -3,3 +3,8 @@ dist
 coverage
 .env
 keys/*
+
+media/temp/*
+media/ytSongs/*
+media/ytVideos/*
+
