@@ -11,8 +11,6 @@ export const createAutoReveal = (msgObject: MessageObj) => {
 		source: `${msgObject.rawCommand.boundaryId}/${chatId}`,
 		name: `auto-reveal-${msgObject.rawCommand.message.to}`,
 		onMessage: msg => {
-			console.log(msg.body);
-
 			if (msg.rawCommand.message.fromHostAccount && msg.body == '!reveal stop') {
 				msg.reply('Podem continuar com seus segredos agora...');
 				msg.revoke();

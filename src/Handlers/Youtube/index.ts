@@ -6,19 +6,16 @@ const firstVideo = createMethod({
 	args: {},
 	func: async requester => {
 		const query = requester.rawCommand.immediateArg;
-
 		if (!query) {
 			return requester.reply('No immediate arg');
 		}
 
 		const results = await YoutubeApi.searchResults(query);
-
 		if (!results) {
 			return requester.reply('No results');
 		}
 
 		const mediaPath = await YoutubeApi.downloadVideoFromUrl(results.results[0].link);
-
 		if (!mediaPath) {
 			return requester.reply('erro');
 		}
@@ -36,21 +33,16 @@ const firstSong = createMethod({
 	args: {},
 	func: async requester => {
 		const query = requester.rawCommand.immediateArg;
-
-		console.log(query);
-
 		if (!query) {
 			return requester.reply('No immediate arg');
 		}
 
 		const results = await YoutubeApi.searchResults(query);
-
 		if (!results) {
 			return requester.reply('No results');
 		}
 
 		const mediaPath = await YoutubeApi.downloadMp3FromUrl(results.results[0].link);
-
 		if (!mediaPath) {
 			return requester.reply('erro');
 		}
