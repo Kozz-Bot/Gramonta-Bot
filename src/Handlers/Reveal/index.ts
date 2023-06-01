@@ -1,4 +1,7 @@
 import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { createAutoReveal } from 'src/Proxies/AutoReveal';
+
+const autoReveals = [];
 
 const defaultMethod = createMethod({
 	name: 'default',
@@ -28,12 +31,30 @@ const defaultMethod = createMethod({
 	},
 });
 
+const autoReveal = createMethod({
+	name: 'auto',
+	args: {},
+	func: requester => {
+		console.log(requester.rawCommand.message);
+		if (!requester.rawCommand.message.fromHostAccount) {
+			return requester.reply('Apenas o dono do bot pode usar esse comando');
+		}
+
+		requester.reply(
+			'Revelando mídias de visualização única a partir de agora hehehe'
+		);
+
+		createAutoReveal(requester);
+	},
+});
+
 export const startRevealHandler = () =>
 	createHandlerInstance({
 		name: 'reveal',
 		address: `${process.env.GATEWAY_URL}`,
 		methods: {
 			...defaultMethod,
+			...autoReveal,
 		},
 		templatePath: './src/Handlers/Reveal/reply.kozz.md',
 	});
