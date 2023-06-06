@@ -35,7 +35,6 @@ const autoReveal = createMethod({
 	name: 'auto',
 	args: {},
 	func: requester => {
-		console.log(requester.rawCommand.message);
 		if (!requester.rawCommand.message.fromHostAccount) {
 			return requester.reply('Apenas o dono do bot pode usar esse comando');
 		}

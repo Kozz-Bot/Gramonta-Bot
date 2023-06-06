@@ -15,6 +15,10 @@ const firstVideo = createMethod({
 			return requester.reply('No results');
 		}
 
+		console.log('Querying video' + query + 'got result', {
+			result: results.results[0],
+		});
+
 		const mediaPath = await YoutubeApi.downloadVideoFromUrl(results.results[0].link);
 		if (!mediaPath) {
 			return requester.reply('erro');
@@ -41,6 +45,10 @@ const firstSong = createMethod({
 		if (!results) {
 			return requester.reply('No results');
 		}
+
+		console.log('Querying song' + query + 'got result', {
+			result: results.results[0],
+		});
 
 		const mediaPath = await YoutubeApi.downloadMp3FromUrl(results.results[0].link);
 		if (!mediaPath) {
