@@ -17,6 +17,7 @@
 		"@types/he": "^1.2.0",
 		"@types/jest": "^29.2.5",
 		"concurrently": "^7.5.0",
+		"kozz-types": "../kozz-types/",
 		"nodemon": "^2.0.22",
 		"patch-package": "^7.0.0",
 		"typedoc": "^0.23.21",

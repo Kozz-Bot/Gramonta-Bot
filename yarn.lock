@@ -648,6 +648,11 @@ kozz-handler-maker@/home/guigalleta/Projects/Kozz/kozz-handler-maker:
     link-module-alias "^1.2.0"
     socket.io-client "^4.6.1"
 
+kozz-types@../kozz-types/:
+  version "0.0.1"
+  dependencies:
+    link-module-alias "^1.2.0"
+
 link-module-alias@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/link-module-alias/-/link-module-alias-1.2.0.tgz#6a3b7b014cfe18b2759a1222fffce6a40fc120e4"
