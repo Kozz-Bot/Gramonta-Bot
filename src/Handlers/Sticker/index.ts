@@ -28,6 +28,7 @@ const toImg = createMethod({
 
 export const startStickerHandler = () =>
 	createHandlerInstance({
+		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
 		name: 's',
 		address: `${process.env.GATEWAY_URL}`,
 		methods: {

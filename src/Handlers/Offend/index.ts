@@ -33,6 +33,8 @@ const [o, a] = ['o', 'a'].map(name =>
 
 export const startOffenseHandler = () =>
 	createHandlerInstance({
+		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+
 		name: 'ofenda',
 		address: `${process.env.GATEWAY_URL}`,
 		methods: {

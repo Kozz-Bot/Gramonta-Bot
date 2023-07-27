@@ -19,6 +19,7 @@ const defaultMethod = createMethod({
 
 export const startGetStatusHandler = () =>
 	createHandlerInstance({
+		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
 		name: 'getstatus',
 		address: `${process.env.GATEWAY_URL}`,
 		methods: {

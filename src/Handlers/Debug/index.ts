@@ -13,10 +13,7 @@ const defaultMethod = createMethod({
 			return;
 		}
 
-		const contactList = await requester.ask.boundary('Gramonta-Wa', {
-			resource: 'all_contacts',
-			data: {},
-		});
+		const contactList = await requester.ask.boundary('Gramonta-Wa', 'all_contacts');
 
 		const contactListString = contactList.response
 			.filter((c: ContactPayload) => !c.isGroup)
@@ -67,6 +64,7 @@ const proxy = createMethod({
 
 export const startDebugHandler = () =>
 	createHandlerInstance({
+		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
 		name: 'debug',
 		address: `${process.env.GATEWAY_URL}`,
 		methods: {

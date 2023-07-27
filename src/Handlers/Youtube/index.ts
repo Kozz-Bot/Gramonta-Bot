@@ -65,6 +65,7 @@ const firstSong = createMethod({
 
 export const startYoutubeHandler = () =>
 	createHandlerInstance({
+		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
 		name: 'yt',
 		address: `${process.env.GATEWAY_URL}`,
 		methods: {

@@ -49,6 +49,8 @@ const autoReveal = createMethod({
 
 export const startRevealHandler = () =>
 	createHandlerInstance({
+		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+
 		name: 'reveal',
 		address: `${process.env.GATEWAY_URL}`,
 		methods: {

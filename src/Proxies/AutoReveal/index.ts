@@ -22,6 +22,5 @@ export const createAutoReveal = (msgObject: MessageObj) => {
 			}
 		},
 	});
-
 	return instance;
 };
