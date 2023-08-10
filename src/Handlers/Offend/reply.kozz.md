@@ -27,3 +27,11 @@ Ae, {{contact}} seu {{offense}}
 Fiquei sabendo que {{contact}} é {{offense}}
 
 > ---
+
+> @Help
+
+Digite !ofenda + nome da pessoa para ofende-la!
+
+_Exemplo_: `!ofenda Joaquim`
+
+> ---

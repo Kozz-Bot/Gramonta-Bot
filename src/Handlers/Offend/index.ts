@@ -1,4 +1,5 @@
 import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 import OffenseAPI from 'src/API/OffendApi';
 
 const [o, a] = ['o', 'a'].map(name =>
@@ -31,6 +32,37 @@ const [o, a] = ['o', 'a'].map(name =>
 	})
 );
 
+const fallback = createMethod({
+	name: 'fallback',
+	args: {},
+	func: async requester => {
+		const name = `${requester.rawCommand.method} ${
+			requester.rawCommand.immediateArg || ''
+		}`
+			.trim()
+			.replace('default', '');
+
+		const offense = await OffenseAPI.getRandomOffense();
+
+		if (!name) {
+			return requester.reply.withTemplate('tagSomeone', {
+				offense: offense?.xingamento,
+			});
+		}
+
+		const curseVariant = ['curse1', 'curse2', 'curse3'].at(
+			Math.round(Math.random() * 2)
+		);
+
+		requester.reply.withTemplate(curseVariant!, {
+			contact: name,
+			offense: offense?.xingamento,
+		});
+	},
+});
+
+const templatePath = './src/Handlers/Offend/reply.kozz.md';
+
 export const startOffenseHandler = () =>
 	createHandlerInstance({
 		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
@@ -40,6 +72,9 @@ export const startOffenseHandler = () =>
 		methods: {
 			...o,
 			...a,
+			...fallback,
 		},
-		templatePath: './src/Handlers/Offend/reply.kozz.md',
-	});
+		templatePath,
+	}).resources.upsertResource('help', () =>
+		loadTemplates(templatePath).getTextFromTemplate('Help')
+	);

@@ -22,10 +22,8 @@
 
 > @Help
 
-# Horóscopo no zap!!!
+Escreva !horoscopo + seu signo para receber sua sorte diária
 
-- Escreva `!horoscopo ` + `seu signo` para receber sua sorte diária
-
-_*Exemplo*_: `!horoscopo aries`
+_Exemplo_: `!horoscopo aries`
 
 > ---

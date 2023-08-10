@@ -1,4 +1,5 @@
 import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 
 const defaultMethod = createMethod({
 	name: 'default',
@@ -18,6 +19,8 @@ const defaultMethod = createMethod({
 	},
 });
 
+const templatePath = './src/Handlers/Ping/reply.kozz.md';
+
 export const startPingHandler = () =>
 	createHandlerInstance({
 		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
@@ -26,5 +29,7 @@ export const startPingHandler = () =>
 		methods: {
 			...defaultMethod,
 		},
-		templatePath: './src/Handlers/Ping/reply.kozz.md',
-	});
+		templatePath,
+	}).resources.upsertResource('help', () =>
+		loadTemplates(templatePath).getTextFromTemplate('Help')
+	);

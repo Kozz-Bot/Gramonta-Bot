@@ -1,4 +1,5 @@
 import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 import { createAutoReveal } from 'src/Proxies/AutoReveal';
 
 const autoReveals = [];
@@ -8,7 +9,7 @@ const defaultMethod = createMethod({
 	args: {},
 	func: requester => {
 		if (!requester.quotedMessage) {
-			return requester.reply.withTemplate('instructions');
+			return requester.reply.withTemplate('Help');
 		}
 
 		if (!requester.quotedMessage.isViewOnce) {
@@ -47,6 +48,8 @@ const autoReveal = createMethod({
 	},
 });
 
+const templatePath = './src/Handlers/Reveal/reply.kozz.md';
+
 export const startRevealHandler = () =>
 	createHandlerInstance({
 		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
@@ -57,5 +60,7 @@ export const startRevealHandler = () =>
 			...defaultMethod,
 			...autoReveal,
 		},
-		templatePath: './src/Handlers/Reveal/reply.kozz.md',
-	});
+		templatePath,
+	}).resources.upsertResource('help', () =>
+		loadTemplates(templatePath).getTextFromTemplate('Help')
+	);

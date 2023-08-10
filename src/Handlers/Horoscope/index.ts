@@ -1,4 +1,5 @@
 import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 import HoroscopeApi from 'src/API/HoroscopeAPI';
 import { normalizeString } from 'src/Utils/strings';
 
@@ -45,6 +46,8 @@ const getSign = createMethod({
 	},
 });
 
+const templatePath = './src/Handlers/Horoscope/reply.kozz.md';
+
 export const startHoroscopeHandler = () =>
 	createHandlerInstance({
 		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
@@ -54,5 +57,7 @@ export const startHoroscopeHandler = () =>
 			...defaultMethod,
 			...getSign,
 		},
-		templatePath: './src/Handlers/Horoscope/reply.kozz.md',
-	});
+		templatePath,
+	}).resources.upsertResource('help', () =>
+		loadTemplates(templatePath).getTextFromTemplate('Help')
+	);

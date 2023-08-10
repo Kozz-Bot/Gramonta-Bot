@@ -1,4 +1,5 @@
 import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 
 const defaultMethod = createMethod({
 	name: 'default',
@@ -26,6 +27,8 @@ const toImg = createMethod({
 	},
 });
 
+const templatePath = './src/Handlers/Sticker/reply.kozz.md';
+
 export const startStickerHandler = () =>
 	createHandlerInstance({
 		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
@@ -35,5 +38,7 @@ export const startStickerHandler = () =>
 			...defaultMethod,
 			...toImg,
 		},
-		templatePath: './src/Handlers/Sticker/reply.kozz.md',
-	});
+		templatePath,
+	}).resources.upsertResource('help', () =>
+		loadTemplates(templatePath).getTextFromTemplate('Help')
+	);

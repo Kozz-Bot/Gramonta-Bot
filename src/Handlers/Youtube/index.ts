@@ -1,4 +1,5 @@
 import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 import * as YoutubeApi from 'src/API/YoutubeAPI';
 
 const firstVideo = createMethod({
@@ -79,6 +80,8 @@ const help = createMethod({
 	},
 });
 
+const templatePath = 'src/Handlers/Youtube/messages.kozz.md';
+
 export const startYoutubeHandler = () =>
 	createHandlerInstance({
 		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
@@ -89,5 +92,7 @@ export const startYoutubeHandler = () =>
 			...firstVideo,
 			...help,
 		},
-		templatePath: 'src/Handlers/Youtube/messages.kozz.md',
-	});
+		templatePath,
+	}).resources.upsertResource('help', () =>
+		loadTemplates(templatePath).getTextFromTemplate('Help')
+	);

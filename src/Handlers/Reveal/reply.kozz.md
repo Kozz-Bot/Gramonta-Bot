@@ -1,6 +1,6 @@
-> @instructions
+> @Help
 
-# 'Responda uma mensagem de visualização única para eu revelar seu conteúdo'
+Responda uma mensagem de visualização única com `!reveal` para eu revelar seu conteúdo
 
 > ---
 
