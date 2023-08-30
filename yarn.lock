@@ -799,7 +799,7 @@ klaw-sync@^6.0.0:
   dependencies:
     graceful-fs "^4.1.11"
 
-kozz-handler-maker@/home/guigalleta/Projects/Kozz/kozz-handler-maker:
+"kozz-handler-maker@file:../kozz-handler-maker":
   version "1.0.0"
   dependencies:
     arcsecond "^5.0.0"

@@ -8,3 +8,4 @@ export * from './Offend';
 export * from './Horoscope';
 export * from './Weather';
 export * from './Help';
+export * from './CalvoCoins';

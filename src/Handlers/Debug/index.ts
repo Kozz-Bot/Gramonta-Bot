@@ -1,64 +1,33 @@
-import {
-	createHandlerInstance,
-	createMethod,
-	createProxyInstance,
-} from 'kozz-handler-maker';
-import { ContactPayload } from 'kozz-types';
+import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
 
-const defaultMethod = createMethod({
-	name: 'default',
-	args: {},
-	func: async requester => {
-		if (!requester.rawCommand.message.fromHostAccount) {
-			return;
-		}
-
-		const contactList = await requester.ask.boundary('Gramonta-Wa', 'all_contacts');
-
-		const contactListString = contactList.response
-			.filter((c: ContactPayload) => !c.isGroup)
-			.reduce((string: string, contact: ContactPayload) => {
-				return (string += `${contact.publicName || contact.privateName}\n`);
-			}, '');
-		requester.reply(contactListString);
-	},
-});
-
-const proxy = createMethod({
-	name: 'proxy',
+const messageInfo = createMethod({
+	name: 'group',
 	args: {},
 	func: requester => {
-		if (!requester.rawCommand.message.fromHostAccount) {
-			return;
-		}
+		const {
+			boundaryId,
+			contact,
+			from,
+			id,
+			messageType,
+			groupName,
+			fromHostAccount,
+			to,
+		} = requester.rawCommand.message.quotedMessage || requester.rawCommand.message;
+		const response = [
+			`Contact Info: \`\`\`${JSON.stringify(contact, undefined, '  ')}\`\`\``,
+			``,
+			`Boundary ID: ${boundaryId}`,
+			`Message ID: ${id}`,
+			`From (requester ID): ${from}`,
+			`To (receiver ID): ${to}`,
+			`From host account: ${fromHostAccount}`,
+			``,
+			`Message Type: ${messageType}`,
+			`Group Name: ${groupName}`,
+		].join('\n');
 
-		const chatId = requester.rawCommand.message.fromHostAccount
-			? requester.rawCommand.message.to
-			: requester.rawCommand.message.from;
-
-		//Create proxy to my chat. Still need to create onProxiedMessage event handler in WA boundary
-		//This is a hack, the message should be proxied directly to Gramonta-Wa boundary;
-		createProxyInstance({
-			address: `${process.env.GATEWAY_URL}`,
-			name: `proxy-${requester}`,
-			source: `${requester.rawCommand.boundaryId}/${chatId}`,
-			onMessage: requester => {
-				const rawMessage = requester.rawCommand.message;
-
-				requester.sendMessage(
-					'5511947952409@c.us',
-					[
-						`Nome: ${rawMessage.contact.publicName}`,
-						`${rawMessage.groupName}`,
-						`${rawMessage.body}`,
-					].join('\n')
-				);
-
-				if (rawMessage.fromHostAccount && rawMessage.body === '!debug stop') {
-					requester.revoke();
-				}
-			},
-		});
+		requester.reply(response);
 	},
 });
 
@@ -68,7 +37,6 @@ export const startDebugHandler = () =>
 		name: 'debug',
 		address: `${process.env.GATEWAY_URL}`,
 		methods: {
-			...defaultMethod,
-			...proxy,
+			...messageInfo,
 		},
 	});

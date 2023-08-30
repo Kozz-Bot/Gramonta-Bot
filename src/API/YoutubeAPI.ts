@@ -70,6 +70,11 @@ const ytDownload = async (
 		const filePath: string = await new Promise((resolve, reject) => {
 			const download = ytdl(url, {
 				quality,
+				requestOptions: {
+					headers: {
+						cookie: process.env.YT_COOKIE,
+					},
+				},
 			}).pipe(oldFs.createWriteStream(savePath));
 
 			download.once('close', () => {

@@ -1,13 +1,23 @@
 import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
 import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 import { createAutoReveal } from 'src/Proxies/AutoReveal';
+import { RevealMapProxy, createAutoRevealMap } from 'src/Proxies/AutoRevealMap';
+import { useJsonDB } from 'src/StaticJsonDb';
 
-const autoReveals = [];
+const revealBlockDB = useJsonDB('block', './src/Handlers/Reveal/revealDB.json');
+const RevealMapDB = useJsonDB<RevealMapProxy, 'map'>(
+	'map',
+	'./src/Handlers/Reveal/revealDB.json'
+);
 
 const defaultMethod = createMethod({
 	name: 'default',
 	args: {},
 	func: requester => {
+		if (revealBlockDB.getEntityById(requester.rawCommand.message.to)) {
+			return requester.reply('Revelação de mídia desabilitada nesse grupo');
+		}
+
 		if (!requester.quotedMessage) {
 			return requester.reply.withTemplate('Help');
 		}
@@ -48,9 +58,56 @@ const autoReveal = createMethod({
 	},
 });
 
+const revealBlock = createMethod({
+	name: 'block',
+	args: {},
+	func: requester => {
+		const fromMe = requester.rawCommand.message.fromHostAccount;
+		if (!fromMe) {
+			return requester.reply('Somente o dono do bot pode usar esse comando');
+		}
+
+		const revealBlockDB = useJsonDB('block', './src/Handlers/Reveal/revealDB.json');
+		revealBlockDB.addEntity({
+			id: requester.rawCommand.message.to,
+		});
+		requester.reply('Revelação de mensagens desativada nesse grupo');
+	},
+});
+
+const revealAllow = createMethod({
+	name: 'allow',
+	args: {},
+	func: requester => {
+		const fromMe = requester.rawCommand.message.fromHostAccount;
+		if (!fromMe) {
+			return requester.reply('Somente o dono do bot pode usar esse comando');
+		}
+
+		const revealBlockDB = useJsonDB('block', './src/Handlers/Reveal/revealDB.json');
+		revealBlockDB.removeEntity(requester.rawCommand.message.to);
+		requester.reply('Revelação de mensagens reativada nesse grupo');
+	},
+});
+
 const templatePath = './src/Handlers/Reveal/reply.kozz.md';
 
-export const startRevealHandler = () =>
+/**
+ * [TODO]: create middleware for methods
+ */
+const notHost = createMethod({
+	name: 'not-host',
+	args: {},
+	func: requester => {
+		return requester.reply('Somente o dono do bot pode usar esse comando');
+	},
+});
+
+export const startRevealHandler = () => {
+	RevealMapDB.getAllEntities().forEach(proxy => {
+		createAutoRevealMap(proxy);
+	});
+
 	createHandlerInstance({
 		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
 
@@ -59,8 +116,11 @@ export const startRevealHandler = () =>
 		methods: {
 			...defaultMethod,
 			...autoReveal,
+			...revealBlock,
+			...revealAllow,
 		},
 		templatePath,
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')
 	);
+};
