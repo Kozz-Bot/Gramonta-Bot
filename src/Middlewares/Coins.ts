@@ -17,10 +17,13 @@ import {
 export const usePremiumCommand =
 	(
 		amount: number,
-		callback: (requester: MessageObj, args: Object) => boolean | void,
+		callback: (
+			requester: MessageObj,
+			args: Object
+		) => boolean | void | Promise<boolean | void>,
 		errorMessage: string
 	) =>
-	(requester: MessageObj, args: Object) => {
+	async (requester: MessageObj, args: Object) => {
 		const user = getUser(requester.rawCommand.message.contact.id);
 		const canUse = canUsePremiumCommand(user);
 
@@ -30,7 +33,7 @@ export const usePremiumCommand =
 			);
 		}
 
-		const shouldDeductCoins = callback(requester, args);
+		const shouldDeductCoins = await callback(requester, args);
 		if (shouldDeductCoins === false) {
 			return;
 		} else {

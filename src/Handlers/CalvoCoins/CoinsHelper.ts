@@ -87,7 +87,7 @@ export const spendCoins = (user: UserCoins, command: Command, amount = 1) => {
 		formattedDate: getFormattedDateAndTime(),
 		id: command.message.id,
 		messageData: {
-			chatId: command.message.from,
+			chatId: command.message.to,
 			messageId: command.message.id,
 		},
 	};
@@ -118,7 +118,7 @@ export const removePremium = (user: UserCoins) => {
 export const isPremium = (user: UserCoins) => {
 	const isPremiumValid = (premiumLastBough: number) => {
 		const oneMonth = 2.592e9;
-		return premiumLastBough + oneMonth < new Date().getTime();
+		return premiumLastBough + oneMonth > new Date().getTime();
 	};
 
 	return user.premium && isPremiumValid(user.lastPremiumBought!);

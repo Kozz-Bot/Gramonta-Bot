@@ -2,8 +2,8 @@
 
 # Dados de usuário
 
-_Nome_: {{name}}
-_CalvoCoins_: {{coins}},
-_Premium?_: {{premium}},
+_*Nome*_: {{name}}
+_*CalvoCoins*_: {{coins}}
+_*Premium?*_ {{premium}}
 
 > ---

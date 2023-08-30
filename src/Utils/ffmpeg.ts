@@ -53,3 +53,60 @@ export const convertPathToPath = async (
 			});
 	});
 };
+
+export const convertB64ToB64 = async (
+	inB64: string,
+	fromFormat: string,
+	toFormat: `${string}`
+): Promise<string> => {
+	const outFilePath = `${__TEMP_AUDIO_PATH__}/temp.${toFormat}`;
+	const inFilePath = `${__TEMP_AUDIO_PATH__}/tempFile.${fromFormat}`;
+
+	const buffer = Buffer.from(inB64, 'base64');
+
+	await fs.writeFile(inFilePath, buffer);
+
+	return new Promise((resolve, reject) => {
+		ffmpeg(inFilePath)
+			.output(outFilePath)
+
+			.saveToFile(outFilePath)
+
+			.on('end', async () => {
+				const buffer = await fs.readFile(outFilePath);
+				resolve(Buffer.from(buffer).toString('base64'));
+			})
+
+			.on('error', err => {
+				reject(err);
+			});
+	});
+};
+
+export const convertB64ToPath = async (
+	inB64: string,
+	fromFormat: string,
+	toFormat: `${string}`
+): Promise<string> => {
+	const outFilePath = `${__TEMP_AUDIO_PATH__}/temp.${toFormat}`;
+	const inFilePath = `${__TEMP_AUDIO_PATH__}/tempFile.${fromFormat}`;
+
+	const buffer = Buffer.from(inB64, 'base64');
+
+	await fs.writeFile(inFilePath, buffer);
+
+	return new Promise((resolve, reject) => {
+		ffmpeg(inFilePath)
+			.output(outFilePath)
+
+			.saveToFile(outFilePath)
+
+			.on('end', async () => {
+				resolve(outFilePath);
+			})
+
+			.on('error', err => {
+				reject(err);
+			});
+	});
+};

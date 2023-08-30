@@ -9,3 +9,4 @@ export * from './Horoscope';
 export * from './Weather';
 export * from './Help';
 export * from './CalvoCoins';
+export * from './AI';

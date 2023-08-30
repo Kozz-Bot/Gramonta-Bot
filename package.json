@@ -32,6 +32,7 @@
 		"jsdom": "^22.1.0",
 		"kozz-handler-maker": "/home/guigalleta/Projects/Kozz/kozz-handler-maker",
 		"link-module-alias": "^1.2.0",
+		"openai": "^3.3.0",
 		"youtube-search": "^1.1.6",
 		"ytdl-core": "^4.11.4"
 	},
