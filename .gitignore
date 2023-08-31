@@ -8,3 +8,4 @@ media/temp/*
 media/ytSongs/*
 media/ytVideos/*
 
+.env.example
