@@ -8,6 +8,13 @@ type DB<EntityName extends string, DataType extends EntityWithID> = {
 	[key in EntityName]: DataType[];
 };
 
+/**
+ * Currently it reads and writes to the file each single operation. I know this is
+ * not scalable, but I'm not gonna cache the thing in memory for now. That's a [TODO]
+ * @param entityName
+ * @param JsonPath
+ * @returns
+ */
 export const useJsonDB = <DataType extends EntityWithID, EntityName extends string>(
 	entityName: EntityName,
 	JsonPath: string
@@ -51,9 +58,9 @@ export const useJsonDB = <DataType extends EntityWithID, EntityName extends stri
 		});
 	};
 
-	const getEntityById = (entityId: string) => {
+	const getEntityById = (entityId: string): DataType | undefined => {
 		const db = getDB();
-		return db[entityName]?.filter(entity => entity.id === entityId)[0]!;
+		return db[entityName]?.filter(entity => entity.id === entityId)[0];
 	};
 
 	const updateEntity = (id: string, newEntity: Partial<DataType>) => {
@@ -73,7 +80,7 @@ export const useJsonDB = <DataType extends EntityWithID, EntityName extends stri
 	};
 
 	const upsertEntity = async (user: DataType) => {
-		const maybeUser: DataType | null = await getEntityById(user.id);
+		const maybeUser: DataType | undefined = await getEntityById(user.id);
 		if (!maybeUser) {
 			return addEntity(user);
 		} else {

@@ -3,6 +3,7 @@ import OpenAPI from 'src/API/OpenAi';
 import { usePremiumCommand } from 'src/Middlewares/Coins';
 import fs from 'fs/promises';
 import { convertB64ToB64, convertB64ToPath } from 'src/Utils/ffmpeg';
+import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 
 const API = new OpenAPI();
 
@@ -93,5 +94,7 @@ export const startAIHandler = () => {
 			...transcribe,
 		},
 		templatePath,
-	});
+	}).resources.upsertResource('help', () =>
+		loadTemplates(templatePath).getTextFromTemplate('Help')
+	);
 };

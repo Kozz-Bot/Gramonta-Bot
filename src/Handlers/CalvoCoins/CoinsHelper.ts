@@ -53,7 +53,7 @@ export const getUser = (id: string) => {
 		});
 	}
 
-	return userCoinsDB.getEntityById(id);
+	return userCoinsDB.getEntityById(id)!;
 };
 
 export const addTransaction = (id: string, transaction: Transaction) => {

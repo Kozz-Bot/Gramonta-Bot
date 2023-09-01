@@ -1,5 +1,6 @@
 import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
 import { loadTemplates } from 'kozz-handler-maker/dist/Message';
+import { makeQuote } from '../Quote';
 
 const defaultMethod = createMethod({
 	name: 'default',
@@ -10,6 +11,9 @@ const defaultMethod = createMethod({
 		}
 		if (message.media) {
 			return message.reply.withSticker(message.media);
+		}
+		if (message.quotedMessage) {
+			return makeQuote(message);
 		}
 		message.reply.withTemplate('instructions_default');
 	},

@@ -7,7 +7,6 @@ const getHelp = createMethod({
 		const allHandlers = await requester.ask.gateway('all_handlers');
 
 		const allHelps = allHandlers.response.map((handler: any) => {
-			console.log(handler.name);
 			return requester.ask.handler(handler.name, 'help').then(resp => ({
 				name: handler.name,
 				help: resp.response,
@@ -16,8 +15,6 @@ const getHelp = createMethod({
 			name: string;
 			help: string;
 		}>[];
-
-		console.log(allHelps);
 
 		Promise.all(allHelps).then(allHelpTexts => {
 			requester.reply(
