@@ -39,7 +39,7 @@ const list = createMethod({
 
 		const response = await Promise.all(responsePromises);
 
-		requester.reply(response.join('\n'));
+		requester.reply(response.join(''));
 	},
 });
 
@@ -75,17 +75,20 @@ const get = createMethod({
 	name: 'fallback',
 	args: {},
 	func: requester => {
-		if (!requester.rawCommand.method) {
+		const query =
+			`${requester.rawCommand.method} ${requester.rawCommand.immediateArg}`.trim();
+
+		if (!query) {
 			return requester.reply.withTemplate('NeedsNameOrNumber');
 		}
 
-		const isNumber = requester.rawCommand.method.match(/^(\d)+/);
+		const isNumber = query.match(/^(\d)+/);
 
 		const copypasta = (() => {
 			if (isNumber) {
-				return getCopypastaByIndex(Number(requester.rawCommand.method));
+				return getCopypastaByIndex(Number(query));
 			} else {
-				return getCopypastaById(requester.rawCommand.method);
+				return getCopypastaById(query);
 			}
 		})();
 
