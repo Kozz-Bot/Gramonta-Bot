@@ -34,6 +34,7 @@
 		"link-module-alias": "^1.2.0",
 		"openai": "^3.3.0",
 		"youtube-search": "^1.1.6",
+		"ytdl": "^1.4.1",
 		"ytdl-core": "^4.11.4"
 	},
 	"_moduleAliases": {

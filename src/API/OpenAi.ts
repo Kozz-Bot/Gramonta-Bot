@@ -29,7 +29,9 @@ type ChatGPTResponse = {
 type AssistantMessage = { role: 'assistant'; content: string };
 type UserMessage = { role: 'user'; content: string };
 
-export type PreviousMessages = [UserMessage, AssistantMessage];
+export type Message = UserMessage | AssistantMessage;
+
+export type PreviousMessages = Message[];
 
 export type OpenAiImage = {
 	url: string;
@@ -71,7 +73,57 @@ export default class OpenAPI {
 		return response.data.results[0].flagged !== 1;
 	}
 
-	async fromPrompt(prompt: string, prevMessages: PreviousMessages[]) {
+	async emojify(prompt: string) {
+		const isSafe = await this.isSafe(prompt);
+		if (!isSafe) throw 'Bad Language';
+
+		const response = await this.axiosInstance.post<ChatGPTResponse>(
+			'/chat/completions',
+			{
+				model: 'gpt-3.5-turbo',
+				temperature: 0.25,
+				messages: [
+					{
+						role: 'system',
+						content:
+							'Você é uma ferramenta de emojificação. Todos os textos que você recebe, você deve reenvia-los cheio de emojis que se adequem ao texto.',
+					},
+					{
+						role: 'user',
+						content: 'Eu to pensando em jogar com outro personagem agora',
+					},
+					{
+						role: 'assistant',
+						content:
+							'🤔🎮 Eu estou pensando 🧠 em jogar 🕹🎮 com um outro personagem agora!',
+					},
+					{
+						role: 'user',
+						content: 'Nossa, por favor, vai ser muito engraçado',
+					},
+					{
+						role: 'assistant',
+						content: '😂😂😂 Nossa, por favor 🙏, vai ser muito engraçado! 🤣🤣🤣',
+					},
+					{
+						role: 'user',
+						content:
+							'Esse bot só não lava, passa e faz a comida porque ainda não existe tecnologia pra isso. Porque se dependesse do Tramonta, o bot faria de tudo!',
+					},
+					{
+						role: 'assistant',
+						content:
+							'🤖💪 Esse bot 🤖 só não lava 👕, passa 👖 e faz a comida 🍔😋🍗🍴 porque ainda não existe tecnologia 💻🖥 pra isso. Porque 🤔 se dependesse do Tramonta 💡, o bot 🤖 faria de tudo! 😄',
+					},
+					{ role: 'user', content: prompt },
+				],
+			}
+		);
+
+		return response.data.choices[0].message.content;
+	}
+
+	async fromPrompt(prompt: string, prevMessages: PreviousMessages) {
 		const isSafe = await this.isSafe(prompt);
 		if (!isSafe) throw 'Bad Language';
 

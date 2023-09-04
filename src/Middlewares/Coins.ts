@@ -19,11 +19,11 @@ export const usePremiumCommand =
 		amount: number,
 		callback: (
 			requester: MessageObj,
-			args: Object
+			args: Record<string, any>
 		) => boolean | void | Promise<boolean | void>,
 		errorMessage: string
 	) =>
-	async (requester: MessageObj, args: Object) => {
+	async (requester: MessageObj, args: Record<string, any>) => {
 		const user = getUser(requester.rawCommand.message.contact.id);
 		const canUse = canUsePremiumCommand(user);
 

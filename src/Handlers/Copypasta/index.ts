@@ -75,8 +75,9 @@ const get = createMethod({
 	name: 'fallback',
 	args: {},
 	func: requester => {
-		const query =
-			`${requester.rawCommand.method} ${requester.rawCommand.immediateArg}`.trim();
+		const query = `${requester.rawCommand.method} ${
+			requester.rawCommand.immediateArg || ''
+		}`.trim();
 
 		if (!query) {
 			return requester.reply.withTemplate('NeedsNameOrNumber');

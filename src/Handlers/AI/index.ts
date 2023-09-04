@@ -54,8 +54,40 @@ const transcribe = createMethod({
 				);
 
 				const transcription = await API.transcribeAudioFromPath(tempFilepath);
+
 				requester.react('✏');
-				requester.reply(transcription.text);
+
+				if (requester.rawCommand.namedArgs?.emoji) {
+					const response = await API.emojify(`${requester.quotedMessage.body}`);
+
+					return requester.reply(response);
+				}
+				return requester.reply(transcription.text);
+			} catch (e) {
+				requester.reply(`Erro: ${e}`);
+			}
+		},
+		'Você não possui CalvoCoins suficientes para usar esse comando'
+	),
+});
+
+const emojify = createMethod({
+	name: 'emojify',
+	args: {},
+	func: usePremiumCommand(
+		2,
+		async requester => {
+			try {
+				if (!requester.quotedMessage?.body) {
+					requester.reply.withTemplate('TranscribeNeedsQuote');
+					return false;
+				}
+
+				requester.react('⏳');
+
+				const response = await API.emojify(`${requester.quotedMessage.body}`);
+
+				requester.reply(response);
 			} catch (e) {
 				requester.reply(`Erro: ${e}`);
 			}
@@ -92,6 +124,7 @@ export const startAIHandler = () => {
 			...fallbakck,
 			...help,
 			...transcribe,
+			...emojify,
 		},
 		templatePath,
 	}).resources.upsertResource('help', () =>
