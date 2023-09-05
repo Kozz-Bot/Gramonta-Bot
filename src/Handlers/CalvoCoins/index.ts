@@ -1,8 +1,9 @@
 import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
-import { addTransaction, getUser } from './CoinsHelper';
+import userCoinsDB, { addTransaction, getUser } from './CoinsHelper';
 import { hostAccountOnly } from 'src/Middlewares/CheckContact';
 import { getFormattedDateAndTime } from 'src/Utils/date';
 import { usePremiumCommand } from 'src/Middlewares/Coins';
+import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 
 const templatePath = './src/Handlers/CalvoCoins/messages.kozz.md';
 
@@ -66,13 +67,24 @@ const makePremium = createMethod({
 const spend = createMethod({
 	name: 'spend',
 	args: {},
-	func: usePremiumCommand(
-		3,
-		requester => {
-			requester.reply('Você gastou 3 moedas');
-		},
-		'Você não possui moedas suficientes'
+	func: hostAccountOnly(
+		usePremiumCommand(
+			3,
+			requester => {
+				requester.reply('Você gastou 3 moedas');
+			},
+			'Você não possui moedas suficientes'
+		),
+		'Apenas o dono do bot pode usar esse comando. É um comando de testes apenas para jogar moedas fora'
 	),
+});
+
+const help = createMethod({
+	name: 'help',
+	args: {},
+	func: async requester => {
+		requester.reply.withTemplate('Help');
+	},
 });
 
 export const startCoinsHandler = () => {
@@ -86,7 +98,10 @@ export const startCoinsHandler = () => {
 			...addCoins,
 			...makePremium,
 			...spend,
+			...help,
 		},
 		templatePath,
-	});
+	}).resources.upsertResource('help', () =>
+		loadTemplates(templatePath).getTextFromTemplate('Help')
+	);
 };

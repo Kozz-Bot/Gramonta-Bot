@@ -7,3 +7,5 @@ keys/*
 media/temp/*
 media/ytSongs/*
 media/ytVideos/*
+
+src/Handlers/CalvoCoins/diamonds.json

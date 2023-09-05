@@ -25,6 +25,7 @@ type CoinUsed = {
 	messageData: {
 		chatId: string;
 		messageId: string;
+		messageBody: string;
 	};
 };
 
@@ -41,6 +42,8 @@ const userCoinsDB = useJsonDB<UserCoins, 'diamonds'>(
 	'diamonds',
 	'./src/Handlers/CalvoCoins/diamonds.json'
 );
+
+export default userCoinsDB;
 
 export const getUser = (id: string) => {
 	if (!userCoinsDB.getEntityById(id)) {
@@ -89,6 +92,7 @@ export const spendCoins = (user: UserCoins, command: Command, amount = 1) => {
 		messageData: {
 			chatId: command.message.to,
 			messageId: command.message.id,
+			messageBody: command.message.body,
 		},
 	};
 
