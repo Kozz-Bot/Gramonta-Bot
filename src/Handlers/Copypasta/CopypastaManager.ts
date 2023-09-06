@@ -50,6 +50,20 @@ export const getCopypastasList = () => {
 	return copypastasDB.getAllEntities().filter(copy => !copy.dateDeleted);
 };
 
+export const searchCopypastaByName = (name: string) => {
+	return copypastasDB.getAllEntities().filter(c => c.id.includes(name));
+};
+
+export const searchCopypastaByContent = (content: string) => {
+	return copypastasDB
+		.getAllEntities()
+		.filter(c => c.id.includes(content))
+		.map(find => ({
+			...find,
+			queryIndex: find.text.indexOf(content),
+		}));
+};
+
 export const deleteCopypastaById = (id: string) => {
 	const copypasta = getCopypastaById(id);
 	if (!copypasta) return;

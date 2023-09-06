@@ -2,23 +2,40 @@
 
 # Copypastas do bot do tramonta
 
-<br>
-
 _*Comandos*_
 `|===================================================|`
 `|   !copypasta list   |  Lista todas as copypastas  |`
 `| !copypasta {{name}} |  Obtém copypasta pelo nome  |`
 `| !copypasta {{numb}} | Obtém copypasta pelo indice |`
+`|  !copypasta search  |     Pesquisa copypasta¹     |`
 `|===================================================|`
+<br>
+¹Passe a flag --deep para pesquisar dentro da copypasta, não apenas o titulo
+<br>
 
 _*Comandos respondendo mensagens:*_
 `|======================================================|`
 `| !copypasta add {{name}}     |   Salva copypasta      |`
-`| !copypasta delete {{name}}  |  Deleta a copypasta¹   |`
+`| !copypasta delete {{name}}  |  Deleta a copypasta²   |`
 `|======================================================|`
 <br>
 
-¹Você só pode deletar uma copypasta que você mesmo adicionou
+²Você só pode deletar uma copypasta que você mesmo adicionou
+
+> ---
+
+> @CopypastaSearchResult
+
+{{number}} - {{name}}
+
+> ---
+
+> @CopypastaSearchResultDeep
+
+{{number}} - {{name}}
+<br>
+{{part}}
+<br>
 
 > ---
 
@@ -31,6 +48,12 @@ _*Comandos respondendo mensagens:*_
 > @NeedsQuote
 
 Erro: Responda com esse comando uma mensagem de texto para torna-la copypasta
+
+> ---
+
+> @NeedsQuery
+
+Erro: Digite algo para eu pesquisar nas copypastas.
 
 > ---
 

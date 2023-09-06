@@ -1,4 +1,4 @@
-import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { MethodMap, createHandlerInstance, createMethod } from 'kozz-handler-maker';
 import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 import {
 	addCopypasta,
@@ -6,7 +6,10 @@ import {
 	getCopypastaById,
 	getCopypastaByIndex,
 	getCopypastasList,
+	searchCopypastaByContent,
+	searchCopypastaByName,
 } from './CopypastaManager';
+import { queryText } from 'src/Utils/strings';
 
 const templatePath = './src/Handlers/Copypasta/messages.kozz.md';
 const templatesHelper = loadTemplates(templatePath);
@@ -70,6 +73,51 @@ const add = createMethod({
 		requester.reply.withTemplate('CopypastaAdded', { name });
 	},
 });
+
+const search = createMethod({
+	name: 'search',
+	args: {},
+	func: async requester => {
+		const query = requester.rawCommand.immediateArg;
+
+		if (!query) {
+			return requester.reply.withTemplate('NeedsQuery');
+		}
+
+		if (requester.rawCommand.namedArgs?.deep) {
+			const found = searchCopypastaByContent(query);
+			const message = await Promise.all(
+				found.map(copy => {
+					const part = queryText(copy.text, query, 15).replace(
+						query,
+						`*--> ${query.toUpperCase()} <--*`
+					);
+					return templatesHelper.getTextFromTemplate('CopypastaSearchResultDeep', {
+						number: copy.index,
+						name: copy.id,
+						part,
+					});
+				})
+			);
+
+			return requester.reply(message.join('') || 'Nenhum resultado');
+		} else {
+			const found = searchCopypastaByName(query);
+
+			const message = await Promise.all(
+				found.map(copy => {
+					return templatesHelper.getTextFromTemplate('CopypastaSearchResult', {
+						number: copy.index,
+						name: copy.id,
+					});
+				})
+			);
+
+			return requester.reply(message.join('') || 'Nenhum resultado');
+		}
+	},
+	// This is a bug in the library that I need to fix.
+}) as unknown as MethodMap<'search', {}>;
 
 const get = createMethod({
 	name: 'fallback',
@@ -147,6 +195,7 @@ export const startCopypastaHandler = () =>
 			...add,
 			...get,
 			...del,
+			...search,
 		},
 		templatePath,
 	}).resources.upsertResource('help', () =>

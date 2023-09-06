@@ -11,10 +11,10 @@ type DownloadType = 'video' | 'audio';
  * @param {string} id
  * @returns {string} mp3 path
  */
-export const downloadMp3FromId = async (id: string): Promise<string | undefined> => {
+export const downloadMp3FromId = async (id: string): Promise<string | void> => {
 	const ytUrl = `https://www.youtube.com/watch?v=${id}`;
 
-	return downloadMp3FromUrl(ytUrl);
+	return downloadMp3FromUrl(ytUrl).catch(err => console.warn(err));
 };
 
 /**
