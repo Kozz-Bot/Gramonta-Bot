@@ -9,7 +9,7 @@ import {
 	searchCopypastaByContent,
 	searchCopypastaByName,
 } from './CopypastaManager';
-import { queryText } from 'src/Utils/strings';
+import { makeAccentsInsensitiveRegex, queryText } from 'src/Utils/strings';
 
 const templatePath = './src/Handlers/Copypasta/messages.kozz.md';
 const templatesHelper = loadTemplates(templatePath);
@@ -20,76 +20,63 @@ const idCompare = (idA: string, idB: string) => {
 	return sanitizedIdA === sanitizedIdB;
 };
 
-const defaultMethod = createMethod({
-	name: 'default',
-	args: {},
-	func: requester => {
-		requester.reply.withTemplate('Help');
-	},
+const help = createMethod('default', requester =>
+	requester.reply.withTemplate('Help')
+);
+
+const list = createMethod('list', async requester => {
+	const copypastaList = getCopypastasList();
+	const responsePromises = copypastaList.map(copypasta =>
+		templatesHelper.getTextFromTemplate('CopypastaListItem', {
+			number: copypasta.index,
+			name: copypasta.id,
+		})
+	);
+
+	const response = await Promise.all(responsePromises);
+
+	requester.reply(response.join(''));
 });
 
-const list = createMethod({
-	name: 'list',
-	args: {},
-	func: async requester => {
-		const copypastaList = getCopypastasList();
-		const responsePromises = copypastaList.map(copypasta =>
-			templatesHelper.getTextFromTemplate('CopypastaListItem', {
-				number: copypasta.index,
-				name: copypasta.id,
-			})
-		);
+const add = createMethod('add', requester => {
+	if (!requester.quotedMessage) {
+		return requester.reply.withTemplate('NeedsQuote');
+	}
+	if (requester.quotedMessage.messageType !== 'TEXT') {
+		return requester.reply.withTemplate('NeedsBody');
+	}
+	if (!requester.rawCommand.immediateArg) {
+		return requester.reply.withTemplate('NeedsName');
+	}
 
-		const response = await Promise.all(responsePromises);
+	const contact = requester.rawCommand.message.contact;
+	const name = requester.rawCommand.immediateArg;
 
-		requester.reply(response.join(''));
-	},
+	addCopypasta({
+		id: name,
+		text: requester.quotedMessage.body,
+		userIdWhoAdded: contact.id,
+		chatId: requester.rawCommand.message.to,
+	});
+
+	requester.reply.withTemplate('CopypastaAdded', { name });
 });
 
-const add = createMethod({
-	name: 'add',
-	args: {},
-	func: requester => {
-		if (!requester.quotedMessage) {
-			return requester.reply.withTemplate('NeedsQuote');
-		}
-		if (requester.quotedMessage.messageType !== 'TEXT') {
-			return requester.reply.withTemplate('NeedsBody');
-		}
-		if (!requester.rawCommand.immediateArg) {
-			return requester.reply.withTemplate('NeedsName');
-		}
-
-		const contact = requester.rawCommand.message.contact;
-		const name = requester.rawCommand.immediateArg;
-
-		addCopypasta({
-			id: name,
-			text: requester.quotedMessage.body,
-			userIdWhoAdded: contact.id,
-			chatId: requester.rawCommand.message.to,
-		});
-
-		requester.reply.withTemplate('CopypastaAdded', { name });
-	},
-});
-
-const search = createMethod({
-	name: 'search',
-	args: {},
-	func: async requester => {
+const search = createMethod(
+	'search',
+	async (requester, args) => {
 		const query = requester.rawCommand.immediateArg;
 
 		if (!query) {
 			return requester.reply.withTemplate('NeedsQuery');
 		}
 
-		if (requester.rawCommand.namedArgs?.deep) {
+		if (args.deep) {
 			const found = searchCopypastaByContent(query);
 			const message = await Promise.all(
 				found.map(copy => {
 					const part = queryText(copy.text, query, 15).replace(
-						query,
+						makeAccentsInsensitiveRegex(query),
 						`*--> ${query.toUpperCase()} <--*`
 					);
 					return templatesHelper.getTextFromTemplate('CopypastaSearchResultDeep', {
@@ -116,72 +103,66 @@ const search = createMethod({
 			return requester.reply(message.join('') || 'Nenhum resultado');
 		}
 	},
-	// This is a bug in the library that I need to fix.
-}) as unknown as MethodMap<'search', {}>;
+	{
+		deep: 'boolean?',
+	}
+);
 
-const get = createMethod({
-	name: 'fallback',
-	args: {},
-	func: requester => {
-		const query = `${requester.rawCommand.method} ${
-			requester.rawCommand.immediateArg || ''
-		}`.trim();
+const get = createMethod('fallback', requester => {
+	const query = `${requester.rawCommand.method} ${
+		requester.rawCommand.immediateArg || ''
+	}`.trim();
 
-		if (!query) {
-			return requester.reply.withTemplate('NeedsNameOrNumber');
+	if (!query) {
+		return requester.reply.withTemplate('NeedsNameOrNumber');
+	}
+
+	const isNumber = query.match(/^(\d)+/);
+
+	const copypasta = (() => {
+		if (isNumber) {
+			return getCopypastaByIndex(Number(query));
+		} else {
+			return getCopypastaById(query);
 		}
+	})();
 
-		const isNumber = query.match(/^(\d)+/);
+	if (!copypasta) {
+		return requester.reply.withTemplate('InvalidCopypasta');
+	}
 
-		const copypasta = (() => {
-			if (isNumber) {
-				return getCopypastaByIndex(Number(query));
-			} else {
-				return getCopypastaById(query);
-			}
-		})();
-
-		if (!copypasta) {
-			return requester.reply.withTemplate('InvalidCopypasta');
-		}
-
-		return requester.reply.withTemplate('Copypasta', copypasta);
-	},
+	return requester.reply.withTemplate('Copypasta', copypasta);
 });
 
-const del = createMethod({
-	name: 'delete',
-	args: {},
-	func: requester => {
-		if (!requester.rawCommand.immediateArg) {
-			return requester.reply.withTemplate('NeedsNameOrNumber');
+const del = createMethod('delete', requester => {
+	if (!requester.rawCommand.immediateArg) {
+		return requester.reply.withTemplate('NeedsNameOrNumber');
+	}
+
+	const isNumber = requester.rawCommand.immediateArg.match(/^(\d)+/);
+
+	const copypasta = (() => {
+		if (isNumber) {
+			return getCopypastaByIndex(Number(requester.rawCommand.immediateArg));
+		} else {
+			return getCopypastaById(requester.rawCommand.immediateArg);
 		}
+	})();
 
-		const isNumber = requester.rawCommand.immediateArg.match(/^(\d)+/);
+	if (!copypasta) {
+		return requester.reply.withTemplate('InvalidCopypasta');
+	}
 
-		const copypasta = (() => {
-			if (isNumber) {
-				return getCopypastaByIndex(Number(requester.rawCommand.immediateArg));
-			} else {
-				return getCopypastaById(requester.rawCommand.immediateArg);
-			}
-		})();
+	if (
+		!idCompare(copypasta.userIdWhoAdded, requester.rawCommand.message.from) &&
+		!requester.rawCommand.message.fromHostAccount
+	) {
+		return requester.reply.withTemplate('NotCopypastaOwner');
+	}
 
-		if (!copypasta) {
-			return requester.reply.withTemplate('InvalidCopypasta');
-		}
+	deleteCopypastaById(copypasta.id);
 
-		if (
-			!idCompare(copypasta.userIdWhoAdded, requester.rawCommand.message.from) &&
-			!requester.rawCommand.message.fromHostAccount
-		) {
-			return requester.reply.withTemplate('NotCopypastaOwner');
-		}
-
-		deleteCopypastaById(copypasta.id);
-
-		return requester.reply.withTemplate('CopypastaDeleted', copypasta);
-	},
+	return requester.reply.withTemplate('CopypastaDeleted', copypasta);
 });
 
 export const startCopypastaHandler = () =>
@@ -190,7 +171,7 @@ export const startCopypastaHandler = () =>
 		name: 'copypasta',
 		address: `${process.env.GATEWAY_URL}`,
 		methods: {
-			...defaultMethod,
+			...help,
 			...list,
 			...add,
 			...get,

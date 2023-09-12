@@ -10,5 +10,4 @@ export * from './Weather';
 export * from './Help';
 export * from './CalvoCoins';
 export * from './AI';
-export { startQuoteHandler } from './Quote';
 export * from './Copypasta';

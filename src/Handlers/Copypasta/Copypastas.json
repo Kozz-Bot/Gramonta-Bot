@@ -1049,6 +1049,26 @@
             "dateAdded": 1693960661130,
             "dateDeleted": null,
             "formattedDateAdded": "05/09/2023 às 21:37"
+        },
+        {
+            "id": "salamito 3",
+            "text": "📝🍕 código salamito 📝🍕\n\neu fiz esse código hoje, bem simples:\n\n```javascript\nvar calabresa = '🍖 salamito 🍖';\n\nif (calabresa) {\n    console.log('🍕 temos calabresa! 🍕');\n} else {\n    console.log('😢 sem calabresa... 😢');\n}\n```\n\nsaída do console:\n```\n🍕 temos salamito! 🍕\n```",
+            "userIdWhoAdded": "5511947952409@c.us",
+            "chatId": "5511975517114-1601677193@g.us",
+            "index": 105,
+            "dateAdded": 1694028072513,
+            "dateDeleted": null,
+            "formattedDateAdded": "06/09/2023 às 16:21"
+        },
+        {
+            "id": "joelbundao",
+            "text": "🌙👋 boa noite, amigos do grupo! 🌟📢 recebendo um recado 📝📢 do nosso colega, o joel nino, membro da devcoff. então, cara, 🤔👥 estou recebendo muitas reclamações 🗣📢 suas aqui no grupo. pessoas alegando 🙅‍♀️📸 que você está enviando foto da bunda 🍑 no privado delas. isso é uma falta de respeito 🚫🙅‍♂️ sem tamanho! isso aí, cara, isso não se faz, entendeu? 😡🙅‍♂️ você já tem 17 anos, você já está bem grandinho, sabe que não pode fazer essas coisas. a gente já avisou uma vez, avisou duas, falou: \"ó, joel, eu não mando foto da bunda 🍑 pro pessoal no privado, não faz isso!\" mas você continua mandando. próxima reclamação 📢🚫 a gente vai ter que te remover do grupo, hein? 🚫👋",
+            "userIdWhoAdded": "557597116650@c.us",
+            "chatId": "120363042544006292@g.us",
+            "index": 106,
+            "dateAdded": 1694044659954,
+            "dateDeleted": null,
+            "formattedDateAdded": "06/09/2023 às 20:57"
         }
     ]
 }

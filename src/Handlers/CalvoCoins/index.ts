@@ -7,26 +7,21 @@ import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 
 const templatePath = './src/Handlers/CalvoCoins/messages.kozz.md';
 
-const getInfo = createMethod({
-	name: 'default',
-	args: {},
-	func: async (message, args) => {
-		// Getting all relevant data
-		const { id, publicName } = message.rawCommand.message.contact;
-		const { coins, premium } = getUser(id);
+const getInfo = createMethod('default', message => {
+	// Getting all relevant data
+	const { id, publicName } = message.rawCommand.message.contact;
+	const { coins, premium } = getUser(id);
 
-		message.reply.withTemplate('Info', {
-			name: publicName,
-			coins,
-			premium: premium ? 'Sim' : 'Não',
-		});
-	},
+	message.reply.withTemplate('Info', {
+		name: publicName,
+		coins,
+		premium: premium ? 'Sim' : 'Não',
+	});
 });
 
-const addCoins = createMethod({
-	name: 'add',
-	args: {},
-	func: hostAccountOnly(requester => {
+const addCoins = createMethod(
+	'add',
+	hostAccountOnly(requester => {
 		const quotedUser = requester.rawCommand.message.quotedMessage?.from;
 		const amount = requester.rawCommand.immediateArg;
 
@@ -42,13 +37,12 @@ const addCoins = createMethod({
 		});
 
 		requester.reply('Feito :)');
-	}, 'Apenas o dono do bot pode adicionar moedas ao saldo de alguém'),
-});
+	}, 'Apenas o dono do bot pode adicionar moedas ao saldo de alguém')
+);
 
-const makePremium = createMethod({
-	name: 'premium',
-	args: {},
-	func: hostAccountOnly(requester => {
+const makePremium = createMethod(
+	'premium',
+	hostAccountOnly(requester => {
 		const quotedUser = requester.rawCommand.message.quotedMessage?.from;
 		if (!quotedUser) return;
 
@@ -61,31 +55,10 @@ const makePremium = createMethod({
 		});
 
 		requester.reply('Feito :)');
-	}, 'Apenas o dono do bot pode fazer alguém premium'),
-});
+	}, 'Apenas o dono do bot pode fazer alguém premium')
+);
 
-const spend = createMethod({
-	name: 'spend',
-	args: {},
-	func: hostAccountOnly(
-		usePremiumCommand(
-			3,
-			requester => {
-				requester.reply('Você gastou 3 moedas');
-			},
-			'Você não possui moedas suficientes'
-		),
-		'Apenas o dono do bot pode usar esse comando. É um comando de testes apenas para jogar moedas fora'
-	),
-});
-
-const help = createMethod({
-	name: 'help',
-	args: {},
-	func: async requester => {
-		requester.reply.withTemplate('Help');
-	},
-});
+const help = createMethod('help', requester => requester.reply.withTemplate('Help'));
 
 export const startCoinsHandler = () => {
 	createHandlerInstance({
@@ -97,7 +70,6 @@ export const startCoinsHandler = () => {
 			...getInfo,
 			...addCoins,
 			...makePremium,
-			...spend,
 			...help,
 		},
 		templatePath,

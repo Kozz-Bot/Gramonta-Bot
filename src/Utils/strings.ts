@@ -2,6 +2,14 @@ export function normalizeString(string: string) {
 	return string.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
+export const makeAccentsInsensitiveRegex = (desiredToMatch: string) => {
+	const regexString = `${desiredToMatch}|${desiredToMatch.replace(
+		/[\u00E0-\u00FC]/,
+		'[à-ü]'
+	)}`;
+	return new RegExp(regexString);
+};
+
 /**
  * Queries a string for a substring and returns the part of the string in which the
  * substring appears. You can control how many words before and after the match should
@@ -19,8 +27,8 @@ export const queryText = (
 	wordsAfter = wordsBefore,
 	caseSensitive = false
 ) => {
-	const splittedText = text.split(' ');
-	const splittedQuery = query.split(' ');
+	const splittedText = normalizeString(text).split(' ');
+	const splittedQuery = normalizeString(query).split(' ');
 
 	const { found, higherIndex, lowerIndex } = (() => {
 		for (let i = 0; i < splittedText.length - splittedQuery.length; i++) {

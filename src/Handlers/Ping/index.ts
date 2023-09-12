@@ -1,22 +1,14 @@
 import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
 import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 
-const defaultMethod = createMethod({
-	name: 'default',
-	args: {},
-	func: requester => {
-		if (requester.rawCommand.message.contact.id === '558892440605@c.us') {
-			return;
-		}
+const defaultMethod = createMethod('default', requester => {
+	const now = new Date().getTime();
+	const requestTime = requester.rawCommand.message.timestamp;
+	const difference = (now - requestTime) / 1000;
 
-		const now = new Date().getTime();
-		const requestTime = requester.rawCommand.message.timestamp;
-		const difference = (now - requestTime) / 1000;
-
-		requester.reply.withTemplate('pong', {
-			difference,
-		});
-	},
+	requester.reply.withTemplate('pong', {
+		difference,
+	});
 });
 
 const templatePath = './src/Handlers/Ping/reply.kozz.md';

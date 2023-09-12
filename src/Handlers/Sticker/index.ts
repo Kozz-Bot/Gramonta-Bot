@@ -1,34 +1,54 @@
 import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
-import { loadTemplates } from 'kozz-handler-maker/dist/Message';
-import { makeQuote } from '../Quote';
+import { MessageObj, loadTemplates } from 'kozz-handler-maker/dist/Message';
+import { Media } from 'kozz-types';
+import { generateQuote } from 'src/API/QuoteApi';
 
-const defaultMethod = createMethod({
-	name: 'default',
-	args: {},
-	func: message => {
-		if (message.quotedMessage?.media) {
-			return message.reply.withSticker(message.quotedMessage.media);
+const makeQuote = async (requester: MessageObj) => {
+	if (!requester.quotedMessage || !requester.quotedMessage.body) {
+		return requester.reply.withTemplate('Help');
+	}
+
+	const text = requester.quotedMessage.body;
+	const name = requester.quotedMessage.contact.publicName;
+	const profilePicUrl = await requester.ask.boundary(
+		'Gramonta-Wa',
+		'contact_profile_pic',
+		{
+			id: requester.quotedMessage.from,
 		}
-		if (message.media) {
-			return message.reply.withSticker(message.media);
-		}
-		if (message.quotedMessage) {
-			return makeQuote(message);
-		}
-		message.reply.withTemplate('instructions_default');
-	},
+	);
+
+	const quoteB64 = await generateQuote(text, name, profilePicUrl.response);
+
+	const stickerMedia: Media = {
+		data: quoteB64,
+		fileName: `${text}.png`,
+		mimeType: 'image',
+		sizeInBytes: null,
+	};
+
+	requester.reply.withSticker(stickerMedia);
+};
+
+const defaultMethod = createMethod('default', message => {
+	if (message.quotedMessage?.media) {
+		return message.reply.withSticker(message.quotedMessage.media);
+	}
+	if (message.media) {
+		return message.reply.withSticker(message.media);
+	}
+	if (message.quotedMessage) {
+		return makeQuote(message);
+	}
+	message.reply.withTemplate('instructions_default');
 });
 
-const toImg = createMethod({
-	name: 'toimg',
-	args: {},
-	func: message => {
-		if (!message.quotedMessage?.media) {
-			return message.reply.withTemplate('instructions_toimg');
-		}
+const toImg = createMethod('toimg', message => {
+	if (!message.quotedMessage?.media) {
+		return message.reply.withTemplate('instructions_toimg');
+	}
 
-		return message.reply.withMedia(message.quotedMessage.media);
-	},
+	return message.reply.withMedia(message.quotedMessage.media);
 });
 
 const templatePath = './src/Handlers/Sticker/reply.kozz.md';

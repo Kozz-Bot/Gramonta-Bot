@@ -3,13 +3,9 @@ import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 import HoroscopeApi from 'src/API/HoroscopeAPI';
 import { normalizeString } from 'src/Utils/strings';
 
-const defaultMethod = createMethod({
-	name: 'default',
-	args: {},
-	func: async requester => {
-		requester.reply.withTemplate('Help');
-	},
-});
+const defaultMethod = createMethod('default', requester =>
+	requester.reply.withTemplate('Help')
+);
 
 const signs = [
 	'aries',
@@ -26,24 +22,20 @@ const signs = [
 	'sagitario',
 ];
 
-const getSign = createMethod({
-	name: 'fallback',
-	args: {},
-	func: async requester => {
-		const sign = normalizeString(requester.rawCommand.method);
-		if (!signs.includes(sign)) {
-			return requester.reply.withTemplate('NotFound');
-		}
+const getSign = createMethod('fallback', async requester => {
+	const sign = normalizeString(requester.rawCommand.method);
+	if (!signs.includes(sign)) {
+		return requester.reply.withTemplate('NotFound');
+	}
 
-		const horoscope = await HoroscopeApi.getDaily(sign);
-		if (!horoscope) {
-			return requester.reply.withTemplate('NotFound');
-		}
+	const horoscope = await HoroscopeApi.getDaily(sign);
+	if (!horoscope) {
+		return requester.reply.withTemplate('NotFound');
+	}
 
-		return requester.reply.withTemplate('Horoscope', {
-			horoscope,
-		});
-	},
+	return requester.reply.withTemplate('Horoscope', {
+		horoscope,
+	});
 });
 
 const templatePath = './src/Handlers/Horoscope/reply.kozz.md';

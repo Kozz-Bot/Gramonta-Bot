@@ -7,10 +7,9 @@ import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 
 const API = new OpenAPI();
 
-const image = createMethod({
-	name: 'image',
-	args: {},
-	func: usePremiumCommand(
+const image = createMethod(
+	'image',
+	usePremiumCommand(
 		10,
 		async requester => {
 			try {
@@ -31,13 +30,12 @@ const image = createMethod({
 			}
 		},
 		'Você não possui CalvoCoins suficientes para usar esse comando'
-	),
-});
+	)
+);
 
-const transcribe = createMethod({
-	name: 'transcribe',
-	args: {},
-	func: usePremiumCommand(
+const transcribe = createMethod(
+	'transcribe',
+	usePremiumCommand(
 		5,
 		async requester => {
 			try {
@@ -68,13 +66,12 @@ const transcribe = createMethod({
 			}
 		},
 		'Você não possui CalvoCoins suficientes para usar esse comando'
-	),
-});
+	)
+);
 
-const emojify = createMethod({
-	name: 'emojify',
-	args: {},
-	func: usePremiumCommand(
+const emojify = createMethod(
+	'emojify',
+	usePremiumCommand(
 		2,
 		async requester => {
 			try {
@@ -93,24 +90,16 @@ const emojify = createMethod({
 			}
 		},
 		'Você não possui CalvoCoins suficientes para usar esse comando'
-	),
-});
+	)
+);
 
-const fallbakck = createMethod({
-	name: 'fallback',
-	args: {},
-	func: async requester => {
-		requester.reply.withTemplate('Fallback');
-	},
-});
+const fallback = createMethod('fallback', requester =>
+	requester.reply.withTemplate('Fallback')
+);
 
-const help = createMethod({
-	name: 'help',
-	args: {},
-	func: async requester => {
-		requester.reply.withTemplate('Fallback');
-	},
-});
+const help = createMethod('fallback', requester =>
+	requester.reply.withTemplate('Fallback')
+);
 
 const templatePath = './src/Handlers/AI/messages.kozz.md';
 export const startAIHandler = () => {
@@ -121,7 +110,7 @@ export const startAIHandler = () => {
 		address: `${process.env.GATEWAY_URL}`,
 		methods: {
 			...image,
-			...fallbakck,
+			...fallback,
 			...help,
 			...transcribe,
 			...emojify,
