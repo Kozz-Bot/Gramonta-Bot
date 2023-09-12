@@ -11,3 +11,4 @@ export * from './Help';
 export * from './CalvoCoins';
 export * from './AI';
 export * from './Copypasta';
+export * from './CNPJ';

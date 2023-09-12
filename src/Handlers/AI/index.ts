@@ -93,13 +93,10 @@ const emojify = createMethod(
 	)
 );
 
-const fallback = createMethod('fallback', requester =>
-	requester.reply.withTemplate('Fallback')
-);
-
-const help = createMethod('fallback', requester =>
-	requester.reply.withTemplate('Fallback')
-);
+const fallback = createMethod('fallback', requester => {
+	console.log(requester.rawCommand);
+	requester.reply.withTemplate('Fallback');
+});
 
 const templatePath = './src/Handlers/AI/messages.kozz.md';
 export const startAIHandler = () => {
@@ -111,7 +108,6 @@ export const startAIHandler = () => {
 		methods: {
 			...image,
 			...fallback,
-			...help,
 			...transcribe,
 			...emojify,
 		},
