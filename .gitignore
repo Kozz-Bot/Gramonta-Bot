@@ -9,3 +9,4 @@ media/ytSongs/*
 media/ytVideos/*
 
 src/Handlers/CalvoCoins/diamonds.json
+src/Handlers/Copypasta/Copypastas.json

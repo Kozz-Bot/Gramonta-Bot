@@ -35,24 +35,26 @@ const firstSong = createMethod('song', async requester => {
 	try {
 		const query = requester.rawCommand.immediateArg;
 		if (!query) {
-			return requester.reply('No immediate arg');
+			return requester.reply.withTemplate('EmptyQuery');
 		}
 
 		const results = await YoutubeApi.searchResults(query);
 		if (!results) {
-			return requester.reply('No results');
+			return requester.reply.withTemplate('NoResults');
 		}
 
 		requester.react('⏳');
-		const mediaPath = await YoutubeApi.downloadVideoFromUrl(results.results[0].link);
+		const mediaPath = await YoutubeApi.downloadMp3FromUrl(results.results[0].link);
 		if (!mediaPath) {
-			return requester.reply('erro');
+			return requester.reply.withTemplate('Error', {
+				error: 'Falha ao salvar o arquivo',
+			});
 		}
 
-		requester.react('🎥');
+		requester.react('🎶');
 		requester.reply.withMedia.fromPath(
 			mediaPath,
-			'video',
+			'audio/webm',
 			`🎥 ${results.results[0].title}`
 		);
 	} catch (e) {
