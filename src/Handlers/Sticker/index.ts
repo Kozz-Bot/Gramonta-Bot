@@ -25,6 +25,7 @@ const makeQuote = async (requester: MessageObj) => {
 		fileName: `${text}.png`,
 		mimeType: 'image',
 		sizeInBytes: null,
+		transportType: 'b64',
 	};
 
 	requester.reply.withSticker(stickerMedia);

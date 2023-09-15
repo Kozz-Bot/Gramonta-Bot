@@ -12,3 +12,4 @@ export * from './CalvoCoins';
 export * from './AI';
 export * from './Copypasta';
 export * from './CNPJ';
+export * from './Tia';

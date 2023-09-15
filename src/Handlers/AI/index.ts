@@ -1,8 +1,7 @@
 import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
 import OpenAPI from 'src/API/OpenAi';
 import { usePremiumCommand } from 'src/Middlewares/Coins';
-import fs from 'fs/promises';
-import { convertB64ToB64, convertB64ToPath } from 'src/Utils/ffmpeg';
+import { convertB64ToPath } from 'src/Utils/ffmpeg';
 import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 
 const API = new OpenAPI();
@@ -27,6 +26,7 @@ const image = createMethod(
 				requester.reply.withMedia.fromB64(image, 'image');
 			} catch (e) {
 				requester.reply(`Erro: ${e}`);
+				return false;
 			}
 		},
 		'Você não possui CalvoCoins suficientes para usar esse comando'
@@ -63,6 +63,7 @@ const transcribe = createMethod(
 				return requester.reply(transcription.text);
 			} catch (e) {
 				requester.reply(`Erro: ${e}`);
+				return false;
 			}
 		},
 		'Você não possui CalvoCoins suficientes para usar esse comando'
@@ -87,6 +88,7 @@ const emojify = createMethod(
 				requester.reply(response);
 			} catch (e) {
 				requester.reply(`Erro: ${e}`);
+				return false;
 			}
 		},
 		'Você não possui CalvoCoins suficientes para usar esse comando'
