@@ -13,3 +13,4 @@ export * from './AI';
 export * from './Copypasta';
 export * from './CNPJ';
 export * from './Tia';
+export * from './News';

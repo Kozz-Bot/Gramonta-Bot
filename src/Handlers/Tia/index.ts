@@ -33,6 +33,10 @@ const queryMessage = createMethod('fallback', async requester => {
 	}
 });
 
+const help = createMethod('help', requester => {
+	requester.reply.withTemplate('Help');
+});
+
 const templatePath = 'src/Handlers/Tia/messages.kozz.md';
 
 export const startTiaHandler = () =>
@@ -42,6 +46,7 @@ export const startTiaHandler = () =>
 		address: `${process.env.GATEWAY_URL}`,
 		methods: {
 			...queryMessage,
+			...help,
 		},
 		templatePath,
 	}).resources.upsertResource('help', () =>

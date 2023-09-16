@@ -15,15 +15,15 @@ import {
  * @returns
  */
 export const usePremiumCommand =
-	(
+	<ArgsType = any>(
 		amount: number,
 		callback: (
 			requester: MessageObj,
-			args: Record<string, any>
+			args: ArgsType
 		) => boolean | void | Promise<boolean | void>,
 		errorMessage: string
 	) =>
-	async (requester: MessageObj, args: Record<string, any>) => {
+	async (requester: MessageObj, args: ArgsType) => {
 		const user = getUser(requester.rawCommand.message.contact.id);
 		const canUse = canUsePremiumCommand(user);
 
