@@ -1,43 +1,26 @@
 import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
-import { loadTemplates } from 'kozz-handler-maker/dist/Message';
-import OffenseAPI from 'src/API/OffendApi';
+import { MessageObj, loadTemplates } from 'kozz-handler-maker/dist/Message';
+import OffenseAPI, { OffenseResponse } from 'src/API/OffendApi';
 
 const [o, a, os, as] = ['o', 'a', 'os', 'as'].map(name =>
-	createMethod(name, async requester => {
+	createMethod(name, requester => {
 		try {
-			const offense = await OffenseAPI.getRandomOffense();
+			const person =
+				requester.rawCommand.taggedContacts.length > 0
+					? requester.rawCommand.taggedContacts[0].publicName
+					: requester.rawCommand.immediateArg;
 
-			const person = requester.rawCommand.immediateArg;
-			if (!person) {
-				return requester.reply.withTemplate('tagSomeone', {
-					offense: offense?.xingamento,
-				});
-			}
-
-			const curseVariant = ['curse1', 'curse2', 'curse3'].at(
-				Math.round(Math.random() * 2)
-			);
-
-			requester.reply.withTemplate(curseVariant!, {
-				contact: person,
-				offense: offense?.xingamento,
-			});
+			offendPerson(person, requester);
 		} catch (e) {
 			requester.reply(`${e}`);
 		}
 	})
 );
 
-const fallback = createMethod('fallback', async requester => {
-	const name = `${requester.rawCommand.method} ${
-		requester.rawCommand.immediateArg || ''
-	}`
-		.trim()
-		.replace('default', '');
-
+const offendPerson = async (person: string | null, requester: MessageObj) => {
 	const offense = await OffenseAPI.getRandomOffense();
 
-	if (!name) {
+	if (!person) {
 		return requester.reply.withTemplate('tagSomeone', {
 			offense: offense?.xingamento,
 		});
@@ -48,9 +31,22 @@ const fallback = createMethod('fallback', async requester => {
 	);
 
 	requester.reply.withTemplate(curseVariant!, {
-		contact: name,
+		contact: person,
 		offense: offense?.xingamento,
 	});
+};
+
+const fallback = createMethod('fallback', async requester => {
+	try {
+		const person =
+			requester.rawCommand.taggedContacts.length > 0
+				? requester.rawCommand.taggedContacts[0].publicName
+				: requester.rawCommand.query;
+
+		offendPerson(person, requester);
+	} catch (e) {
+		requester.reply(`${e}`);
+	}
 });
 
 const templatePath = './src/Handlers/Offend/reply.kozz.md';

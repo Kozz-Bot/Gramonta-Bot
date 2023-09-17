@@ -60,7 +60,7 @@ export const queryText = (
 		return '';
 	}
 
-	// Making sure i'm not indexing out of bounds with those ugly ternar
+	// Making sure i'm not indexing out of bounds with those ugly ternary expressions
 	const sanitizedLowerIndex =
 		lowerIndex! - wordsBefore < 0 ? 0 : lowerIndex! - wordsBefore;
 	const sanitizedHigherIndex =

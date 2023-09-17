@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 
-type OffenseResponse = {
+export type OffenseResponse = {
 	xingamento: string;
 };
 

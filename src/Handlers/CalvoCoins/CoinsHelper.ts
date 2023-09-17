@@ -80,12 +80,7 @@ export const spendCoins = (user: UserCoins, command: Command, amount = 1) => {
 
 	const coinsUsed: CoinUsed = {
 		amountUsed: user.premium ? 0 : amount,
-		commandPayload: {
-			boundaryId: command.boundaryId,
-			immediateArg: command.immediateArg,
-			method: command.method,
-			namedArgs: command.namedArgs,
-		},
+		commandPayload: command,
 		date: new Date().getTime(),
 		formattedDate: getFormattedDateAndTime(),
 		id: command.message.id,

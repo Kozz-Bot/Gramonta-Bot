@@ -4,11 +4,8 @@ import WeatherAPI from 'src/API/WeatherAPI';
 
 const queryWeather = createMethod('fallback', async requester => {
 	try {
-		const query = `${requester.rawCommand.method} ${
-			requester.rawCommand.immediateArg || ''
-		}`.trim();
+		const query = requester.rawCommand.query;
 
-		console.log('-', query, '-');
 		if (!query) {
 			requester.reply.withTemplate('Help');
 		}

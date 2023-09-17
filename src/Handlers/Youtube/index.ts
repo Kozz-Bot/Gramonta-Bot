@@ -6,7 +6,7 @@ const firstVideo = createMethod('video', async requester => {
 	try {
 		const query = requester.rawCommand.immediateArg;
 		if (!query) {
-			return requester.reply('No immediate arg');
+			return requester.reply.withTemplate('EmptyQuery');
 		}
 
 		const results = await YoutubeApi.searchResults(query);
