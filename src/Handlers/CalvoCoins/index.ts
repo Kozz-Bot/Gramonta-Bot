@@ -1,4 +1,4 @@
-import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { createModule, createMethod } from 'kozz-handler-maker';
 import userCoinsDB, { addTransaction, getUser } from './CoinsHelper';
 import { hostAccountOnly } from 'src/Middlewares/CheckContact';
 import { getFormattedDateAndTime } from 'src/Utils/date';
@@ -61,17 +61,18 @@ const makePremium = createMethod(
 const help = createMethod('help', requester => requester.reply.withTemplate('Help'));
 
 export const startCoinsHandler = () => {
-	createHandlerInstance({
-		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
-
+	createModule({
+		commands: {
+			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			methods: {
+				...getInfo,
+				...addCoins,
+				...makePremium,
+				...help,
+			},
+		},
 		name: 'coins',
 		address: `${process.env.GATEWAY_URL}`,
-		methods: {
-			...getInfo,
-			...addCoins,
-			...makePremium,
-			...help,
-		},
 		templatePath,
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')

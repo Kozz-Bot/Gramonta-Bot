@@ -1,4 +1,4 @@
-import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { createModule, createMethod } from 'kozz-handler-maker';
 
 const getHelp = createMethod('default', async requester => {
 	const allHandlers = await requester.ask.gateway('all_handlers');
@@ -25,11 +25,13 @@ const getHelp = createMethod('default', async requester => {
 });
 
 export const startHelpInstance = () =>
-	createHandlerInstance({
-		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+	createModule({
+		commands: {
+			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			methods: {
+				...getHelp,
+			},
+		},
 		name: 'help',
 		address: `${process.env.GATEWAY_URL}`,
-		methods: {
-			...getHelp,
-		},
 	});

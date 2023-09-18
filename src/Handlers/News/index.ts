@@ -1,4 +1,4 @@
-import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { createModule, createMethod } from 'kozz-handler-maker';
 import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 import { getHeadlines, searchNews } from 'src/API/NewsApi';
 import { usePremiumCommand } from 'src/Middlewares/Coins';
@@ -88,15 +88,17 @@ const help = createMethod('help', requester => {
 });
 
 export const startNewsHandler = () =>
-	createHandlerInstance({
-		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+	createModule({
+		commands: {
+			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			methods: {
+				...queryNews,
+				...getDaily,
+				...help,
+			},
+		},
 		name: 'news',
 		address: `${process.env.GATEWAY_URL}`,
-		methods: {
-			...queryNews,
-			...getDaily,
-			...help,
-		},
 		templatePath,
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')

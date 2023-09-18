@@ -1,4 +1,4 @@
-import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { createModule, createMethod } from 'kozz-handler-maker';
 import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 import { hostAccountOnly } from 'src/Middlewares/CheckContact';
 import { createAutoReveal } from 'src/Proxies/AutoReveal';
@@ -76,17 +76,18 @@ export const startRevealHandler = () => {
 		createAutoRevealMap(proxy);
 	});
 
-	createHandlerInstance({
-		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
-
+	createModule({
+		commands: {
+			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			methods: {
+				...defaultMethod,
+				...autoReveal,
+				...revealBlock,
+				...revealAllow,
+			},
+		},
 		name: 'reveal',
 		address: `${process.env.GATEWAY_URL}`,
-		methods: {
-			...defaultMethod,
-			...autoReveal,
-			...revealBlock,
-			...revealAllow,
-		},
 		templatePath,
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')

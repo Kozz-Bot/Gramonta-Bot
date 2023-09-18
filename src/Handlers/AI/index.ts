@@ -1,4 +1,4 @@
-import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { createModule, createMethod } from 'kozz-handler-maker';
 import OpenAPI from 'src/API/OpenAi';
 import { usePremiumCommand } from 'src/Middlewares/Coins';
 import { convertB64ToPath } from 'src/Utils/ffmpeg';
@@ -102,17 +102,18 @@ const fallback = createMethod('fallback', requester => {
 
 const templatePath = './src/Handlers/AI/messages.kozz.md';
 export const startAIHandler = () => {
-	createHandlerInstance({
-		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
-
+	createModule({
+		commands: {
+			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			methods: {
+				...image,
+				...fallback,
+				...transcribe,
+				...emojify,
+			},
+		},
 		name: 'ai',
 		address: `${process.env.GATEWAY_URL}`,
-		methods: {
-			...image,
-			...fallback,
-			...transcribe,
-			...emojify,
-		},
 		templatePath,
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')

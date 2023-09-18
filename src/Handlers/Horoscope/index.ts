@@ -1,4 +1,4 @@
-import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { createModule, createMethod } from 'kozz-handler-maker';
 import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 import HoroscopeApi from 'src/API/HoroscopeAPI';
 import { normalizeString } from 'src/Utils/strings';
@@ -41,14 +41,17 @@ const getSign = createMethod('fallback', async requester => {
 const templatePath = './src/Handlers/Horoscope/reply.kozz.md';
 
 export const startHoroscopeHandler = () =>
-	createHandlerInstance({
-		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+	createModule({
+		commands: {
+			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			methods: {
+				...defaultMethod,
+				...getSign,
+			},
+		},
 		name: 'horoscopo',
 		address: `${process.env.GATEWAY_URL}`,
-		methods: {
-			...defaultMethod,
-			...getSign,
-		},
+
 		templatePath,
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')

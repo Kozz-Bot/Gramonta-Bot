@@ -1,4 +1,4 @@
-import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { createModule, createMethod } from 'kozz-handler-maker';
 import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 import WeatherAPI from 'src/API/WeatherAPI';
 
@@ -38,13 +38,15 @@ const queryWeather = createMethod('fallback', async requester => {
 const templatePath = 'src/Handlers/Weather/messages.kozz.md';
 
 export const startWeatherHandler = () =>
-	createHandlerInstance({
-		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+	createModule({
+		commands: {
+			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			methods: {
+				...queryWeather,
+			},
+		},
 		name: 'clima',
 		address: `${process.env.GATEWAY_URL}`,
-		methods: {
-			...queryWeather,
-		},
 		templatePath,
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')

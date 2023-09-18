@@ -1,4 +1,4 @@
-import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { createModule, createMethod } from 'kozz-handler-maker';
 import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 import * as YoutubeApi from 'src/API/YoutubeAPI';
 
@@ -69,15 +69,17 @@ const help = createMethod('fallback', requester =>
 const templatePath = 'src/Handlers/Youtube/messages.kozz.md';
 
 export const startYoutubeHandler = () =>
-	createHandlerInstance({
-		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+	createModule({
+		commands: {
+			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			methods: {
+				...firstSong,
+				...firstVideo,
+				...help,
+			},
+		},
 		name: 'yt',
 		address: `${process.env.GATEWAY_URL}`,
-		methods: {
-			...firstSong,
-			...firstVideo,
-			...help,
-		},
 		templatePath,
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')

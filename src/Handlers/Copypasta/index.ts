@@ -1,4 +1,4 @@
-import { MethodMap, createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { MethodMap, createMethod, createModule } from 'kozz-handler-maker';
 import { loadTemplates } from 'kozz-handler-maker/dist/Message';
 import {
 	addCopypasta,
@@ -166,18 +166,20 @@ const del = createMethod('delete', requester => {
 });
 
 export const startCopypastaHandler = () =>
-	createHandlerInstance({
-		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+	createModule({
+		commands: {
+			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			methods: {
+				...help,
+				...list,
+				...add,
+				...get,
+				...del,
+				...search,
+			},
+		},
 		name: 'copypasta',
 		address: `${process.env.GATEWAY_URL}`,
-		methods: {
-			...help,
-			...list,
-			...add,
-			...get,
-			...del,
-			...search,
-		},
 		templatePath,
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')

@@ -1,4 +1,4 @@
-import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { createModule, createMethod } from 'kozz-handler-maker';
 import { MessageObj, loadTemplates } from 'kozz-handler-maker/dist/Message';
 import OffenseAPI, { OffenseResponse } from 'src/API/OffendApi';
 
@@ -52,18 +52,20 @@ const fallback = createMethod('fallback', async requester => {
 const templatePath = './src/Handlers/Offend/reply.kozz.md';
 
 export const startOffenseHandler = () =>
-	createHandlerInstance({
-		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+	createModule({
+		commands: {
+			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			methods: {
+				...o,
+				...a,
+				...os,
+				...as,
+				...fallback,
+			},
+		},
 
 		name: 'ofenda',
 		address: `${process.env.GATEWAY_URL}`,
-		methods: {
-			...o,
-			...a,
-			...os,
-			...as,
-			...fallback,
-		},
 		templatePath,
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')

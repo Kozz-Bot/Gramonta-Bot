@@ -1,8 +1,8 @@
-import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { createModule, createMethod } from 'kozz-handler-maker';
 
 const messageInfo = createMethod('default', requester => {
 	const {
-		boundaryId,
+		boundaryName,
 		contact,
 		from,
 		id,
@@ -14,7 +14,7 @@ const messageInfo = createMethod('default', requester => {
 	const response = [
 		`Contact Info: \`\`\`${JSON.stringify(contact, undefined, '  ')}\`\`\``,
 		``,
-		`Boundary ID: ${boundaryId}`,
+		`Boundary Name: ${boundaryName}`,
 		`Message ID: ${id}`,
 		`From (requester ID): ${from}`,
 		`To (receiver ID): ${to}`,
@@ -28,11 +28,13 @@ const messageInfo = createMethod('default', requester => {
 });
 
 export const startDebugHandler = () =>
-	createHandlerInstance({
-		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+	createModule({
+		commands: {
+			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			methods: {
+				...messageInfo,
+			},
+		},
 		name: 'debug',
 		address: `${process.env.GATEWAY_URL}`,
-		methods: {
-			...messageInfo,
-		},
 	});

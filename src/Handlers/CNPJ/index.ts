@@ -1,4 +1,4 @@
-import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { createModule, createMethod } from 'kozz-handler-maker';
 import APIBrasil from 'src/API/APIBrasil';
 import { usePremiumCommand } from 'src/Middlewares/Coins';
 
@@ -38,11 +38,13 @@ const getCnpj = createMethod(
 );
 
 export const startCNPJInstance = () =>
-	createHandlerInstance({
-		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+	createModule({
+		commands: {
+			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			methods: {
+				...getCnpj,
+			},
+		},
 		name: 'cnpj',
 		address: `${process.env.GATEWAY_URL}`,
-		methods: {
-			...getCnpj,
-		},
 	});

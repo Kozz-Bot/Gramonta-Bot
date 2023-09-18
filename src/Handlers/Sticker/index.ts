@@ -1,4 +1,4 @@
-import { createHandlerInstance, createMethod } from 'kozz-handler-maker';
+import { createModule, createMethod } from 'kozz-handler-maker';
 import { MessageObj, loadTemplates } from 'kozz-handler-maker/dist/Message';
 import { Media } from 'kozz-types';
 import { generateQuote } from 'src/API/QuoteApi';
@@ -55,14 +55,16 @@ const toImg = createMethod('toimg', message => {
 const templatePath = './src/Handlers/Sticker/reply.kozz.md';
 
 export const startStickerHandler = () =>
-	createHandlerInstance({
-		boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+	createModule({
+		commands: {
+			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			methods: {
+				...defaultMethod,
+				...toImg,
+			},
+		},
 		name: 's',
 		address: `${process.env.GATEWAY_URL}`,
-		methods: {
-			...defaultMethod,
-			...toImg,
-		},
 		templatePath,
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')
