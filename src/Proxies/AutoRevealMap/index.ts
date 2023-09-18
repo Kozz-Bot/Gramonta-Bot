@@ -1,5 +1,5 @@
-import { createModule } from 'kozz-handler-maker';
-import { bold } from 'kozz-handler-maker/dist/Message';
+import { createModule } from 'kozz-module-maker';
+import { bold } from 'kozz-module-maker/dist/Message';
 
 export type RevealMapProxy = {
 	id: string;

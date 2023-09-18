@@ -1,9 +1,9 @@
-import { createModule, createMethod } from 'kozz-handler-maker';
+import { createModule, createMethod } from 'kozz-module-maker';
 import userCoinsDB, { addTransaction, getUser } from './CoinsHelper';
 import { hostAccountOnly } from 'src/Middlewares/CheckContact';
 import { getFormattedDateAndTime } from 'src/Utils/date';
 import { usePremiumCommand } from 'src/Middlewares/Coins';
-import { loadTemplates } from 'kozz-handler-maker/dist/Message';
+import { loadTemplates } from 'kozz-module-maker/dist/Message';
 
 const templatePath = './src/Handlers/CalvoCoins/messages.kozz.md';
 

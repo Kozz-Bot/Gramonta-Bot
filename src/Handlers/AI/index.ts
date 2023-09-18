@@ -1,8 +1,8 @@
-import { createModule, createMethod } from 'kozz-handler-maker';
+import { createModule, createMethod } from 'kozz-module-maker';
 import OpenAPI from 'src/API/OpenAi';
 import { usePremiumCommand } from 'src/Middlewares/Coins';
 import { convertB64ToPath } from 'src/Utils/ffmpeg';
-import { loadTemplates } from 'kozz-handler-maker/dist/Message';
+import { loadTemplates } from 'kozz-module-maker/dist/Message';
 
 const API = new OpenAPI();
 

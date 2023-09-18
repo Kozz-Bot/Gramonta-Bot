@@ -1,5 +1,5 @@
 Arguments: 
-  /home/guigalleta/.nvm/versions/node/v19.0.1/bin/node /usr/local/bin/yarn add /home/guigalleta/Projects/Kozz/kozz-handler-maker
+  /home/guigalleta/.nvm/versions/node/v19.0.1/bin/node /usr/local/bin/yarn add /home/guigalleta/Projects/Kozz/kozz-module-maker
 
 PATH: 
   /home/guigalleta/.vscode-server/bin/660393deaaa6d1996740ff4880f1bad43768c814/bin/remote-cli:/home/guigalleta/.local/bin:/home/guigalleta/.nvm/versions/node/v19.0.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin/home/guigalleta/.yarn/bin/bash/snap/bin/home/guigalleta/.yarn/bin/home/guigalleta/.yarn/bin/bash/snap/bin
@@ -14,7 +14,7 @@ Platform:
   linux x64
 
 Trace: 
-  Error: ENOSPC: no space left on device, copyfile '/home/guigalleta/Projects/Kozz/kozz-handler-maker/node_modules/kozz-types/node_modules/kozz-types/node_modules/kozz-types/node_modules/shell-quote/test/set.js' -> '/home/guigalleta/.cache/yarn/v6/npm-kozz-handler-maker-1.0.0-7e3da16e-dd83-4733-b726-ecf717f125e6-1690414899736/node_modules/kozz-handler-maker/node_modules/kozz-types/node_modules/kozz-types/node_modules/kozz-types/node_modules/shell-quote/test/set.js'
+  Error: ENOSPC: no space left on device, copyfile '/home/guigalleta/Projects/Kozz/kozz-module-maker/node_modules/kozz-types/node_modules/kozz-types/node_modules/kozz-types/node_modules/shell-quote/test/set.js' -> '/home/guigalleta/.cache/yarn/v6/npm-kozz-module-maker-1.0.0-7e3da16e-dd83-4733-b726-ecf717f125e6-1690414899736/node_modules/kozz-module-maker/node_modules/kozz-types/node_modules/kozz-types/node_modules/kozz-types/node_modules/shell-quote/test/set.js'
 
 npm manifest: 
   {

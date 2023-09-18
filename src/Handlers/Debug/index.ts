@@ -1,4 +1,4 @@
-import { createModule, createMethod } from 'kozz-handler-maker';
+import { createModule, createMethod } from 'kozz-module-maker';
 
 const messageInfo = createMethod('default', requester => {
 	const {

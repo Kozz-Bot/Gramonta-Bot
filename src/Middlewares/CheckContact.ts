@@ -1,4 +1,4 @@
-import { MessageObj } from 'kozz-handler-maker/dist/Message';
+import { MessageObj } from 'kozz-module-maker/dist/Message';
 
 export const hostAccountOnly =
 	<T>(

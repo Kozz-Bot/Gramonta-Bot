@@ -1,5 +1,5 @@
-import { createModule, createMethod } from 'kozz-handler-maker';
-import { loadTemplates } from 'kozz-handler-maker/dist/Message';
+import { createModule, createMethod } from 'kozz-module-maker';
+import { loadTemplates } from 'kozz-module-maker/dist/Message';
 import { hostAccountOnly } from 'src/Middlewares/CheckContact';
 import { createAutoReveal } from 'src/Proxies/AutoReveal';
 import { RevealMapProxy, createAutoRevealMap } from 'src/Proxies/AutoRevealMap';

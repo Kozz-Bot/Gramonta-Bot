@@ -1,5 +1,5 @@
-import { MethodMap, createMethod, createModule } from 'kozz-handler-maker';
-import { loadTemplates } from 'kozz-handler-maker/dist/Message';
+import { MethodMap, createMethod, createModule } from 'kozz-module-maker';
+import { loadTemplates } from 'kozz-module-maker/dist/Message';
 import {
 	addCopypasta,
 	deleteCopypastaById,

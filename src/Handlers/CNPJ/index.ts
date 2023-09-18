@@ -1,4 +1,4 @@
-import { createModule, createMethod } from 'kozz-handler-maker';
+import { createModule, createMethod } from 'kozz-module-maker';
 import APIBrasil from 'src/API/APIBrasil';
 import { usePremiumCommand } from 'src/Middlewares/Coins';
 

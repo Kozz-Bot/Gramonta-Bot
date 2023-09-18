@@ -1,5 +1,5 @@
-import { createModule, createMethod } from 'kozz-handler-maker';
-import { MessageObj, loadTemplates } from 'kozz-handler-maker/dist/Message';
+import { createModule, createMethod } from 'kozz-module-maker';
+import { MessageObj, loadTemplates } from 'kozz-module-maker/dist/Message';
 import { Media } from 'kozz-types';
 import { generateQuote } from 'src/API/QuoteApi';
 

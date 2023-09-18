@@ -1,5 +1,5 @@
-import { createModule } from 'kozz-handler-maker';
-import { MessageObj } from 'kozz-handler-maker/dist/Message';
+import { createModule } from 'kozz-module-maker';
+import { MessageObj } from 'kozz-module-maker/dist/Message';
 
 export const createAutoReveal = (msgObject: MessageObj) => {
 	const chatId = msgObject.rawCommand.message.fromHostAccount

@@ -1,4 +1,4 @@
-import { createModule, createMethod } from 'kozz-handler-maker';
+import { createModule, createMethod } from 'kozz-module-maker';
 
 const getHelp = createMethod('default', async requester => {
 	const allHandlers = await requester.ask.gateway('all_handlers');

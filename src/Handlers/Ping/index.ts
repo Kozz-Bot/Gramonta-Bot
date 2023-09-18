@@ -1,5 +1,5 @@
-import { createModule, createMethod } from 'kozz-handler-maker';
-import { loadTemplates } from 'kozz-handler-maker/dist/Message';
+import { createModule, createMethod } from 'kozz-module-maker';
+import { loadTemplates } from 'kozz-module-maker/dist/Message';
 
 const defaultMethod = createMethod('default', requester => {
 	const now = new Date().getTime();

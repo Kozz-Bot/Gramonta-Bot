@@ -1,4 +1,4 @@
-import { createModule, createMethod } from 'kozz-handler-maker';
+import { createModule, createMethod } from 'kozz-module-maker';
 
 const defaultMethod = createMethod('default', requester => {
 	if (!requester.quotedMessage) {
