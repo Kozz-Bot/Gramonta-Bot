@@ -14,9 +14,9 @@ export const createAutoRevealMap = ({ from, to, boundaryId }: RevealMapProxy) =>
 		name: `auto-reveal-map-${from}`,
 		proxy: {
 			source: `${boundaryId}/${from}`,
-			onMessage: msg => {
-				if (msg.isViewOnce) {
-					const { contact, body, groupName } = msg.rawCommand.message;
+			onMessage: requester => {
+				if (requester.message.isViewOnce) {
+					const { contact, body, groupName } = requester.message;
 
 					const caption = [
 						`Quem enviou: ${bold(`${contact.publicName} / ${contact.privateName}`)}`,
@@ -25,7 +25,7 @@ export const createAutoRevealMap = ({ from, to, boundaryId }: RevealMapProxy) =>
 						`Legenda: ${body}`,
 					].join('\n');
 
-					instance.sendMessage.withMedia(to, caption, boundaryId, msg.media!);
+					instance.sendMessage.withMedia(to, caption, boundaryId, requester.message.media!);
 				}
 			},
 		},

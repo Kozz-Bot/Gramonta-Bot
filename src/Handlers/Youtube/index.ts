@@ -4,7 +4,7 @@ import * as YoutubeApi from 'src/API/YoutubeAPI';
 
 const firstVideo = createMethod('video', async requester => {
 	try {
-		const query = requester.rawCommand.immediateArg;
+		const query = requester.rawCommand!.immediateArg;
 		if (!query) {
 			return requester.reply.withTemplate('EmptyQuery');
 		}
@@ -33,7 +33,7 @@ const firstVideo = createMethod('video', async requester => {
 
 const firstSong = createMethod('song', async requester => {
 	try {
-		const query = requester.rawCommand.immediateArg;
+		const query = requester.rawCommand!.immediateArg;
 		if (!query) {
 			return requester.reply.withTemplate('EmptyQuery');
 		}

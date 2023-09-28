@@ -1,16 +1,16 @@
 import { createModule, createMethod } from 'kozz-module-maker';
 
 const defaultMethod = createMethod('default', requester => {
-	if (!requester.quotedMessage) {
+	if (!requester.message.quotedMessage) {
 		return requester.reply.withTemplate('instructions');
 	}
 
-	if (!requester.quotedMessage.media) {
+	if (!requester.message.quotedMessage.media) {
 		return requester.reply.withTemplate('error', {
 			error: 'Erro: O bot não conseguiu encontrar mídia na mensagem',
 		});
 	}
-	return requester.reply.withMedia(requester.quotedMessage.media);
+	return requester.reply.withMedia(requester.message.quotedMessage.media);
 });
 
 export const startGetStatusHandler = () =>

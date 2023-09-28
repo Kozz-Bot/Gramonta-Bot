@@ -4,17 +4,20 @@ import { Media } from 'kozz-types';
 import { generateQuote } from 'src/API/QuoteApi';
 
 const makeQuote = async (requester: MessageObj) => {
-	if (!requester.quotedMessage || !requester.quotedMessage.body) {
+	const {quotedMessage} = requester.message;
+	
+	if (!quotedMessage || !quotedMessage.body) {
 		return requester.reply.withTemplate('Help');
 	}
 
-	const text = requester.quotedMessage.body;
-	const name = requester.quotedMessage.contact.publicName;
+	const text = quotedMessage.body;
+	const name = quotedMessage.contact.publicName;
+
 	const profilePicUrl = await requester.ask.boundary(
 		'Gramonta-Wa',
 		'contact_profile_pic',
 		{
-			id: requester.quotedMessage.from,
+			id: quotedMessage.from,
 		}
 	);
 
@@ -31,25 +34,28 @@ const makeQuote = async (requester: MessageObj) => {
 	requester.reply.withSticker(stickerMedia);
 };
 
-const defaultMethod = createMethod('default', message => {
-	if (message.quotedMessage?.media) {
-		return message.reply.withSticker(message.quotedMessage.media);
+const defaultMethod = createMethod('default', (requester) => {
+	const {quotedMessage, media} = requester.message
+
+	if (quotedMessage?.media) {
+		return requester.reply.withSticker(quotedMessage.media);
 	}
-	if (message.media) {
-		return message.reply.withSticker(message.media);
+	if (media) {
+		return requester.reply.withSticker(media);
 	}
-	if (message.quotedMessage) {
-		return makeQuote(message);
+	if (quotedMessage) {
+		return makeQuote(requester);
 	}
-	message.reply.withTemplate('instructions_default');
+
+	requester.reply.withTemplate('instructions_default');
 });
 
 const toImg = createMethod('toimg', message => {
-	if (!message.quotedMessage?.media) {
+	if (!message.message.quotedMessage?.media) {
 		return message.reply.withTemplate('instructions_toimg');
 	}
 
-	return message.reply.withMedia(message.quotedMessage.media);
+	return message.reply.withMedia(message.message.quotedMessage.media);
 });
 
 const templatePath = './src/Handlers/Sticker/reply.kozz.md';

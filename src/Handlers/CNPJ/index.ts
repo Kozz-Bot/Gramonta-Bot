@@ -13,7 +13,7 @@ const getCnpj = createMethod(
 					`${num}{2}.?${num}{3}.?${num}{3}/?${num}{4}-?${num}{2}`
 				);
 
-				const cnpj = requester.rawCommand.method.match(cpfRegex);
+				const cnpj = requester.rawCommand!.method.match(cpfRegex);
 
 				if (!cnpj) {
 					requester.reply('Forneça um CNPJ no formato 00.000.000/0000-00');

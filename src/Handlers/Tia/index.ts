@@ -4,7 +4,7 @@ import TiApi, { TiaMessage } from 'src/API/TiApi';
 
 const queryMessage = createMethod('fallback', async requester => {
 	try {
-		const query = requester.rawCommand.query;
+		const query = requester.rawCommand!.query;
 
 		if (!query) {
 			requester.reply.withTemplate('Help');

@@ -13,9 +13,7 @@ const queryNews = createMethod(
 		10,
 		async (requester, args) => {
 			try {
-				const query = `${requester.rawCommand.method} ${
-					requester.rawCommand.immediateArg || ''
-				}`.trim();
+				const query = requester.rawCommand?.query;
 
 				if (!query) {
 					requester.reply.withTemplate('Help');

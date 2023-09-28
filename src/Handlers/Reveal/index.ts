@@ -12,30 +12,32 @@ const RevealMapDB = useJsonDB<RevealMapProxy, 'map'>(
 );
 
 const defaultMethod = createMethod('default', requester => {
-	if (revealBlockDB.getEntityById(requester.rawCommand.message.to)) {
+	const {quotedMessage} = requester.message;
+
+	if (revealBlockDB.getEntityById(requester.message.to)) {
 		return requester.reply('Revelação de mídia desabilitada nesse grupo');
 	}
 
-	if (!requester.quotedMessage) {
+	if (!quotedMessage) {
 		return requester.reply.withTemplate('Help');
 	}
 
-	if (!requester.quotedMessage.isViewOnce) {
+	if (!quotedMessage.isViewOnce) {
 		return requester.reply.withTemplate('error', {
 			error: 'Apenas mensagens de visualização única podem ser reveladas',
 		});
 	}
 
 	if (
-		requester.quotedMessage.messageType === 'IMAGE' ||
-		requester.quotedMessage.messageType === 'VIDEO'
+		quotedMessage.messageType === 'IMAGE' ||
+		quotedMessage.messageType === 'VIDEO'
 	) {
-		if (!requester.quotedMessage.media) {
+		if (!quotedMessage.media) {
 			return requester.reply.withTemplate('error', {
 				error: 'Erro: O bot não conseguiu encontrar mídia na mensagem',
 			});
 		}
-		return requester.reply.withMedia(requester.quotedMessage.media);
+		return requester.reply.withMedia(quotedMessage.media);
 	}
 });
 
@@ -55,7 +57,7 @@ const revealBlock = createMethod(
 	hostAccountOnly(requester => {
 		const revealBlockDB = useJsonDB('block', './src/Handlers/Reveal/revealDB.json');
 		revealBlockDB.addEntity({
-			id: requester.rawCommand.message.to,
+			id: requester.message.to,
 		});
 		requester.reply('Revelação de mensagens desativada nesse grupo');
 	})
@@ -65,7 +67,7 @@ const revealAllow = createMethod(
 	'allow',
 	hostAccountOnly(requester => {
 		const revealBlockDB = useJsonDB('block', './src/Handlers/Reveal/revealDB.json');
-		revealBlockDB.removeEntity(requester.rawCommand.message.to);
+		revealBlockDB.removeEntity(requester.message.to);
 		requester.reply('Revelação de mensagens reativada nesse grupo');
 	})
 );

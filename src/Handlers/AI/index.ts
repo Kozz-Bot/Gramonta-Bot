@@ -12,7 +12,7 @@ const image = createMethod(
 		10,
 		async requester => {
 			try {
-				const prompt = requester.rawCommand.immediateArg;
+				const prompt = requester.rawCommand!.immediateArg;
 
 				if (!prompt) {
 					requester.reply.withTemplate('EmptyPrompt');
@@ -39,14 +39,14 @@ const transcribe = createMethod(
 		5,
 		async requester => {
 			try {
-				if (!requester.quotedMessage?.media) {
+				if (!requester.message.quotedMessage?.media) {
 					requester.reply.withTemplate('TranscribeNeedsQuote');
 					return false;
 				}
 
 				requester.react('⏳');
 				const tempFilepath = await convertB64ToPath(
-					requester.quotedMessage.media.data,
+					requester.message.quotedMessage.media.data,
 					'opus',
 					'mp3'
 				);
@@ -55,8 +55,8 @@ const transcribe = createMethod(
 
 				requester.react('✏');
 
-				if (requester.rawCommand.namedArgs?.emoji) {
-					const response = await API.emojify(`${requester.quotedMessage.body}`);
+				if (requester.rawCommand!.namedArgs?.emoji) {
+					const response = await API.emojify(`${requester.message.quotedMessage.body}`);
 
 					return requester.reply(response);
 				}
@@ -76,14 +76,14 @@ const emojify = createMethod(
 		2,
 		async requester => {
 			try {
-				if (!requester.quotedMessage?.body) {
+				if (!requester.message.quotedMessage?.body) {
 					requester.reply.withTemplate('TranscribeNeedsQuote');
 					return false;
 				}
 
 				requester.react('⏳');
 
-				const response = await API.emojify(`${requester.quotedMessage.body}`);
+				const response = await API.emojify(`${requester.message.quotedMessage.body}`);
 
 				requester.reply(response);
 			} catch (e) {

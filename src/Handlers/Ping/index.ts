@@ -3,7 +3,7 @@ import { loadTemplates } from 'kozz-module-maker/dist/Message';
 
 const defaultMethod = createMethod('default', requester => {
 	const now = new Date().getTime();
-	const requestTime = requester.rawCommand.message.timestamp;
+	const requestTime = requester.message.timestamp;
 	const difference = (now - requestTime!) / 1000;
 
 	requester.reply.withTemplate('pong', {

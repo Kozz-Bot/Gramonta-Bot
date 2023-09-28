@@ -6,7 +6,7 @@ export const hostAccountOnly =
 		errorMessage: string = 'Apenas o dono do bot pode usar esse comando'
 	) =>
 	(requester: MessageObj, args: T) => {
-		if (!requester.rawCommand.message.fromHostAccount) {
+		if (!requester.rawCommand!.message.fromHostAccount) {
 			requester.reply(errorMessage);
 		} else {
 			callback(requester, args);

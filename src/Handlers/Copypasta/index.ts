@@ -39,24 +39,24 @@ const list = createMethod('list', async requester => {
 });
 
 const add = createMethod('add', requester => {
-	if (!requester.quotedMessage) {
+	if (!requester.message.quotedMessage) {
 		return requester.reply.withTemplate('NeedsQuote');
 	}
-	if (requester.quotedMessage.messageType !== 'TEXT') {
+	if (requester.message.quotedMessage.messageType !== 'TEXT') {
 		return requester.reply.withTemplate('NeedsBody');
 	}
-	if (!requester.rawCommand.immediateArg) {
+	if (!requester.rawCommand!.immediateArg) {
 		return requester.reply.withTemplate('NeedsName');
 	}
 
-	const contact = requester.rawCommand.message.contact;
-	const name = requester.rawCommand.immediateArg;
+	const contact = requester.rawCommand!.message.contact;
+	const name = requester.rawCommand!.immediateArg;
 
 	addCopypasta({
 		id: name,
-		text: requester.quotedMessage.body,
+		text: requester.message.quotedMessage.body,
 		userIdWhoAdded: contact.id,
-		chatId: requester.rawCommand.message.to,
+		chatId: requester.message.to,
 	});
 
 	requester.reply.withTemplate('CopypastaAdded', { name });
@@ -65,7 +65,7 @@ const add = createMethod('add', requester => {
 const search = createMethod(
 	'search',
 	async (requester, args) => {
-		const query = requester.rawCommand.immediateArg;
+		const query = requester.rawCommand!.immediateArg;
 
 		if (!query) {
 			return requester.reply.withTemplate('NeedsQuery');
@@ -109,8 +109,8 @@ const search = createMethod(
 );
 
 const get = createMethod('fallback', requester => {
-	const query = `${requester.rawCommand.method} ${
-		requester.rawCommand.immediateArg || ''
+	const query = `${requester.rawCommand!.method} ${
+		requester.rawCommand!.immediateArg || ''
 	}`.trim();
 
 	if (!query) {
@@ -135,17 +135,17 @@ const get = createMethod('fallback', requester => {
 });
 
 const del = createMethod('delete', requester => {
-	if (!requester.rawCommand.immediateArg) {
+	if (!requester.rawCommand!.immediateArg) {
 		return requester.reply.withTemplate('NeedsNameOrNumber');
 	}
 
-	const isNumber = requester.rawCommand.immediateArg.match(/^(\d)+/);
+	const isNumber = requester.rawCommand!.immediateArg.match(/^(\d)+/);
 
 	const copypasta = (() => {
 		if (isNumber) {
-			return getCopypastaByIndex(Number(requester.rawCommand.immediateArg));
+			return getCopypastaByIndex(Number(requester.rawCommand!.immediateArg));
 		} else {
-			return getCopypastaById(requester.rawCommand.immediateArg);
+			return getCopypastaById(requester.rawCommand!.immediateArg);
 		}
 	})();
 
@@ -154,8 +154,8 @@ const del = createMethod('delete', requester => {
 	}
 
 	if (
-		!idCompare(copypasta.userIdWhoAdded, requester.rawCommand.message.from) &&
-		!requester.rawCommand.message.fromHostAccount
+		!idCompare(copypasta.userIdWhoAdded, requester.rawCommand!.message.from) &&
+		!requester.rawCommand!.message.fromHostAccount
 	) {
 		return requester.reply.withTemplate('NotCopypastaOwner');
 	}

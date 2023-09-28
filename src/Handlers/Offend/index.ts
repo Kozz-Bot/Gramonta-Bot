@@ -6,9 +6,9 @@ const [o, a, os, as] = ['o', 'a', 'os', 'as'].map(name =>
 	createMethod(name, requester => {
 		try {
 			const person =
-				requester.rawCommand.taggedContacts.length > 0
-					? requester.rawCommand.taggedContacts[0].publicName
-					: requester.rawCommand.immediateArg;
+				requester.rawCommand!.taggedContacts.length > 0
+					? requester.rawCommand!.taggedContacts[0].publicName
+					: requester.rawCommand!.immediateArg;
 
 			offendPerson(person, requester);
 		} catch (e) {
@@ -39,9 +39,9 @@ const offendPerson = async (person: string | null, requester: MessageObj) => {
 const fallback = createMethod('fallback', async requester => {
 	try {
 		const person =
-			requester.rawCommand.taggedContacts.length > 0
-				? requester.rawCommand.taggedContacts[0].publicName
-				: requester.rawCommand.query;
+			requester.rawCommand!.taggedContacts.length > 0
+				? requester.rawCommand!.taggedContacts[0].publicName
+				: requester.rawCommand!.query;
 
 		offendPerson(person, requester);
 	} catch (e) {

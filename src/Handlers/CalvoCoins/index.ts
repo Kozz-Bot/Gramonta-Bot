@@ -7,12 +7,12 @@ import { loadTemplates } from 'kozz-module-maker/dist/Message';
 
 const templatePath = './src/Handlers/CalvoCoins/messages.kozz.md';
 
-const getInfo = createMethod('default', message => {
+const getInfo = createMethod('default', requester => {
 	// Getting all relevant data
-	const { id, publicName } = message.rawCommand.message.contact;
+	const { id, publicName } = requester.message.contact;
 	const { coins, premium } = getUser(id);
 
-	message.reply.withTemplate('Info', {
+	requester.reply.withTemplate('Info', {
 		name: publicName,
 		coins,
 		premium: premium ? 'Sim' : 'Não',
@@ -22,8 +22,8 @@ const getInfo = createMethod('default', message => {
 const addCoins = createMethod(
 	'add',
 	hostAccountOnly(requester => {
-		const quotedUser = requester.rawCommand.message.quotedMessage?.from;
-		const amount = requester.rawCommand.immediateArg;
+		const quotedUser = requester.message.quotedMessage?.from;
+		const amount = requester.rawCommand?.immediateArg;
 
 		if (!quotedUser) return;
 		if (!amount) return;
@@ -43,7 +43,7 @@ const addCoins = createMethod(
 const makePremium = createMethod(
 	'premium',
 	hostAccountOnly(requester => {
-		const quotedUser = requester.rawCommand.message.quotedMessage?.from;
+		const quotedUser = requester.message.quotedMessage?.from;
 		if (!quotedUser) return;
 
 		addTransaction(quotedUser, {

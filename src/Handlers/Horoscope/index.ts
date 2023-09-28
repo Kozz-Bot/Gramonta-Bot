@@ -23,7 +23,7 @@ const signs = [
 ];
 
 const getSign = createMethod('fallback', async requester => {
-	const sign = normalizeString(requester.rawCommand.method);
+	const sign = normalizeString(requester.rawCommand!.method);
 	if (!signs.includes(sign)) {
 		return requester.reply.withTemplate('NotFound');
 	}

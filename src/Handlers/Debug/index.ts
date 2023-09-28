@@ -10,7 +10,7 @@ const messageInfo = createMethod('default', requester => {
 		groupName,
 		fromHostAccount,
 		to,
-	} = requester.rawCommand.message.quotedMessage || requester.rawCommand.message;
+	} = requester.rawCommand!.message.quotedMessage || requester.message;
 	const response = [
 		`Contact Info: \`\`\`${JSON.stringify(contact, undefined, '  ')}\`\`\``,
 		``,

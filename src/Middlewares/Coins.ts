@@ -24,7 +24,7 @@ export const usePremiumCommand =
 		errorMessage: string
 	) =>
 	async (requester: MessageObj, args: ArgsType) => {
-		const user = getUser(requester.rawCommand.message.contact.id);
+		const user = getUser(requester.message.contact.id);
 		const canUse = canUsePremiumCommand(user);
 
 		if (!canUse) {
@@ -37,6 +37,6 @@ export const usePremiumCommand =
 		if (shouldDeductCoins === false) {
 			return;
 		} else {
-			spendCoins(user, requester.rawCommand, amount);
+			spendCoins(user, requester.rawCommand!, amount);
 		}
 	};

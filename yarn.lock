@@ -845,8 +845,10 @@ klaw-sync@^6.0.0:
   dependencies:
     graceful-fs "^4.1.11"
 
-kozz-module-maker@/home/guigalleta/Projects/Kozz/kozz-module-maker:
-  version "1.0.0"
+kozz-module-maker@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/kozz-module-maker/-/kozz-module-maker-0.1.2.tgz#22ca171f80ad1f113c055c24744c181331a689f5"
+  integrity sha512-Za8Hl4euw3ZPXOoQkuIVQAqz9ouumMO/QsoVOxnYcCkuLndqoAW0IxGhp1ULkPwUDNXpfIdnsmPF+c1yUST8EQ==
   dependencies:
     arcsecond "^5.0.0"
     dotenv "^16.0.3"
@@ -854,8 +856,10 @@ kozz-module-maker@/home/guigalleta/Projects/Kozz/kozz-module-maker:
     link-module-alias "^1.2.0"
     socket.io-client "^4.6.1"
 
-kozz-types@../kozz-types/:
-  version "0.0.1"
+kozz-types@@latest:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/kozz-types/-/kozz-types-0.1.0.tgz#322d4067869ad08c34477ff24c1878d274806740"
+  integrity sha512-sFeU6D+nTtsb4NLqSP7tb4nEYEzi8Zg/0Ivjsy99OXjQPLVB53HKo/zbGuXOQi4wWRMvY5fp6CGVuVznyKGTrw==
   dependencies:
     link-module-alias "^1.2.0"
 
