@@ -30,7 +30,7 @@
 		"he": "^1.2.0",
 		"html-memo": "^1.0.1",
 		"jsdom": "^22.1.0",
-		"kozz-module-maker": "^0.1.2",
+		"kozz-module-maker": "/home/guigalleta/Projects/Kozz/kozz-module-maker",
 		"link-module-alias": "^1.2.0",
 		"openai": "^3.3.0",
 		"youtube-search": "^1.1.6",

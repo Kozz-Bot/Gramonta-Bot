@@ -50,7 +50,7 @@ export const generateQuote = async (
 		};
 
 		const result = await axios
-			.post<QuoteSuccess>('https://bot.lyo.su/quote/generate', json)
+			.post<QuoteSuccess>('http://gramont.ddns.net/quote/generate', json)
 			.then(resp => resp.data);
 
 		return result.result.image;

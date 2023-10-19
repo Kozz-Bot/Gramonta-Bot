@@ -845,10 +845,8 @@ klaw-sync@^6.0.0:
   dependencies:
     graceful-fs "^4.1.11"
 
-kozz-module-maker@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/kozz-module-maker/-/kozz-module-maker-0.1.2.tgz#22ca171f80ad1f113c055c24744c181331a689f5"
-  integrity sha512-Za8Hl4euw3ZPXOoQkuIVQAqz9ouumMO/QsoVOxnYcCkuLndqoAW0IxGhp1ULkPwUDNXpfIdnsmPF+c1yUST8EQ==
+kozz-module-maker@/home/guigalleta/Projects/Kozz/kozz-module-maker:
+  version "0.1.8"
   dependencies:
     arcsecond "^5.0.0"
     dotenv "^16.0.3"
