@@ -5,9 +5,6 @@ import { generateQuote } from 'src/API/QuoteApi';
 
 const makeQuote = async (requester: MessageObj) => {
 	const { quotedMessage } = requester.message;
-	// requester.reply("A API de quote está fora do ar.");
-	// return;
-
 
 	if (!quotedMessage || !quotedMessage.body) {
 		return requester.reply.withTemplate('Help');
@@ -17,7 +14,7 @@ const makeQuote = async (requester: MessageObj) => {
 	const name = quotedMessage.contact.publicName;
 
 	const profilePicUrl = await requester.ask.boundary(
-		'Gramonta-Wa',
+		requester.message.boundaryName,
 		'contact_profile_pic',
 		{
 			id: quotedMessage.from,
