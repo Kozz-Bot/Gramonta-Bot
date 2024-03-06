@@ -97,6 +97,7 @@ export const startNewsHandler = () =>
 		},
 		name: 'news',
 		address: `${process.env.GATEWAY_URL}`,
+		customSocketPath: process.env.SOCKET_PATH,
 		templatePath,
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')

@@ -1,6 +1,7 @@
 import { createModule, createMethod } from 'kozz-module-maker';
+import fs from 'fs/promises';
 
-const messageInfo = createMethod('default', requester => {
+const messageInfo = createMethod('default', async requester => {
 	const {
 		boundaryName,
 		contact,
@@ -10,6 +11,7 @@ const messageInfo = createMethod('default', requester => {
 		groupName,
 		fromHostAccount,
 		to,
+		media,
 	} = requester.rawCommand!.message.quotedMessage || requester.message;
 	const response = [
 		`Contact Info: \`\`\`${JSON.stringify(contact, undefined, '  ')}\`\`\``,
@@ -22,7 +24,16 @@ const messageInfo = createMethod('default', requester => {
 		``,
 		`Message Type: ${messageType}`,
 		`Group Name: ${groupName}`,
+		`hasMedia: ${!!media?.data}`,
 	].join('\n');
+
+	if (!!media) {
+		if (messageType === 'STICKER') {
+			await fs.writeFile('./media/tempFile.webp', media.data, {
+				encoding: 'base64',
+			});
+		}
+	}
 
 	requester.reply(response);
 });
@@ -36,5 +47,6 @@ export const startDebugHandler = () =>
 			},
 		},
 		name: 'debug',
+		customSocketPath: process.env.SOCKET_PATH,
 		address: `${process.env.GATEWAY_URL}`,
 	});

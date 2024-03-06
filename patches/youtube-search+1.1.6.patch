@@ -1,0 +1,43 @@
+diff --git a/node_modules/youtube-search/index.js b/node_modules/youtube-search/index.js
+index c509622..d51de5b 100644
+--- a/node_modules/youtube-search/index.js
++++ b/node_modules/youtube-search/index.js
+@@ -34,7 +34,7 @@ var allowedProperties = [
+   'key'
+ ]
+ 
+-module.exports = function search (term, opts, cb) {
++module.exports = function search(term, opts, cb) {
+   if (typeof opts === 'function') {
+     cb = opts
+     opts = {}
+@@ -46,7 +46,7 @@ module.exports = function search (term, opts, cb) {
+     return new Promise(function (resolve, reject) {
+       search(term, opts, function (err, results, pageInfo) {
+         if (err) return reject(err)
+-        resolve({results: results, pageInfo: pageInfo})
++        resolve({ results: results, pageInfo: pageInfo })
+       })
+     })
+   }
+@@ -61,7 +61,7 @@ module.exports = function search (term, opts, cb) {
+     if (allowedProperties.indexOf(k) > -1) params[k] = opts[k]
+   })
+ 
+-  axios.get('https://www.googleapis.com/youtube/v3/search?' + querystring.stringify(params))
++  return axios.get('https://www.googleapis.com/youtube/v3/search?' + querystring.stringify(params))
+     .then(function (response) {
+       var result = response.data
+ 
+@@ -103,7 +103,10 @@ module.exports = function search (term, opts, cb) {
+         }
+       })
+ 
+-      return cb(null, findings, pageInfo)
++      return {
++        results: findings,
++        pageInfo,
++      }
+     })
+     .catch(function (err) {
+       return cb(err)

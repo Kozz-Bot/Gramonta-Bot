@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const TiApi = axios.create({
-	baseURL: 'http://gramont.ddns.net:5050',
+	baseURL: 'http://gramont.ddns.net/tia',
 });
 
 export default TiApi;

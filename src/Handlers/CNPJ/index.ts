@@ -46,5 +46,6 @@ export const startCNPJInstance = () =>
 			},
 		},
 		name: 'cnpj',
+		customSocketPath: process.env.SOCKET_PATH,
 		address: `${process.env.GATEWAY_URL}`,
 	});

@@ -55,6 +55,9 @@ class WeatherAPI {
 			params: {
 				city,
 			},
+			headers: {
+				token: process.env.WEATHER_TOKEN
+			}
 		});
 		return weather.data;
 	}

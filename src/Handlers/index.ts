@@ -14,3 +14,5 @@ export * from './Copypasta';
 export * from './CNPJ';
 export * from './Tia';
 export * from './News';
+export * from './Transmission';
+export * from './AntiTag';

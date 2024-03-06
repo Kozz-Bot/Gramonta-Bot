@@ -96,7 +96,6 @@ const emojify = createMethod(
 );
 
 const fallback = createMethod('fallback', requester => {
-	console.log(requester.rawCommand);
 	requester.reply.withTemplate('Fallback');
 });
 

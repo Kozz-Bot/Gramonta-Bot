@@ -65,16 +65,11 @@ const ytDownload = async (
 	savePath: string
 ): Promise<string | undefined> => {
 	try {
-		const quality = type === 'video' ? '18' : 'highestaudio';
+		const quality = type === 'video' ? '18' : '140';
 
 		const filePath: string = await new Promise((resolve, reject) => {
 			const download = ytdl(url, {
 				quality,
-				requestOptions: {
-					headers: {
-						cookie: process.env.YT_COOKIE,
-					},
-				},
 			}).pipe(oldFs.createWriteStream(savePath));
 
 			download.once('close', () => {
@@ -105,15 +100,17 @@ export const searchResults = async (
 		const options: YouTubeSearchOptions = {
 			maxResults,
 			key: process.env.YOUTUBE_KEY,
-			pageToken: token,
 		};
-		const response = await YTSearch(query, options);
+
+		const response = await YTSearch(query, options, err => {
+			console.warn(err);
+		});
 
 		return {
 			...response,
 			results: response.results
 				.filter(result => result.kind === 'youtube#video')
-				.map((result, index) => ({
+				.map((result) => ({
 					link: result.link,
 					title: he.decode(result.title),
 					thumbnail: result.thumbnails.high?.url,

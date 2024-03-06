@@ -3,7 +3,7 @@ import { loadTemplates } from 'kozz-module-maker/dist/Message';
 import { hostAccountOnly } from 'src/Middlewares/CheckContact';
 import { createAutoReveal } from 'src/Proxies/AutoReveal';
 import { RevealMapProxy, createAutoRevealMap } from 'src/Proxies/AutoRevealMap';
-import { useJsonDB } from 'src/StaticJsonDb';
+import { useJsonDB } from 'src/Utils/StaticJsonDb';
 
 const revealBlockDB = useJsonDB('block', './src/Handlers/Reveal/revealDB.json');
 const RevealMapDB = useJsonDB<RevealMapProxy, 'map'>(
@@ -12,7 +12,7 @@ const RevealMapDB = useJsonDB<RevealMapProxy, 'map'>(
 );
 
 const defaultMethod = createMethod('default', requester => {
-	const {quotedMessage} = requester.message;
+	const { quotedMessage } = requester.message;
 
 	if (revealBlockDB.getEntityById(requester.message.to)) {
 		return requester.reply('Revelação de mídia desabilitada nesse grupo');
@@ -28,17 +28,13 @@ const defaultMethod = createMethod('default', requester => {
 		});
 	}
 
-	if (
-		quotedMessage.messageType === 'IMAGE' ||
-		quotedMessage.messageType === 'VIDEO'
-	) {
-		if (!quotedMessage.media) {
-			return requester.reply.withTemplate('error', {
-				error: 'Erro: O bot não conseguiu encontrar mídia na mensagem',
-			});
-		}
-		return requester.reply.withMedia(quotedMessage.media);
+	if (!quotedMessage.media) {
+		return requester.reply.withTemplate('error', {
+			error: 'Erro: O bot não conseguiu encontrar mídia na mensagem',
+		});
 	}
+
+	return requester.reply.withMedia(quotedMessage.media);
 });
 
 const autoReveal = createMethod(
@@ -90,6 +86,7 @@ export const startRevealHandler = () => {
 		},
 		name: 'reveal',
 		address: `${process.env.GATEWAY_URL}`,
+		customSocketPath: process.env.SOCKET_PATH,
 		templatePath,
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')

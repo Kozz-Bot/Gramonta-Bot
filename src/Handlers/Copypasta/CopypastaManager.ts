@@ -1,4 +1,4 @@
-import { useJsonDB } from 'src/StaticJsonDb';
+import { useJsonDB } from 'src/Utils/StaticJsonDb';
 import { getFormattedDateAndTime } from 'src/Utils/date';
 
 type Copypasta = {

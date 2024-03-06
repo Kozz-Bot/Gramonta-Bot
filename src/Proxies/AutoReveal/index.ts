@@ -8,11 +8,16 @@ export const createAutoReveal = (msgObject: MessageObj) => {
 
 	const instance = createModule({
 		address: `${process.env.GATEWAY_URL}`,
+		customSocketPath: process.env.SOCKET_PATH,
+
 		name: `auto-reveal-${msgObject.message.to}`,
 		proxy: {
-			source: `${msgObject.rawCommand!.boundaryId}/${chatId}`,
+			source: `${msgObject.rawCommand!.boundaryName}/${chatId}`,
 			onMessage: requester => {
-				if (requester.message.fromHostAccount && requester.message.body == '!reveal stop') {
+				if (
+					requester.message.fromHostAccount &&
+					requester.message.body == '!reveal stop'
+				) {
 					requester.reply('Podem continuar com seus segredos agora...');
 					requester.revoke();
 				}

@@ -12,6 +12,8 @@ export const createAutoRevealMap = ({ from, to, boundaryId }: RevealMapProxy) =>
 	const instance = createModule({
 		address: `${process.env.GATEWAY_URL}`,
 		name: `auto-reveal-map-${from}`,
+		customSocketPath: process.env.SOCKET_PATH,
+
 		proxy: {
 			source: `${boundaryId}/${from}`,
 			onMessage: requester => {
@@ -25,7 +27,7 @@ export const createAutoRevealMap = ({ from, to, boundaryId }: RevealMapProxy) =>
 						`Legenda: ${body}`,
 					].join('\n');
 
-					instance.sendMessage.withMedia(to, caption, boundaryId, requester.message.media!);
+					requester.sendMessage.withMedia(to, caption, requester.message.media!);
 				}
 			},
 		},

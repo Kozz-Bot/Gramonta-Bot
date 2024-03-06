@@ -34,8 +34,8 @@ const makeQuote = async (requester: MessageObj) => {
 	requester.reply.withSticker(stickerMedia);
 };
 
-const defaultMethod = createMethod('default', (requester) => {
-	const { quotedMessage, media } = requester.message
+const defaultMethod = createMethod('default', requester => {
+	const { quotedMessage, media } = requester.message;
 
 	if (quotedMessage?.media) {
 		return requester.reply.withSticker(quotedMessage.media);
@@ -70,6 +70,7 @@ export const startStickerHandler = () =>
 			},
 		},
 		name: 's',
+		customSocketPath: process.env.SOCKET_PATH,
 		address: `${process.env.GATEWAY_URL}`,
 		templatePath,
 	}).resources.upsertResource('help', () =>

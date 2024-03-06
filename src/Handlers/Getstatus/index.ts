@@ -23,6 +23,6 @@ export const startGetStatusHandler = () =>
 		},
 		name: 'getstatus',
 		address: `${process.env.GATEWAY_URL}`,
-
+		customSocketPath: process.env.SOCKET_PATH,
 		templatePath: './src/Handlers/Getstatus/reply.kozz.md',
 	});

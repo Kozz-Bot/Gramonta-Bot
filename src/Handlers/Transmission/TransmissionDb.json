@@ -1,0 +1,742 @@
+{
+    "groups": [
+			{
+				"id": "353d3dc4-dc90-4a0d-a324-d28b4dbc5f05",
+				"chatId": "376655166-1561409708@g.us",
+				"list": "updates",
+				"boundary": "Gramonta-Wa"
+			},
+			{
+				"id": "7f7d5828-6355-45d5-8b4d-d65fa7b86c33",
+				"chatId": "351927564122-1628713903@g.us",
+				"list": "updates",
+				"boundary": "Gramonta-Wa"
+			},
+			{
+				"id": "11dd93bd-7484-4953-8916-9e6b45b225da",
+				"chatId": "120363145764693476@g.us",
+				"list": "updates",
+				"boundary": "Gramonta-Wa"
+			},
+			{
+				"id": "e690436a-4224-4db2-877a-780a198ad356",
+				"chatId": "120363039585015031@g.us",
+				"list": "updates",
+				"boundary": "Gramonta-Wa"
+			},
+			{
+				"id": "a72463ab-6395-4b65-947e-b7794be81879",
+				"chatId": "5511989784605-1570726812@g.us",
+				"list": "updates",
+				"boundary": "Gramonta-Wa"
+			},
+			{
+				"id": "033c455e-c016-4357-867d-c126b6af507c",
+				"chatId": "120363022851012631@g.us",
+				"list": "updates",
+				"boundary": "Gramonta-Wa"
+			},
+			{
+				"id": "bedaff02-b2b3-435e-afda-bed6b9ac99c7",
+				"chatId": "120363021796742500@g.us",
+				"list": "updates",
+				"boundary": "Gramonta-Wa"
+			},
+			{
+				"id": "2c17e43d-87b1-45d5-bcca-cbdd24804ea5",
+				"chatId": "5511975517114-1601677193@g.us",
+				"list": "updates",
+				"boundary": "Gramonta-Wa"
+			},
+			{
+				"id": "40cd8870-50ea-4eaf-b6c6-66fa040222ae",
+				"chatId": "120363152736439624@g.us",
+				"list": "updates",
+				"boundary": "Gramonta-Wa"
+			},
+			{
+				"id": "3142dd87-883e-424b-b0a2-7547cdf09198",
+				"chatId": "5521981661449-1596042265@g.us",
+				"list": "updates",
+				"boundary": "Gramonta-Wa"
+			},
+			{
+				"id": "cf73fb3f-d8ab-41c3-b2fa-f779ea1849bf",
+				"chatId": "120363157055522333@g.us",
+				"list": "updates",
+				"boundary": "Gramonta-Wa"
+			},
+			{
+				"id": "e4c6afa0-a25b-479d-831b-74edf31552c9",
+				"chatId": "120363022189228407@g.us",
+				"list": "updates",
+				"boundary": "Gramonta-Wa"
+			},
+			{
+				"id": "555fcec6-ea0a-44f2-a5c5-bba52b325634",
+				"chatId": "556599669870-1595635385@g.us",
+				"list": "updates",
+				"boundary": "Gramonta-Wa"
+			},
+			{
+				"id": "9ac07baa-5538-4fb1-abf4-ef884cf7defa",
+				"chatId": "5521985620967-1618881956@g.us",
+				"list": "updates",
+				"boundary": "Gramonta-Wa"
+			},
+			{
+				"id": "331843c2-385d-4004-82ca-8990c13c1220",
+				"chatId": "120363025867505023@g.us",
+				"list": "updates",
+				"boundary": "Gramonta-Wa"
+			},
+			{
+				"id": "e0ed58cc-b1a1-4e90-b96a-b78b3078ca3f",
+				"chatId": "120363127738812289@g.us",
+				"list": "updates",
+				"boundary": "Gramonta-Wa"
+			},
+			{
+				"id": "a0af9990-cf6b-4bae-a851-4f6bc5f14d4b",
+				"chatId": "120363065908858094@g.us",
+				"list": "updates",
+				"boundary": "Gramonta-Wa"
+			},
+			{
+				"id": "da931dda-7798-4a46-bf90-44f6ff03404f",
+				"chatId": "120363178455834271@g.us",
+				"list": "updates",
+				"boundary": "Gramonta-Wa"
+			},
+			{
+				"id": "4209b6c1-3919-4543-8f16-04da40d8f96f",
+				"chatId": "554384862158-1607034789@g.us",
+				"list": "updates",
+				"boundary": "Gramonta-Wa"
+			},
+			{
+				"id": "0bb51650-a5c9-403b-af74-b8b14e880b88",
+				"chatId": "5519992197785-1563875033@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "90e3a1b7-fe2e-4ee8-88ac-2eace3544247",
+				"chatId": "5519997332403-1559511889@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "f9a05f96-7a58-4cda-96a8-ebde8acd9c08",
+				"chatId": "5519999543152-1567630588@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "e8e7b18a-2777-4c6e-a541-50a7b55e043a",
+				"chatId": "5519992648000-1573395333@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "767d4a35-1148-4214-8be8-2beb1e40f872",
+				"chatId": "120363045837499766@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "7a09f2f1-2e1c-4ed1-b5f8-36d07aab3a5f",
+				"chatId": "5519997613987-1601545792@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "91e5537e-8ea4-4fe9-ac57-9891ba652810",
+				"chatId": "5519997332403-1559511889@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "017013ec-cf88-47a6-add2-781bcb97b91b",
+				"chatId": "5519994906361-1595088476@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "3335378c-311e-4e99-8e98-89f40d94d482",
+				"chatId": "120363037196935093@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "29a152a8-3951-4716-8aa1-b72b8ffb682a",
+				"chatId": "120363028300724865@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "93a83cf7-d992-474c-83c8-b19d8f5c128d",
+				"chatId": "120363178087179967@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "5ebb6a08-d138-4d2a-a192-b31974417cc6",
+				"chatId": "120363188641407138@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "70c31806-2328-4800-bda3-3dacedada42c",
+				"chatId": "120363025047895887@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "80fc607f-a554-402d-ab1c-f7b3c380e973",
+				"chatId": "120363039357499212@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "ac8aef3e-fb6d-4e9c-85d9-e5913f0bfcae",
+				"chatId": "5519992998891-1558428972@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "e2701348-cf6a-45ff-a9b9-63215a9f18f4",
+				"chatId": "5519994119274-1614098011@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "788e7174-23f7-406c-a563-828ae288c400",
+				"chatId": "5519988691778-1511036471@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "7dd1377b-d41e-4848-bc3a-76078c8a967f",
+				"chatId": "5519999087325-1487076279@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "79c2c06c-e087-4926-af7a-46a6495093f4",
+				"chatId": "5519981457874-1610041682@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "379857e8-b994-4138-ac57-1650197b63a6",
+				"chatId": "5519988874586-1518134650@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "cbc27a2a-b1b9-46f0-b75a-8411e1085be2",
+				"chatId": "120363024169806472@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "b5c1a755-eb58-4cb3-96ff-0fabf1fb4013",
+				"chatId": "5519984377710-1460588722@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "c317c584-4f07-4fba-af90-0da97d413281",
+				"chatId": "120363178444514571@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "bab33da1-d0dc-4db3-a405-6c43224b137d",
+				"chatId": "120363148278747838@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "f58e5a2e-7c3c-42f9-8c72-0f6e1f714de3",
+				"chatId": "120363038037820243@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "c907e0d6-88b5-4f76-a799-fedcc04719fd",
+				"chatId": "120363143629913788@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "595c62e1-3d03-4855-a7c4-e61b9e5530f5",
+				"chatId": "5511991658606-1621686588@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "bc23ec1d-0101-44ac-be7e-e8ec9ed293ce",
+				"chatId": "5519971720311-1499292868@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "605d7161-94eb-4615-80c6-0701ef228627",
+				"chatId": "120363039627531601@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "132ee031-0473-4f69-b92b-ed8562db3cd1",
+				"chatId": "5519983094940-1605480563@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "b456a628-c402-42b5-b305-9c8ab0a1e6ad",
+				"chatId": "5519983094940-1621691073@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "0dc6492c-4b3e-4201-80b2-196b51472a04",
+				"chatId": "120363179218386306@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "17dcb4f9-81e4-4c0c-83f7-c14ecbc524bc",
+				"chatId": "5519983300877-1572125166@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "5c878a23-0c31-41e1-be06-1a8ed7ed187f",
+				"chatId": "5519992584224-1485269006@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "9cb15f66-4366-4b2e-b15c-1f20856f0d89",
+				"chatId": "120363044213035568@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "359f3f73-0e7b-4feb-94d9-e9f1040747e9",
+				"chatId": "120363046145778687@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "d90028c5-2fec-49ca-8e9d-e3ebe6f16b73",
+				"chatId": "120363162673246330@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "f2e916d9-0e0e-4626-8c7e-7466e459b2f0",
+				"chatId": "120363166921251387@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "2c82c170-e8bd-41a8-bdef-0a94f87d1d78",
+				"chatId": "120363056204682850@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "462cf4e6-71e3-4d82-a75f-210257fc9e86",
+				"chatId": "120363142387964936@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "1086445c-cabc-4056-b2ee-7c44deff1102",
+				"chatId": "5519974155244-1585419088@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "030181e0-c9a3-461a-a285-6412a0a86259",
+				"chatId": "5519996363535-1513293905@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "d3bfcef6-de14-4f34-a91b-97a6eb70af0c",
+				"chatId": "120363045761486036@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "b3b4bf5a-ce29-4bb1-a8de-e389c2b962b4",
+				"chatId": "120363043303199553@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "ab7f8a0e-6887-4a56-831e-8cc632eced19",
+				"chatId": "5519992071213-1569459635@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "7523fc69-7292-4384-a173-42fdba2ba29e",
+				"chatId": "5519974057317-1619366447@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "b2aeda7d-57b6-446c-804c-baae2647428c",
+				"chatId": "5519996638051-1569412925@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "f3546439-b0b2-4a1f-a3aa-28d5875e3db2",
+				"chatId": "120363145822270892@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "ddc89f2d-e42a-4548-b5ef-ecd3675a4e29",
+				"chatId": "5519991168322-1558475695@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "5374ef8b-15a8-422f-ab0f-7fb4ad065799",
+				"chatId": "120363147293934309@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "35cdb509-d18c-470c-8a82-3df63c3b6405",
+				"chatId": "120363164361511223@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "74e54e0c-a85c-486d-83a4-2777a89287b9",
+				"chatId": "5519997613987-1600363029@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "0bd27b8b-a954-4028-af91-e234d5fd9947",
+				"chatId": "120363029900968055@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "87953e92-b136-47d9-9f26-bd024e3231d7",
+				"chatId": "5519992527615-1523369691@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "9a893f86-f60a-4def-9c07-45c17314e0c2",
+				"chatId": "5519987601215-1519580237@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "96e18b2d-6d26-4f61-8dbb-64cdc44e1632",
+				"chatId": "120363121157274509@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "ce96a85f-99c5-408f-8632-e466bc82d049",
+				"chatId": "120363044952951026@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "98248524-43e8-4015-9f47-5af9c89a7940",
+				"chatId": "5519988691778-1511036471@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "903a972e-c41a-4174-a5ea-85a576e9aa76",
+				"chatId": "5519994408216-1521217368@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "f592db97-cea0-4db5-bbba-75256f27e7f5",
+				"chatId": "5519981858863-1627226805@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "8dfea913-15b0-46c4-996a-0e3c7813e0db",
+				"chatId": "5519982458157-1475192851@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "a4edb511-f390-4bb6-be73-d53bb0bc5e1d",
+				"chatId": "5511991658606-1477682752@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "e32f7843-eb06-4b9d-9d9b-7cd932ef5eab",
+				"chatId": "5511991658606-1513110026@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "b75f9b86-fb47-469f-b640-b95d1d5ebddf",
+				"chatId": "5519982458157-1475192851@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "f752a056-3454-4ae0-ac19-447261e4786c",
+				"chatId": "5511991658606-1477682752@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "7ffaa18d-5d48-4783-bd8d-43b3c38be505",
+				"chatId": "5511991658606-1513110026@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "f9a7fe80-faf4-4c8b-a013-a2517281b30a",
+				"chatId": "5519982458157-1475192851@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "340b91d5-3357-45a6-888c-4a34db3ec41e",
+				"chatId": "5511991658606-1477682752@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "283f53f2-8704-4078-b590-2e16b7f5dca1",
+				"chatId": "5511991658606-1513110026@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "31e80bc7-4b94-4ad5-87e5-12e4b9987680",
+				"chatId": "120363159751363851@g.us",
+				"list": "updates",
+				"boundary": "Gramonta-Wa"
+			},
+			{
+				"id": "e599ac55-c0e0-4a92-8b3f-8779760493ad",
+				"chatId": "5519996976969-1594345564@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "1801932e-9bec-413d-b23f-bdd8713f16d1",
+				"chatId": "120363040850843421@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "c200455f-fa9f-482f-b421-23d451181eae",
+				"chatId": "5519998201404-1485003816@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "81869745-308a-4e94-91c2-662bcb53030b",
+				"chatId": "5519996976969-1523094405@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "d4975f9f-fb68-4700-bf8e-d7be93c511c8",
+				"chatId": "5519999543152-1505437342@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "723611f8-4701-40a5-8bcf-6ed8d6ba69ca",
+				"chatId": "5519993434522-1515367471@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "00eb4349-80ce-4fc2-a30b-8554ae41226d",
+				"chatId": "120363041035471193@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "a27b5755-28ba-4801-bfb1-28ae1ea87cd4",
+				"chatId": "5519992071213-1584034203@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "b3b7bc7a-4fbe-455e-8724-93a95369b631",
+				"chatId": "120363161245530764@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "630eaf1d-b0a2-4f47-9c86-716c62e6505b",
+				"chatId": "5519982960340-1594598288@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "ebec4c74-f821-4282-844b-7ab1b13c7ea7",
+				"chatId": "5519995333530-1618401463@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "8baedbf7-c3a5-405a-8a2c-ca1a7e303a03",
+				"chatId": "5519982960340-1581428910@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "2850954e-4c63-4306-a08b-84f0398dc76b",
+				"chatId": "120363043081942882@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "49ac881c-504c-4e45-892f-2a8f4a5fb735",
+				"chatId": "5519981551514-1631051715@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "bbd00b6d-0773-4906-a790-51607b332587",
+				"chatId": "5519999221555-1628088290@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "1278e991-8381-44cf-9dfe-5ae504cce8c6",
+				"chatId": "5513997659669-1525779669@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "14e37fe1-8537-4480-94a5-deae270d7670",
+				"chatId": "553499551056-1615649670@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "0b1a7af7-3280-43ee-9d90-039a98c21b2d",
+				"chatId": "120363168985755850@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "1316da02-8282-4ed4-b511-06d8f24340d9",
+				"chatId": "5519992558264-1529607719@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "77da4248-ee22-4ffd-8a20-69d8475a3afe",
+				"chatId": "5519998277289-1488198652@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "1b5a3f8b-902c-4970-bbb1-59eb64568235",
+				"chatId": "5519994534514-1577644044@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "ba25b699-9bf5-41ab-9ff6-c2f982581661",
+				"chatId": "5519988449972-1559746729@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "301c92bf-5e97-496b-b1a8-a8a49dbe5ad1",
+				"chatId": "120363066214730980@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "0524aecd-1979-4637-9880-2063bb108b17",
+				"chatId": "5519998938130-1587419613@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "5b0ad26d-ee73-4482-982e-4838a85d443d",
+				"chatId": "5511991658606-1596202367@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "36df98a2-672a-4bb6-9743-a8e87ed4107c",
+				"chatId": "5519989346854-1588458523@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "a3344974-6dea-44d5-a5d2-67b093a77b24",
+				"chatId": "120363026867439978@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "ab212018-6898-4070-bb31-82a967d23e20",
+				"chatId": "5519991129320-1494202801@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "cead8c75-8de8-491c-a8c1-c477a71b99ab",
+				"chatId": "120363200091978179@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "c5e30af0-9009-4789-b471-4c8ac3168ca1",
+				"chatId": "5519984606066-1571710864@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "19c4be68-e838-45f1-9d20-5d141a974aa4",
+				"chatId": "5519987504700-1517434148@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "58796552-bfd2-47aa-868c-4661f16bdc24",
+				"chatId": "5519997425456-1552859112@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "3a9233a4-7ccb-4b74-b637-a6f3fee966ef",
+				"chatId": "5519992620681-1511794073@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			},
+			{
+				"id": "3f090449-7d07-4948-b154-e760e672a1eb",
+				"chatId": "120363044553561730@g.us",
+				"list": "vendas",
+				"boundary": "SalesBot"
+			}
+		]
+}
