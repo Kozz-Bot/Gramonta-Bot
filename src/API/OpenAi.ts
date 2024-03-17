@@ -123,9 +123,16 @@ export default class OpenAPI {
 		return response.data.choices[0].message.content;
 	}
 
-	async fromPrompt(prompt: string, prevMessages: PreviousMessages) {
-		const isSafe = await this.isSafe(prompt);
-		if (!isSafe) throw 'Bad Language';
+	async fromPrompt(context: PreviousMessages) {
+		const safeMessages = await Promise.all(
+			context.map(message => this.isSafe(message.content))
+		);
+
+		const allSafe = safeMessages.reduce((allSafe, msgIsSafe) => {
+			return allSafe && msgIsSafe;
+		}, true);
+
+		if (!allSafe) throw 'Bad Language';
 
 		const response = await this.axiosInstance.post<ChatGPTResponse>(
 			'/chat/completions',
@@ -136,10 +143,9 @@ export default class OpenAPI {
 					{
 						role: 'system',
 						content:
-							'Você está em um grupo de whatsapp conversando com várias pessoas. Em determinado momento alguém manda uma mensagem e você começa a conversar com essa pessoa.',
+							'Você é um chatbot chamado CalvoGPT e está em um grupo de whatsapp conversando com várias pessoas. Em determinado momento você decide participar da conversa. Suas respostas seguem o formato `[#CalvoGPT]:{Resposta}`. É IMPORTANTISSIMO que você inicie sua resposta com "[#CalvoGPT]:" para garantir o funcionamento do bot',
 					},
-					...prevMessages.flat(1),
-					{ role: 'user', content: prompt },
+					...context.flat(1),
 				],
 			}
 		);

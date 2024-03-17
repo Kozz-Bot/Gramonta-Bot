@@ -3,9 +3,11 @@
 # CalvoCoins
 
 CalvoCoins são as moedas utilizadas nos comandos premium do bot do Tramonta. Cada CalvoCoin equivale a 1 centavo e os comandos pagos irão automaticamente cobrar as moedas do seu saldo
+<br>
 
 _*Como criar conta?*_
 Para criar uma conta no CalvoBank basta digitar `!coins create`. Você terá uma conta com saldo de 0 CalvoCoins
+<br>
 
 _*Como comprar CalvoCoins?*_
 Basta fazer um pix para o numero 11947952409 e avisar o Tramonta. Ele irá adicionar as moedas ao seu saldo e você poderá utiliza-las imediatamente.
@@ -76,6 +78,7 @@ _*Contraparte*_: {{counterpart}}
 _*Valor*_: C$ {{amount}}
 _*Mensagem*_: {{messageBody}}
 _*Grupo*_:{{groupName}}
+_*Mídia da mensagem*_: {{mediaUrl}}
 
 > ---
 

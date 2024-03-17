@@ -23,12 +23,13 @@
 		"nodemon": "^2.0.22",
 		"patch-package": "^7.0.0",
 		"typedoc": "^0.23.21",
-		"typescript": "^5.0.4"
+		"typescript": "^5.4.2"
 	},
 	"dependencies": {
 		"@supabase/supabase-js": "^2.39.7",
 		"dotenv": "^16.0.3",
 		"express": "^4.18.2",
+		"firebase-admin": "^12.0.0",
 		"fluent-ffmpeg": "^2.1.2",
 		"he": "^1.2.0",
 		"html-memo": "^1.0.1",

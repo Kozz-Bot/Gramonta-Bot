@@ -3,14 +3,23 @@ import OpenAPI from 'src/API/OpenAi';
 import { usePremiumCommand } from 'src/Middlewares/Coins';
 import { convertB64ToPath } from 'src/Utils/ffmpeg';
 import { loadTemplates } from 'kozz-module-maker/dist/Message';
+import { MessageReceived } from 'kozz-types';
+import {
+	StylePreset,
+	availableStyles,
+	isStabilityError,
+	isValidStyle,
+	textToImage,
+} from 'src/API/StabiliyApi';
+import { randomItem } from 'src/Utils/arrays';
 
 const API = new OpenAPI();
 
 const image = createMethod(
 	'image',
 	usePremiumCommand(
-		10,
-		async requester => {
+		5,
+		async (requester, { style }) => {
 			try {
 				const prompt = requester.rawCommand!.immediateArg;
 
@@ -20,18 +29,41 @@ const image = createMethod(
 				}
 
 				requester.react('⏳');
-				const image = await API.createImageFromPrompt(prompt);
+
+				if (!isValidStyle(style)) {
+					style = randomItem(availableStyles);
+					requester.reply.withTemplate('Image-Style-Unsupported', {
+						style,
+					});
+				}
+
+				const response = await textToImage(prompt, 'stable-diffusion-xl-1024-v1-0', {
+					style_preset: style as StylePreset,
+				});
+
+				if (isStabilityError(response)) {
+					requester.react('❌');
+					requester.reply(`Error: ${response.message}`);
+					return false;
+				}
 
 				requester.react('🎨');
-				requester.reply.withMedia.fromB64(image, 'image');
+				requester.reply.withMedia.fromB64(response.base64, 'image');
 			} catch (e) {
 				requester.reply(`Erro: ${e}`);
 				return false;
 			}
 		},
 		'Você não possui CalvoCoins suficientes para usar esse comando'
-	)
+	),
+	{
+		style: 'string?',
+	}
 );
+
+const imageStyleList = createMethod('image-styles', requester => {
+	requester.reply(availableStyles.join('\n'));
+});
 
 const transcribe = createMethod(
 	'transcribe',
@@ -56,7 +88,9 @@ const transcribe = createMethod(
 				requester.react('✏');
 
 				if (requester.rawCommand!.namedArgs?.emoji) {
-					const response = await API.emojify(`${requester.message.quotedMessage.body}`);
+					const response = await API.emojify(
+						`${requester.message.quotedMessage.body}`
+					);
 
 					return requester.reply(response);
 				}
@@ -83,13 +117,60 @@ const emojify = createMethod(
 
 				requester.react('⏳');
 
-				const response = await API.emojify(`${requester.message.quotedMessage.body}`);
+				const response = await API.emojify(
+					`${requester.message.quotedMessage.body}`
+				);
 
 				requester.reply(response);
 			} catch (e) {
 				requester.reply(`Erro: ${e}`);
 				return false;
 			}
+		},
+		'Você não possui CalvoCoins suficientes para usar esse comando'
+	)
+);
+
+const talk = createMethod(
+	'talk',
+	usePremiumCommand(
+		3,
+		async requester => {
+			const messages: string[] = [];
+			let currMessage: MessageReceived | undefined = requester.message;
+
+			while (currMessage) {
+				const hasMedia = !!currMessage.media;
+
+				const messageBody = hasMedia
+					? `{Mensagem em mídia, formato ${
+							currMessage.media!.mimeType
+					  }}, legenda da mídia: = "${currMessage.santizedBody}"`
+					: `"${currMessage.body}"`;
+
+				messages.unshift(
+					`[${
+						currMessage.body.includes('#CalvoGPT')
+							? 'CalvoGPT'
+							: currMessage.contact.publicName
+					}]: ${messageBody.replace(/^!( ){0,1}ai talk /i, '')}`
+				);
+				currMessage = currMessage.quotedMessage;
+			}
+
+			const formattedMessages = messages.map(message => {
+				const botMessage = message.includes('#CalvoGPT');
+				return {
+					role: botMessage ? 'assistant' : 'user',
+					content: message.replace('#CalvoGPT', ''),
+				} as const;
+			});
+
+			const response = await API.fromPrompt(formattedMessages);
+
+			requester.reply(
+				response.startsWith('[#CalvoGPT]') ? response : `[#CalvoGPT]: ${response}`
+			);
 		},
 		'Você não possui CalvoCoins suficientes para usar esse comando'
 	)
@@ -109,10 +190,13 @@ export const startAIHandler = () => {
 				...fallback,
 				...transcribe,
 				...emojify,
+				...talk,
+				...imageStyleList,
 			},
 		},
 		name: 'ai',
 		address: `${process.env.GATEWAY_URL}`,
+		customSocketPath: '/kozz/socket.io/',
 		templatePath,
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')

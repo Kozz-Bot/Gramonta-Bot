@@ -20,12 +20,20 @@ Esses comandos são PAGOS. Cada comando usa uma quantidade de CalvoCoins. Para s
 `|==================================================|`
 `|   image    | 10 CalvoCoins| !ai image {{prompt}} |`
 `| transcribe | 5 CalvoCoins |    !ai transcribe    |`
-`|    talk    | 2 CalvoCoins | !ai talk {{message}} |`
+`|    talk    | 3 CalvoCoins | !ai talk {{message}} |`
 `|==================================================|`
 <br>
 
 _*Image:*_ Gera uma imagem a partir do seu prompt usando Dalle-2
 _*Transcribe*_: Transcreve um video ou audio para texto usando Whisper-Ai
 _*Talk*_: Conversa com o chat-GPT. Responda as mensagens para continuar a conversa.
+
+> ---
+
+> @Image-Style-Unsupported
+
+Estilo não suportado ou não especificado. A imagem será criada usando o estilo {{style}}.
+
+- Para uma lista de estilos, digite `!ai image-styles`
 
 > ---

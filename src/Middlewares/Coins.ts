@@ -1,5 +1,7 @@
 import { MessageObj } from 'kozz-module-maker/dist/Message';
+import { type Media, type MessageReceived } from 'kozz-types';
 import * as CoinsApi from 'src/API/CoinsApi';
+import { uploadMedia, uploadMediaFromMessage } from 'src/API/Firebase';
 
 /**
  * Make the callback return true or void to decrement the coins.
@@ -25,7 +27,7 @@ export const usePremiumCommand =
 
 		if (!userExists) {
 			return requester.reply(
-				'Você não possui conta no CalvoBank. Envie `!coins help` para mais informações'
+				'Você não possui conta no CalvoBank. Envie  `!coins create` para criar sua conta ou `!coins help` para mais informações'
 			);
 		}
 
@@ -43,9 +45,46 @@ export const usePremiumCommand =
 		if (shouldDeductCoins === false) {
 			return;
 		} else {
-			CoinsApi.spendCoins(userId, amount, requester.message);
+			CoinsApi.spendCoins(
+				userId,
+				amount,
+				await uploadAllMediaToBucket(requester.message)
+			);
 		}
 	};
+
+/**
+ * Recursively traverses the quotedMessage map to upload to the bucket every
+ * media and substitutes the media found for a url
+ * @param message
+ * @returns
+ */
+const uploadAllMediaToBucket = async (
+	message: MessageReceived
+): Promise<MessageReceived | undefined> => {
+	const fileUrl = message.media ? await uploadMediaFromMessage(message) : undefined;
+
+	return {
+		...message,
+		media: message.media
+			? {
+					...message.media,
+					transportType: 'url',
+					data: fileUrl!,
+			  }
+			: undefined,
+		quotedMessage: message.quotedMessage
+			? await uploadAllMediaToBucket(message.quotedMessage)
+			: undefined,
+	};
+};
+
+export const uploadMediaToBucket = async (
+	name: string,
+	media: Media
+): Promise<string> => {
+	return uploadMedia(name, media);
+};
 
 const canUsePremiumCommand = (
 	requestedAmount: number,

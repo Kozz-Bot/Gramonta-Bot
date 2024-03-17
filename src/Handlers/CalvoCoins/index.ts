@@ -143,6 +143,9 @@ const getHistory = createMethod('history', async requester => {
 				timestamp: getFormattedDateAndTime(transaction.timestamp),
 				messageBody: transaction.transactionRequestPayload.body,
 				groupName: transaction.transactionRequestPayload.groupName ?? 'Chat Privado',
+				mediaUrl: transaction.transactionRequestPayload.quotedMessage?.media
+					? transaction.transactionRequestPayload.quotedMessage.media.data
+					: 'Inexistente',
 			};
 		});
 

@@ -1,5 +1,4 @@
 import { createModule, createMethod } from 'kozz-module-maker';
-import fs from 'fs/promises';
 
 const messageInfo = createMethod('default', async requester => {
 	const {
@@ -26,14 +25,6 @@ const messageInfo = createMethod('default', async requester => {
 		`Group Name: ${groupName}`,
 		`hasMedia: ${!!media?.data}`,
 	].join('\n');
-
-	if (!!media) {
-		if (messageType === 'STICKER') {
-			await fs.writeFile('./media/tempFile.webp', media.data, {
-				encoding: 'base64',
-			});
-		}
-	}
 
 	requester.reply(response);
 });
