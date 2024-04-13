@@ -12,6 +12,7 @@ import {
 	textToImage,
 } from 'src/API/StabiliyApi';
 import { randomItem } from 'src/Utils/arrays';
+import { fromPrompt } from 'src/API/MistralApi';
 
 const API = new OpenAPI();
 
@@ -151,7 +152,7 @@ const talk = createMethod(
 				messages.unshift(
 					`[${
 						currMessage.body.includes('#CalvoGPT')
-							? 'CalvoGPT'
+							? '#CalvoGPT'
 							: currMessage.contact.publicName
 					}]: ${messageBody.replace(/^!( ){0,1}ai talk /i, '')}`
 				);
@@ -166,23 +167,21 @@ const talk = createMethod(
 				} as const;
 			});
 
-			const response = await API.fromPrompt(formattedMessages);
+			const response = await fromPrompt(formattedMessages);
 
-			requester.reply(
-				response.startsWith('[#CalvoGPT]') ? response : `[#CalvoGPT]: ${response}`
-			);
+			requester.reply(response.replace(/(.*)]:/, '[#CalvoGpt]:'));
 		},
 		'Você não possui CalvoCoins suficientes para usar esse comando'
 	)
 );
 
 const fallback = createMethod('fallback', requester => {
-	requester.reply.withTemplate('Fallback');
+	requester.reply.withTemplate('Help');
 });
 
 const templatePath = './src/Handlers/AI/messages.kozz.md';
 export const startAIHandler = () => {
-	createModule({
+	const instance = createModule({
 		commands: {
 			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
 			methods: {
@@ -201,4 +200,5 @@ export const startAIHandler = () => {
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')
 	);
+	return instance;
 };

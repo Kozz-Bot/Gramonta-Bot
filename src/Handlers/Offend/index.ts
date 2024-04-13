@@ -51,8 +51,8 @@ const fallback = createMethod('fallback', async requester => {
 
 const templatePath = './src/Handlers/Offend/reply.kozz.md';
 
-export const startOffenseHandler = () =>
-	createModule({
+export const startOffenseHandler = () => {
+	const instance = createModule({
 		commands: {
 			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
 			methods: {
@@ -71,3 +71,6 @@ export const startOffenseHandler = () =>
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')
 	);
+
+	return instance;
+};

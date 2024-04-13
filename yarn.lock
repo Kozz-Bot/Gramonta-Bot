@@ -1751,8 +1751,10 @@ klaw-sync@^6.0.0:
   dependencies:
     graceful-fs "^4.1.11"
 
-"kozz-module-maker@file:../kozz-module-maker":
-  version "0.1.11"
+kozz-module-maker@^0.1.18:
+  version "0.1.18"
+  resolved "https://registry.yarnpkg.com/kozz-module-maker/-/kozz-module-maker-0.1.18.tgz#4e8ed61045fd9b88f5af24680ecace7447af5036"
+  integrity sha512-9nyas5AcKnoj6kr2aiVyqXAOMFxPqE2oGGy4HuJ+GNRtVXJMbEHu37sYz5eut/cP3WXv60KytpBnwcxIfeqVYQ==
   dependencies:
     arcsecond "^5.0.0"
     dotenv "^16.0.3"
@@ -1760,10 +1762,10 @@ klaw-sync@^6.0.0:
     link-module-alias "^1.2.0"
     socket.io-client "^4.6.1"
 
-kozz-types@^0.1.5:
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/kozz-types/-/kozz-types-0.1.5.tgz#56ef69f457f19f5c75e255f20d5a838f459d900e"
-  integrity sha512-4fkyx9mRCMQo14KS5rhXFA2tQT3ZtnjHPrkBOSCUmuPDEJaUfNZWXZtQr9pml5yEwQ/6UZ+Ajsv/rgC+facqlg==
+kozz-types@^0.1.9:
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/kozz-types/-/kozz-types-0.1.9.tgz#797d2968d49a7450ceba98228bc34c2ee6503c63"
+  integrity sha512-JKGznh8ntLPwpDikZStVh9K+BWxeYqKziy+CloybTZgUZgTt9p2lBkALUxbqgxuiOfWeg/4bA7Z+chGyFKhE+Q==
   dependencies:
     link-module-alias "^1.2.0"
 

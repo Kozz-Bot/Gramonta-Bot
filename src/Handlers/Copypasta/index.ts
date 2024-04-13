@@ -165,8 +165,8 @@ const del = createMethod('delete', requester => {
 	return requester.reply.withTemplate('CopypastaDeleted', copypasta);
 });
 
-export const startCopypastaHandler = () =>
-	createModule({
+export const startCopypastaHandler = () => {
+	const instance = createModule({
 		commands: {
 			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
 			methods: {
@@ -185,3 +185,6 @@ export const startCopypastaHandler = () =>
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')
 	);
+
+	return instance;
+};

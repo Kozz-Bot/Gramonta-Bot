@@ -29,26 +29,46 @@ const makeQuote = async (requester: MessageObj) => {
 		mimeType: 'image',
 		sizeInBytes: null,
 		transportType: 'b64',
+		stickerTags: ['💬', '🗯', '💭'],
 	};
 
 	requester.reply.withSticker(stickerMedia);
 };
 
-const defaultMethod = createMethod('default', requester => {
-	const { quotedMessage, media } = requester.message;
+const defaultMethod = createMethod(
+	'default',
+	(requester, { tags }) => {
+		const { quotedMessage, media } = requester.message;
 
-	if (quotedMessage?.media) {
-		return requester.reply.withSticker(quotedMessage.media);
-	}
-	if (media) {
-		return requester.reply.withSticker(media);
-	}
-	if (quotedMessage) {
-		return makeQuote(requester);
-	}
+		if (media) {
+			return requester.reply.withSticker({
+				...media,
+				stickerTags: tags?.split('') ?? [],
+			});
+		}
 
-	requester.reply.withTemplate('instructions_default');
-});
+		if (quotedMessage?.media) {
+			if (
+				quotedMessage?.media &&
+				!['IMAGE', 'VIDEO', 'TEXT'].includes(quotedMessage.messageType)
+			) {
+				console.log('Entrou');
+				return requester.reply('Não sei como fazer figurinha desse tipo de mídia');
+			} else {
+				return requester.reply.withSticker(quotedMessage.media);
+			}
+		}
+
+		if (quotedMessage) {
+			return makeQuote(requester);
+		}
+
+		// requester.reply.withTemplate('instructions_default');
+	},
+	{
+		tags: 'string?',
+	}
+);
 
 const toImg = createMethod('toimg', message => {
 	if (!message.message.quotedMessage?.media) {
@@ -60,8 +80,8 @@ const toImg = createMethod('toimg', message => {
 
 const templatePath = './src/Handlers/Sticker/reply.kozz.md';
 
-export const startStickerHandler = () =>
-	createModule({
+export const startStickerHandler = () => {
+	const instance = createModule({
 		commands: {
 			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
 			methods: {
@@ -76,3 +96,6 @@ export const startStickerHandler = () =>
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')
 	);
+
+	return instance;
+};

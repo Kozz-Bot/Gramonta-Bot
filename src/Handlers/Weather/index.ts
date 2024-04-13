@@ -37,8 +37,8 @@ const queryWeather = createMethod('fallback', async requester => {
 
 const templatePath = 'src/Handlers/Weather/messages.kozz.md';
 
-export const startWeatherHandler = () =>
-	createModule({
+export const startWeatherHandler = () => {
+	const instance = createModule({
 		commands: {
 			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
 			methods: {
@@ -52,3 +52,6 @@ export const startWeatherHandler = () =>
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')
 	);
+
+	return instance;
+};

@@ -45,6 +45,13 @@ const autoReveal = createMethod(
 		);
 
 		createAutoReveal(requester);
+
+		RevealMapDB.addEntity({
+			id: requester.message.id,
+			from: requester.message.to,
+			to: requester.message.to,
+			boundaryId: requester.message.boundaryName,
+		});
 	})
 );
 
@@ -74,7 +81,7 @@ export const startRevealHandler = () => {
 		createAutoRevealMap(proxy);
 	});
 
-	createModule({
+	const instance = createModule({
 		commands: {
 			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
 			methods: {
@@ -91,4 +98,6 @@ export const startRevealHandler = () => {
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')
 	);
+
+	return instance;
 };

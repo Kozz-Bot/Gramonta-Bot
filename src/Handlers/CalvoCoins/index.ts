@@ -1,4 +1,5 @@
 import { createModule, createMethod } from 'kozz-module-maker';
+import { tagMember } from 'kozz-module-maker/dist/InlineCommands';
 import { hostAccountOnly } from 'src/Middlewares/CheckContact';
 import * as CoinsApi from 'src/API/CoinsApi';
 import { loadTemplates } from 'kozz-module-maker/dist/Message';
@@ -21,7 +22,7 @@ const assertUserExists = async (userId: string) => {
 
 const getInfo = createMethod('default', async requester => {
 	try {
-		const { id: userId, publicName } = requester.message.contact;
+		const { id: userId } = requester.message.contact;
 
 		await assertUserExists(userId);
 
@@ -32,7 +33,7 @@ const getInfo = createMethod('default', async requester => {
 		requester.reply.withTemplate('Info', {
 			id: id,
 			userId: userId,
-			name: publicName,
+			name: tagMember(userId),
 			coins,
 			premium: premium ? '✅' : '❌',
 		});
@@ -97,7 +98,7 @@ const makePremium = createMethod(
 			await CoinsApi.makeUserPremium(quotedUser, oneMonth, requester.message);
 
 			requester.reply.withTemplate('MakePremiumResponse', {
-				quotedUser: quotedUser.split('@')[0],
+				quotedUser: tagMember(quotedUser),
 			});
 		} catch (e) {
 			requester.reply.withTemplate('Error', {
@@ -169,7 +170,7 @@ const getHistory = createMethod('history', async requester => {
 const help = createMethod('help', requester => requester.reply.withTemplate('Help'));
 
 export const startCoinsHandler = () => {
-	createModule({
+	const instance = createModule({
 		commands: {
 			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
 			methods: {
@@ -188,4 +189,6 @@ export const startCoinsHandler = () => {
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')
 	);
+
+	return instance;
 };

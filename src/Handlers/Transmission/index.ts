@@ -111,8 +111,8 @@ const list = createMethod(
 	})
 );
 
-export const startTransmissionHandler = () =>
-	createModule({
+export const startTransmissionHandler = () => {
+	const instance = createModule({
 		commands: {
 			boundariesToHandle: [
 				'Gramonta-Wa',
@@ -133,3 +133,6 @@ export const startTransmissionHandler = () =>
 		customSocketPath: process.env.SOCKET_PATH,
 		templatePath,
 	});
+
+	return instance;
+};

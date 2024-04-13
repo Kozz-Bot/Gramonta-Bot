@@ -27,6 +27,7 @@ export const createAutoRaid = () => {
 								mimeType: 'image/webp',
 								sizeInBytes: null,
 								transportType: 'b64',
+								stickerTags: [],
 							});
 
 							delay += delayIncrement + Math.random() * 1500;

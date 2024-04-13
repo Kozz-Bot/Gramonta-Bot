@@ -20,7 +20,7 @@ Sua pesquisa não pode ser vazia.
 
 > @NoResults
 
-Putz, não achei nada. Tente refinar sua pesquisa.
+Putz, não achei nada. Provavelmente a cota de download diária do youtube foi atingida. Tente novamente amanhã.
 
 > ---
 

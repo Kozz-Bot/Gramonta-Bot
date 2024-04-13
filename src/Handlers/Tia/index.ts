@@ -7,7 +7,7 @@ const queryMessage = createMethod('fallback', async requester => {
 		const query = requester.rawCommand!.query;
 
 		if (!query) {
-			requester.reply.withTemplate('Help');
+			return requester.reply.withTemplate('Help');
 		}
 
 		const { data: randomMesage } = await TiApi.get<TiaMessage>('/random', {
@@ -37,8 +37,8 @@ const help = createMethod('help', requester => {
 
 const templatePath = 'src/Handlers/Tia/messages.kozz.md';
 
-export const startTiaHandler = () =>
-	createModule({
+export const startTiaHandler = () => {
+	const instance = createModule({
 		commands: {
 			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
 			methods: {
@@ -53,3 +53,6 @@ export const startTiaHandler = () =>
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')
 	);
+
+	return instance;
+};

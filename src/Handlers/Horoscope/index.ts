@@ -40,8 +40,8 @@ const getSign = createMethod('fallback', async requester => {
 
 const templatePath = './src/Handlers/Horoscope/reply.kozz.md';
 
-export const startHoroscopeHandler = () =>
-	createModule({
+export const startHoroscopeHandler = () => {
+	const instance = createModule({
 		commands: {
 			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
 			methods: {
@@ -56,3 +56,5 @@ export const startHoroscopeHandler = () =>
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')
 	);
+	return instance;
+};

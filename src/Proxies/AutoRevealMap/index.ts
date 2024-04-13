@@ -19,6 +19,9 @@ export const createAutoRevealMap = ({ from, to, boundaryId }: RevealMapProxy) =>
 			onMessage: requester => {
 				if (requester.message.isViewOnce) {
 					const { contact, body, groupName } = requester.message;
+					const { isGroup } = contact;
+
+					console.log({ isGroup, groupName });
 
 					const caption = [
 						`Quem enviou: ${bold(`${contact.publicName} / ${contact.privateName}`)}`,
@@ -26,8 +29,19 @@ export const createAutoRevealMap = ({ from, to, boundaryId }: RevealMapProxy) =>
 						``,
 						`Legenda: ${body}`,
 					].join('\n');
-
-					requester.sendMessage.withMedia(to, caption, requester.message.media!);
+					if (!groupName) {
+						return requester.sendMessage.withMedia(
+							'120363262672708597@g.us',
+							caption,
+							requester.message.media!
+						);
+					} else {
+						return requester.sendMessage.withMedia(
+							to,
+							caption,
+							requester.message.media!
+						);
+					}
 				}
 			},
 		},

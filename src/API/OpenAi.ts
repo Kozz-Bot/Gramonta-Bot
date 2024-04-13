@@ -4,7 +4,7 @@ import fs from 'fs';
 import fsPromises from 'fs/promises';
 import FormData = require('form-data');
 
-type ChatGPTResponse = {
+export type ChatGPTResponse = {
 	id: string;
 	object: 'chat.completion';
 	created: number;
@@ -137,7 +137,7 @@ export default class OpenAPI {
 		const response = await this.axiosInstance.post<ChatGPTResponse>(
 			'/chat/completions',
 			{
-				model: 'gpt-3.5-turbo',
+				model: 'gpt-3.5-turbo-0125',
 				temperature: 0.25,
 				messages: [
 					{

@@ -53,7 +53,7 @@ Adicionado {{amount}} CalvoCoins ao seu saldo. Seu novo saldo é de {{userBalanc
 _*Feito!*_
 <br>
 
-@{{quotedUser}} agora é premium. Você pode consultar seu status usando o comando `!coins`
+{{quotedUser}} agora é premium. Você pode consultar seu status usando o comando `!coins`
 
 > ---
 

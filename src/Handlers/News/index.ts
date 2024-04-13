@@ -85,8 +85,8 @@ const help = createMethod('help', requester => {
 	requester.reply.withTemplate('Help');
 });
 
-export const startNewsHandler = () =>
-	createModule({
+export const startNewsHandler = () => {
+	const instance = createModule({
 		commands: {
 			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
 			methods: {
@@ -102,3 +102,6 @@ export const startNewsHandler = () =>
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')
 	);
+
+	return instance;
+};

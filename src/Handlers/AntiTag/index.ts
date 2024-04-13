@@ -1,7 +1,7 @@
 import { createModule, createStateMachine } from 'kozz-module-maker';
 
 export const createAntiTag = () => {
-	createModule({
+	const instance = createModule({
 		name: 'anti-tag',
 		address: `${process.env.GATEWAY_URL}`,
 		customSocketPath: process.env.SOCKET_PATH,
@@ -48,4 +48,6 @@ export const createAntiTag = () => {
 			}),
 		},
 	});
+
+	return instance;
 };
