@@ -11,3 +11,7 @@ media/ytVideos/*
 src/Handlers/Copypasta/Copypastas.json
 
 credentials.json
+
+src/Handlers/Wordle/games.json
+src/Handlers/Reveal/revealDB.json
+src/Handlers/Copypasta/Copypastas.json

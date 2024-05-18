@@ -16,3 +16,5 @@ export * from './Tia';
 export * from './News';
 export * from './Transmission';
 export * from './AntiTag';
+export * from './All';
+export * from './Wordle';
