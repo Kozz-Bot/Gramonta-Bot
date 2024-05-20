@@ -12,7 +12,9 @@ const guess = createMethod('fallback', requester => {
 
 		const game = guessWord(requester, query);
 
-		const prettyResult = game.guesses.map(guess => guess.prettyResult).join('\n');
+		const prettyResult = game.guesses
+			.map(guess => `${guess.guess.toUpperCase()}\n${guess.prettyResult}`)
+			.join('\n');
 		const tries = game.guesses.length;
 
 		if (game.win) {
@@ -21,10 +23,14 @@ const guess = createMethod('fallback', requester => {
 				history: prettyResult,
 			});
 		} else {
-			return requester.reply.withTemplate('GuessResult', {
+			requester.reply.withTemplate('GuessResult', {
 				tries,
 				history: prettyResult,
 			});
+
+			if (tries === 6) {
+				requester.reply(`A palavra era ${game.word}`);
+			}
 		}
 	} catch (e) {
 		if (e === 'INVALID_GUESS') {
@@ -48,6 +54,7 @@ export const startWordleModule = () => {
 			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
 			methods: {
 				...guess,
+				...help,
 			},
 		},
 		address: `${process.env.GATEWAY_URL}`,

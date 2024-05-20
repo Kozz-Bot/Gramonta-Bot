@@ -76,7 +76,8 @@ export const guessWord = (requester: MessageObj, guess: string) => {
 
 	const normalizedGuess = normalizeString(guess);
 
-	if (!validGuesses.includes(guess)) throw 'INVALID_GUESS';
+	if (!validGuesses.some(validGuess => normalizeString(validGuess) === guess))
+		throw 'INVALID_GUESS';
 
 	const word = createWord(game.word);
 
@@ -89,7 +90,7 @@ export const guessWord = (requester: MessageObj, guess: string) => {
 		})
 		.join('');
 
-	const win = guess === word.asString;
+	const win = guess === normalizeString(word.asString);
 
 	const updatedGame: Game = {
 		...game,

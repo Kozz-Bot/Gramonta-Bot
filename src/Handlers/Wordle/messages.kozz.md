@@ -33,7 +33,7 @@ Tentativas usadas: {{tries}}
 
 > @GuessResult
 
-# Worlde
+# Wordle
 
 Chute {{tries}} de 6
 {{history}}
