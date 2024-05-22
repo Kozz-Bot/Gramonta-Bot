@@ -18,3 +18,4 @@ export * from './Transmission';
 export * from './AntiTag';
 export * from './Wordle';
 export * from './Todes';
+export * from './MemeMaker';
