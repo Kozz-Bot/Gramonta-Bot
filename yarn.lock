@@ -1751,10 +1751,10 @@ klaw-sync@^6.0.0:
   dependencies:
     graceful-fs "^4.1.11"
 
-kozz-module-maker@^0.1.18:
-  version "0.1.18"
-  resolved "https://registry.yarnpkg.com/kozz-module-maker/-/kozz-module-maker-0.1.18.tgz#4e8ed61045fd9b88f5af24680ecace7447af5036"
-  integrity sha512-9nyas5AcKnoj6kr2aiVyqXAOMFxPqE2oGGy4HuJ+GNRtVXJMbEHu37sYz5eut/cP3WXv60KytpBnwcxIfeqVYQ==
+kozz-module-maker@^0.1.19:
+  version "0.1.19"
+  resolved "https://registry.yarnpkg.com/kozz-module-maker/-/kozz-module-maker-0.1.19.tgz#752bac666198bf64906f308f8ec7ff1eea7caa2b"
+  integrity sha512-z/ZfmBwPQu/j5pmJVWiVdfZmEyk3l5aeJNxmGN9KAVdXNYTf1HA3tMbxzptqElQ8ZHGyCHdNVrSslssFbzYouw==
   dependencies:
     arcsecond "^5.0.0"
     dotenv "^16.0.3"

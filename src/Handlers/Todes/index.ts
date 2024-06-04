@@ -5,6 +5,7 @@ import { hostAccountOnly } from 'src/Middlewares/CheckContact';
 import { useJsonDB } from 'src/Utils/StaticJsonDb';
 
 const todesDb = useJsonDB('auth', 'src/Handlers/Todes/todesdb.json');
+const avoidDb = useJsonDB('avoid', 'src/Handlers/Todes/todesdb.json');
 
 const getId = (requester: MessageObj) => {
 	const groupId = requester.message.to;
@@ -24,11 +25,37 @@ const tagAll = createMethod('fallback', requester => {
 
 	const taggerId = requester.message.from;
 
+	const untaggable = avoidDb.getAllEntities().map(({ id }) => id);
+
 	return requester.reply(
 		`${tagMember(taggerId)} mencionou todos os membros: ${
 			requester.rawCommand?.query
-		} ${tagEveryone()}`
+		} ${tagEveryone(untaggable)}`
 	);
+});
+
+const avoidMe = createMethod('avoid', requester => {
+	const id = requester.message.from;
+
+	const alreadyAvoided = !!avoidDb.getEntityById(id);
+	if (alreadyAvoided) {
+		return requester.reply('Você já está imune à marcação geral');
+	}
+
+	avoidDb.addEntity({ id });
+	requester.reply('Você não será mais marcado nas notificações gerais.');
+});
+
+const unavoidMe = createMethod('unavoid', requester => {
+	const id = requester.message.from;
+
+	const notAvoided = !avoidDb.getEntityById(id);
+	if (notAvoided) {
+		return requester.reply('Você já está recebendo notificações de marcação geral');
+	}
+
+	avoidDb.removeEntity(id);
+	requester.reply('Você voltará a ser marcado nas notificações gerais.');
 });
 
 const allow = createMethod(
@@ -77,6 +104,8 @@ export const startTodesHandler = () => {
 				...tagAll,
 				...allow,
 				...deny,
+				...avoidMe,
+				...unavoidMe,
 			},
 		},
 		name: 'todes',

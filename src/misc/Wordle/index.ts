@@ -36,7 +36,7 @@ const gameDb = useJsonDB<Game, 'games'>('games', './src/Handlers/Wordle/games.js
 const getWord = (requester: MessageObj) => {
 	const groupIdAsNumber = Number(requester.message.to.match(/[0-9]*/)![0]);
 	const contactIdAsNumber = Number(requester.message.from.match(/[0-9]*/)![0]);
-	const formattedDay = new Date().getDay();
+	const formattedDay = new Date().getDate();
 	const formattedMonth = new Date().getMonth();
 
 	//expression to get a number hash using current day, month, requester's contactId and chatId
