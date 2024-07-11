@@ -195,7 +195,7 @@ export const startAIHandler = () => {
 		},
 		name: 'ai',
 		address: `${process.env.GATEWAY_URL}`,
-		customSocketPath: '/kozz/socket.io/',
+		customSocketPath: process.env.SOCKET_PATH,
 		templatePath,
 	}).resources.upsertResource('help', () =>
 		loadTemplates(templatePath).getTextFromTemplate('Help')

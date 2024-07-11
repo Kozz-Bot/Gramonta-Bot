@@ -1,17 +1,21 @@
 import { createMethod, createModule } from 'kozz-module-maker';
-import { loadTemplates } from 'kozz-module-maker/dist/Message';
-import { useJsonDB } from 'src/Utils/StaticJsonDb';
-import { MutedPerson, mutePerson, unmutePerson, isUserMutted } from './mutedDB';
+import { MessageObj, loadTemplates } from 'kozz-module-maker/dist/Message';
+import {
+	getMuteRegister,
+	isUserMutted,
+	MutedPerson,
+	mutePerson,
+	unmutePerson,
+	updateWhenMutedSendsMessage,
+} from './mutedDB';
 import { hostAccountOnly } from 'src/Middlewares/CheckContact';
 import { UseFn } from 'kozz-module-maker/dist/Instance/Common';
+import { tagMember } from 'kozz-module-maker/dist/InlineCommands';
 
-const MutedDB = useJsonDB<MutedPerson, 'muted'>(
-	'muted',
-	'./src/Proxies/Mute/muted.json'
-);
+const feedbackIntervalTime = 60 * 1000; // 60 seconds
 
 const mute = createMethod(
-	'add',
+	'fallback',
 	hostAccountOnly(async (requester, { reason, time }) => {
 		const taggedPeople = requester.message.taggedContacts;
 		taggedPeople.forEach(person => {
@@ -27,7 +31,7 @@ const mute = createMethod(
 );
 
 const unmute = createMethod(
-	'add',
+	'unmute',
 	hostAccountOnly(async requester => {
 		const taggedPeople = requester.message.taggedContacts;
 		taggedPeople.forEach(person => {
@@ -38,9 +42,36 @@ const unmute = createMethod(
 	})
 );
 
+const shouldReply = (muteRegister: MutedPerson['mutes'][number]) => {
+	const lastMessageASNumber = muteRegister.lastMessageSent;
+
+	return new Date().getTime() > lastMessageASNumber + feedbackIntervalTime;
+};
+
+const onUserMessage = (requester: MessageObj) => {
+	const { contact, to: chat } = requester.message;
+	if (isUserMutted(contact, chat)) {
+		const muteRegister = getMuteRegister(contact, chat)!;
+
+		const shouldSendMessage = shouldReply(muteRegister);
+
+		if (shouldSendMessage) {
+			requester.sendMessage(
+				chat,
+				`${tagMember(requester.message.from)}, você está silenciado do grupo até ${
+					muteRegister.prettyExpiration
+				}. Motivo: ${muteRegister.reason}`
+			);
+			updateWhenMutedSendsMessage(contact, chat);
+		}
+
+		requester.message.delete();
+	}
+};
+
 export const useMute: UseFn = command => {
-	const abort = isUserMutted(command.message.contact, command.message.to);
-	if (abort) {
+	const { contact, to: chat } = command.message;
+	if (isUserMutted(contact, chat)) {
 		if (!command.namedArgs) {
 			command.namedArgs = {};
 		}
@@ -51,7 +82,7 @@ export const useMute: UseFn = command => {
 };
 
 const templatePath = './src/Handlers/Mute/messages.kozz.md';
-export const startCopypastaHandler = () => {
+export const startMuteHandler = () => {
 	const instance = createModule({
 		commands: {
 			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
@@ -60,13 +91,15 @@ export const startCopypastaHandler = () => {
 				...unmute,
 			},
 		},
+		proxy: {
+			source: 'Gramonta-Wa/*',
+			onMessage: onUserMessage,
+		},
 		name: 'mute',
 		address: `${process.env.GATEWAY_URL}`,
 		customSocketPath: process.env.SOCKET_PATH,
 		templatePath,
-	}).resources.upsertResource('help', () =>
-		loadTemplates(templatePath).getTextFromTemplate('Help')
-	);
+	});
 
 	return instance;
 };

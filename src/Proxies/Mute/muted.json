@@ -1,3 +1,40 @@
 {
-	"muted": []
+    "muted": [
+        {
+            "id": "5522981369325@c.us",
+            "mutes": [
+                {
+                    "chat": "120363145764693476@g.us",
+                    "reason": "spam",
+                    "expiration": 1720721091985,
+                    "prettyExpiration": "11/07/2024 15:04:51",
+                    "lastMessageSent": 1720720592797
+                }
+            ]
+        },
+        {
+            "id": "5511983159740@c.us",
+            "mutes": [
+                {
+                    "chat": "120363145764693476@g.us",
+                    "reason": "spam",
+                    "expiration": 1719601440318,
+                    "prettyExpiration": "28/06/2024 16:04:00",
+                    "lastMessageSent": "28/06/2024 16:04:00"
+                }
+            ]
+        },
+        {
+            "id": "5519982979150@c.us",
+            "mutes": [
+                {
+                    "chat": "120363145764693476@g.us",
+                    "reason": "teste",
+                    "expiration": 0,
+                    "prettyExpiration": "11/07/2024 15:11:38",
+                    "lastMessageSent": 1720718049547
+                }
+            ]
+        }
+    ]
 }

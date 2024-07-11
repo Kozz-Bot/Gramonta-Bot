@@ -1,5 +1,6 @@
 import { createModule } from 'kozz-module-maker';
 import { bold } from 'kozz-module-maker/dist/Message';
+import { isUserMutted } from '../Mute/mutedDB';
 
 export type RevealMapProxy = {
 	id: string;
@@ -17,11 +18,12 @@ export const createAutoRevealMap = ({ from, to, boundaryId }: RevealMapProxy) =>
 		proxy: {
 			source: `${boundaryId}/${from}`,
 			onMessage: requester => {
+				if (isUserMutted(requester.message.contact, requester.message.to)) {
+					return;
+				}
+
 				if (requester.message.isViewOnce) {
 					const { contact, body, groupName } = requester.message;
-					const { isGroup } = contact;
-
-					console.log({ isGroup, groupName });
 
 					const caption = [
 						`Quem enviou: ${bold(`${contact.publicName} / ${contact.privateName}`)}`,
