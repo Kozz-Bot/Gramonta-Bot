@@ -4,14 +4,18 @@ import { Media } from 'kozz-types';
 import { generateQuote } from 'src/API/QuoteApi';
 
 const makeQuote = async (requester: MessageObj) => {
+	console.log('making quote');
+
 	const { quotedMessage } = requester.message;
 
 	if (!quotedMessage || !quotedMessage.body) {
 		return requester.reply.withTemplate('Help');
 	}
 
-	const text = quotedMessage.body;
+	const text = quotedMessage.taggedConctactFriendlyBody;
 	const name = quotedMessage.contact.publicName;
+
+	console.log(quotedMessage);
 
 	const profilePicUrl = await requester.ask.boundary(
 		requester.message.boundaryName,
@@ -20,8 +24,11 @@ const makeQuote = async (requester: MessageObj) => {
 			id: quotedMessage.from,
 		}
 	);
-
 	const quoteB64 = await generateQuote(text, name, profilePicUrl.response);
+
+	if (!quoteB64) {
+		return requester.reply('erro');
+	}
 
 	const stickerMedia: Media = {
 		data: quoteB64,
@@ -63,7 +70,7 @@ const defaultMethod = createMethod(
 			return makeQuote(requester);
 		}
 
-		// requester.reply.withTemplate('instructions_default');
+		requester.reply.withTemplate('instructions_default');
 	},
 	{
 		tags: 'string?',
@@ -83,7 +90,7 @@ const templatePath = './src/Handlers/Sticker/reply.kozz.md';
 export const startStickerHandler = () => {
 	const instance = createModule({
 		commands: {
-			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			boundariesToHandle: ['*'],
 			methods: {
 				...defaultMethod,
 				...toImg,

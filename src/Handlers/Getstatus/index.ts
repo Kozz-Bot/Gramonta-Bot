@@ -16,7 +16,7 @@ const defaultMethod = createMethod('default', requester => {
 export const startGetStatusHandler = () =>
 	createModule({
 		commands: {
-			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			boundariesToHandle: ['*'],
 			methods: {
 				...defaultMethod,
 			},

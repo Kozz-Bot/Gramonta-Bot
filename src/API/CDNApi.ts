@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-	baseURL: 'https://gramont.ddns.net/cdn',
+	baseURL: 'http://gramont.ddns.net/cdn',
 	headers: {
 		Authorization: process.env.CDN_TOKEN,
 	},

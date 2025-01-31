@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-export type EngineId = 'stable-diffusion-v1-6';
+import qs from 'qs';
 export type StylePreset = (typeof availableStyles)[number];
 
 export const availableStyles = [
@@ -32,6 +31,7 @@ const Api = axios.create({
 	headers: {
 		Authorization: `Bearer ${process.env.STABILITY_TOKEN}`,
 		Accept: 'application/json',
+		'Content-Type': 'multipart/form-data',
 	},
 });
 
@@ -42,11 +42,9 @@ export type ApiRequestError = {
 };
 
 export type TextToImageResponse = {
-	artifacts: {
-		base64: string;
-		finishReason: string;
-		seed: number;
-	}[];
+	image: string;
+	finish_reason: string;
+	seed: number;
 };
 
 export type TextToImageGenerationOptions = {
@@ -60,26 +58,18 @@ export const isStabilityError = (e: any): e is ApiRequestError => {
 
 export const textToImage = async (
 	prompt: string,
-	engineId = 'stable-diffusion-xl-1024-v1-0',
 	options: Partial<TextToImageGenerationOptions> = {}
 ) => {
 	try {
 		const response = await Api.post<TextToImageResponse>(
-			`/v1/generation/${engineId}/text-to-image`,
-			{
-				text_prompts: [
-					{
-						text: prompt,
-						weight: 0.7,
-					},
-				],
-				style_preset: 'digital-art',
-				steps: 50,
-				...options,
-			}
+			`/v2beta/stable-image/generate/core`,
+			axios.toFormData({
+				prompt,
+				style_preset: options.style_preset ?? 'digital-art',
+			})
 		);
 
-		return response.data.artifacts[0];
+		return response.data;
 	} catch (e) {
 		console.log(e);
 		if (axios.isAxiosError(e)) {

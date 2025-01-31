@@ -20,20 +20,20 @@ const instance = () => {
 		// I unfortunately have to upload to my bucket because Memegen Api doesnt support
 		// custom images as b64 encoded strings.
 		const mediaUrlInBucket = await CDNApi.uploadPublicFile(
-			`ZapMeme-${memeId}.png`,
+			`ZapMeme-${memeId}.jpeg`,
 			media.data
 		);
 
 		const { data } = await api.post<MemegenApiResponse>('/templates/custom', {
 			background: mediaUrlInBucket,
 			text: [topText, bottomText],
-			extension: 'png',
+			extension: 'jpeg',
 		});
 
 		// And here I overwrite the file in my bucket.
 		const memeUrl = await CDNApi.uploadFileFromUrl(
 			'public',
-			`ZapMeme-${memeId}.png`,
+			`ZapMeme-${memeId}.jpeg`,
 			data.url
 		);
 

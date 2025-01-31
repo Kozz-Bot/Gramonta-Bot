@@ -31,7 +31,7 @@ const getHelp = createMethod('default', async requester => {
 export const startHelpInstance = () =>
 	createModule({
 		commands: {
-			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			boundariesToHandle: ['*'],
 			methods: {
 				...getHelp,
 			},

@@ -22,34 +22,39 @@ export const usePremiumCommand =
 		errorMessage: string
 	) =>
 	async (requester: MessageObj, args: ArgsType) => {
-		const userId = requester.message.contact.id;
-		const { userExists } = await CoinsApi.assertUserExists(userId);
+		try {
+			const userId = requester.message.contact.id;
+			const { userExists } = await CoinsApi.assertUserExists(userId);
 
-		if (!userExists) {
-			return requester.reply(
-				'Você não possui conta no CalvoBank. Envie  `!coins create` para criar sua conta ou `!coins help` para mais informações'
-			);
-		}
+			if (!userExists) {
+				return requester.reply(
+					'Você não possui conta no CalvoBank. Envie  `!coins create` para criar sua conta ou `!coins help` para mais informações'
+				);
+			}
 
-		const { coins, premiumValidUntil } = await CoinsApi.getUserData(userId);
+			const { coins, premiumValidUntil } = await CoinsApi.getUserData(userId);
 
-		const canUse = canUsePremiumCommand(amount, coins, premiumValidUntil);
+			const canUse = canUsePremiumCommand(amount, coins, premiumValidUntil);
 
-		if (!canUse) {
-			return requester.reply(
-				`${errorMessage}\n - Você possui ${coins} CalvoCoins e o necessário são ${amount}`
-			);
-		}
+			if (!canUse) {
+				return requester.reply(
+					`${errorMessage}\n - Você possui ${coins} CalvoCoins e o necessário são ${amount}`
+				);
+			}
 
-		const shouldDeductCoins = await callback(requester, args);
-		if (shouldDeductCoins === false) {
-			return;
-		} else {
-			CoinsApi.spendCoins(
-				userId,
-				amount,
-				await uploadAllMediaToBucket(requester.message)
-			);
+			const shouldDeductCoins = await callback(requester, args);
+			if (shouldDeductCoins === false) {
+				return;
+			} else {
+				CoinsApi.spendCoins(
+					userId,
+					amount,
+					await uploadAllMediaToBucket(requester.message)
+				);
+			}
+		} catch (e) {
+			console.warn(e);
+			return requester.reply(`${e}`);
 		}
 	};
 

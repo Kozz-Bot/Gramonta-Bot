@@ -25,8 +25,6 @@ const createMeme = createMethod(
 
 			requester.react('⏳');
 
-			console.log(args);
-
 			const memeUrl = await MemeMakerApi.createMemeFromImage(
 				requester.message.quotedMessage.media!,
 				args['top-text'] ?? '',
@@ -35,6 +33,8 @@ const createMeme = createMethod(
 			);
 
 			requester.react('✅');
+
+			console.log(memeUrl);
 
 			return requester.reply.withMedia.fromUrl(
 				memeUrl,

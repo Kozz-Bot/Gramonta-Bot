@@ -19,3 +19,6 @@ export * from './AntiTag';
 export * from './Wordle';
 export * from './Todes';
 export * from './MemeMaker';
+export * from './SaveLocalFile';
+export * from './AsciiImage';
+export * from './MineRegister';

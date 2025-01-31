@@ -20,7 +20,7 @@ const templatePath = './src/Handlers/Ping/reply.kozz.md';
 export const startPingHandler = () => {
 	const instance = createModule({
 		commands: {
-			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			boundariesToHandle: ['*'],
 			methods: {
 				...defaultMethod,
 			},

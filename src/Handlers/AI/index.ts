@@ -38,7 +38,7 @@ const image = createMethod(
 					});
 				}
 
-				const response = await textToImage(prompt, 'stable-diffusion-xl-1024-v1-0', {
+				const response = await textToImage(prompt, {
 					style_preset: style as StylePreset,
 				});
 
@@ -49,7 +49,7 @@ const image = createMethod(
 				}
 
 				requester.react('🎨');
-				requester.reply.withMedia.fromB64(response.base64, 'image');
+				requester.reply.withMedia.fromB64(response.image, 'image');
 			} catch (e) {
 				requester.reply(`Erro: ${e}`);
 				return false;
@@ -183,7 +183,7 @@ const templatePath = './src/Handlers/AI/messages.kozz.md';
 export const startAIHandler = () => {
 	const instance = createModule({
 		commands: {
-			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			boundariesToHandle: ['*'],
 			methods: {
 				...image,
 				...fallback,

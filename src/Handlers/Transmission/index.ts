@@ -114,12 +114,7 @@ const list = createMethod(
 export const startTransmissionHandler = () => {
 	const instance = createModule({
 		commands: {
-			boundariesToHandle: [
-				'Gramonta-Wa',
-				'postman-test',
-				'postman-test-2',
-				'SalesBot',
-			],
+			boundariesToHandle: ['*'],
 			methods: {
 				...help,
 				...add,

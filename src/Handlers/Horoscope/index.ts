@@ -43,7 +43,7 @@ const templatePath = './src/Handlers/Horoscope/reply.kozz.md';
 export const startHoroscopeHandler = () => {
 	const instance = createModule({
 		commands: {
-			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			boundariesToHandle: ['*'],
 			methods: {
 				...defaultMethod,
 				...getSign,

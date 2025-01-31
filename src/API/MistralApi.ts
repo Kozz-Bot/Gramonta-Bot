@@ -10,7 +10,7 @@ const API = axios.create({
 
 export const fromPrompt = async (context: PreviousMessages) => {
 	const response = await API.post<ChatGPTResponse>('/chat/completions', {
-		model: 'open-mixtral-8x7b',
+		model: 'open-mistral-nemo',
 		messages: [
 			{
 				role: 'system',

@@ -168,7 +168,7 @@ const del = createMethod('delete', requester => {
 export const startCopypastaHandler = () => {
 	const instance = createModule({
 		commands: {
-			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			boundariesToHandle: ['*'],
 			methods: {
 				...help,
 				...list,

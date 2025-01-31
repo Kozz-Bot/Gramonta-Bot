@@ -40,7 +40,7 @@ const templatePath = 'src/Handlers/Weather/messages.kozz.md';
 export const startWeatherHandler = () => {
 	const instance = createModule({
 		commands: {
-			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			boundariesToHandle: ['*'],
 			methods: {
 				...queryWeather,
 			},

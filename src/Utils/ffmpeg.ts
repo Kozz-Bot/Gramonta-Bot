@@ -11,6 +11,8 @@ export const convertBufferToPath = async (
 	const inFilePath = `${__TEMP_AUDIO_PATH__}/tempFile.${fromFormat}`;
 	const outFilePath = `${__TEMP_AUDIO_PATH__}/temp.${toFormat}`;
 
+	//@ts-ignore
+
 	await fs.writeFile(inFilePath, buffer);
 
 	return new Promise((resolve, reject) => {
@@ -33,22 +35,27 @@ export const convertPathToPath = async (
 	inFilePath: string,
 	toFormat: `${string}`
 ): Promise<string> => {
-	const outFilePath = `${__TEMP_AUDIO_PATH__}/temp.${toFormat}`;
+	const outFilePath = `${__TEMP_AUDIO_PATH__}.${toFormat}`;
 	const buffer = await fs.readFile(inFilePath);
 
+	//@ts-ignore
 	await fs.writeFile(inFilePath, buffer);
 
 	return new Promise((resolve, reject) => {
 		ffmpeg(inFilePath)
 			.output(outFilePath)
-
 			.saveToFile(outFilePath)
 
 			.on('end', () => {
+				console.log('Endded');
+				1;
 				resolve(outFilePath);
 			})
 
+			.on('progress', progress => console.log({ progress }))
+
 			.on('error', err => {
+				console.warn(err);
 				reject(err);
 			});
 	});
@@ -64,6 +71,8 @@ export const convertB64ToB64 = async (
 
 	const buffer = Buffer.from(inB64, 'base64');
 
+	//@ts-ignore
+
 	await fs.writeFile(inFilePath, buffer);
 
 	return new Promise((resolve, reject) => {
@@ -74,6 +83,8 @@ export const convertB64ToB64 = async (
 
 			.on('end', async () => {
 				const buffer = await fs.readFile(outFilePath);
+				//@ts-ignore
+
 				resolve(Buffer.from(buffer).toString('base64'));
 			})
 
@@ -92,6 +103,8 @@ export const convertB64ToPath = async (
 	const inFilePath = `${__TEMP_AUDIO_PATH__}/tempFile.${fromFormat}`;
 
 	const buffer = Buffer.from(inB64, 'base64');
+
+	//@ts-ignore
 
 	await fs.writeFile(inFilePath, buffer);
 

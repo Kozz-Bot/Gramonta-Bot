@@ -25,6 +25,7 @@ const queryMessage = createMethod('fallback', async requester => {
 			});
 		}
 	} catch (e) {
+		console.log(e);
 		return requester.reply.withTemplate('Error', {
 			error: e,
 		});
@@ -40,7 +41,7 @@ const templatePath = 'src/Handlers/Tia/messages.kozz.md';
 export const startTiaHandler = () => {
 	const instance = createModule({
 		commands: {
-			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			boundariesToHandle: ['*'],
 			methods: {
 				...queryMessage,
 				...help,

@@ -29,7 +29,7 @@ export type WithID<T extends keyof CoinsEntitiesModel> = {
 } & CoinsEntitiesModel[T];
 
 const instance = axios.create({
-	baseURL: 'https://gramont.ddns.net/coins',
+	baseURL: 'http://192.168.15.4:8000/coins/',
 	headers: {
 		Authorization: `${process.env.COINS_TOKEN}`,
 	},
@@ -38,7 +38,7 @@ const instance = axios.create({
 export const getUserData = async (userId: string) => {
 	const response = await instance.get<WithID<'user'>>('/user', {
 		params: {
-			userId,
+			userId: userId.replace('@s.whatsapp.net', '@c.us'),
 		},
 	});
 
@@ -51,7 +51,7 @@ export const addCoinsToUser = async (
 	payload: any
 ) => {
 	const response = await instance.post('/user/add-balance', {
-		userId,
+		userId: userId.replace('@s.whatsapp.net', '@c.us'),
 		amount,
 		payload,
 	});
@@ -65,7 +65,7 @@ export const makeUserPremium = async (
 	payload: any
 ) => {
 	const response = await instance.post('/user/set-premium', {
-		userId,
+		userId: userId.replace('@s.whatsapp.net', '@c.us'),
 		premiumValidFor,
 		payload,
 	});
@@ -75,7 +75,7 @@ export const makeUserPremium = async (
 
 export const spendCoins = async (userId: string, amount: number, payload: any) => {
 	const response = await instance.post('/user/spend', {
-		userId,
+		userId: userId.replace('@s.whatsapp.net', '@c.us'),
 		amount,
 		payload,
 	});
@@ -85,7 +85,7 @@ export const spendCoins = async (userId: string, amount: number, payload: any) =
 
 export const createUser = async (userId: string, coins = 0) => {
 	const response = await instance.post('/user', {
-		userId,
+		userId: userId.replace('@s.whatsapp.net', '@c.us'),
 		coins,
 	});
 
@@ -97,7 +97,7 @@ export const getFullTransactionList = async (userId: string) => {
 		'/transactions/list',
 		{
 			params: {
-				userId,
+				userId: userId.replace('@s.whatsapp.net', '@c.us'),
 			},
 		}
 	);
@@ -112,7 +112,7 @@ type AssertUserExistsResponse = {
 export const assertUserExists = async (userId: string) => {
 	const response = await instance.get<AssertUserExistsResponse>('/user/exists', {
 		params: {
-			userId,
+			userId: userId.replace('@s.whatsapp.net', '@c.us'),
 		},
 	});
 

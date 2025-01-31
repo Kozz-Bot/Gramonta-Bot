@@ -1,8 +1,14 @@
-import ytdl from 'ytdl-core';
+import ytdl from '@distube/ytdl-core';
 import oldFs from 'fs';
 import YTSearch, { YouTubeSearchOptions } from 'youtube-search';
 import he from 'he';
 import { convertPathToPath } from 'src/Utils/ffmpeg';
+
+const agent = ytdl.createAgent(
+	JSON.parse(oldFs.readFileSync('./src/API/ytCookies.json', { encoding: 'utf-8' }))
+);
+
+console.log(agent);
 
 type DownloadType = 'video' | 'audio';
 
@@ -65,15 +71,19 @@ const ytDownload = async (
 	savePath: string
 ): Promise<string | undefined> => {
 	try {
-		const quality = type === 'video' ? '18' : '140';
+		const filePath: string = await new Promise(async (resolve, reject) => {
+			let info = await ytdl.getInfo(url.split('=')[1], { agent });
+			let format = ytdl.filterFormats(info.formats, 'audioandvideo')[0];
+			console.log('Format found!', format);
+			const videoPath = savePath + '.' + format.container;
 
-		const filePath: string = await new Promise((resolve, reject) => {
 			const download = ytdl(url, {
-				quality,
-			}).pipe(oldFs.createWriteStream(savePath));
+				format,
+				agent,
+			}).pipe(oldFs.createWriteStream(videoPath));
 
 			download.once('close', () => {
-				resolve(savePath);
+				resolve(videoPath);
 			});
 
 			download.once('error', err => {
@@ -87,6 +97,7 @@ const ytDownload = async (
 
 		return convertPathToPath(filePath, 'mp3');
 	} catch (e) {
+		console.warn(e);
 		return undefined;
 	}
 };
@@ -94,7 +105,7 @@ const ytDownload = async (
 export const searchResults = async (
 	query: string,
 	token?: string,
-	maxResults = 3
+	maxResults = 1
 ) => {
 	try {
 		const options: YouTubeSearchOptions = {
@@ -110,7 +121,7 @@ export const searchResults = async (
 			...response,
 			results: response.results
 				.filter(result => result.kind === 'youtube#video')
-				.map((result) => ({
+				.map(result => ({
 					link: result.link,
 					title: he.decode(result.title),
 					thumbnail: result.thumbnails.high?.url,

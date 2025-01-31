@@ -15,6 +15,8 @@ const templatePath = './src/Handlers/CalvoCoins/messages.kozz.md';
 const assertUserExists = async (userId: string) => {
 	const { userExists } = await CoinsApi.assertUserExists(userId);
 
+	console.log({ userId });
+
 	if (!userExists) {
 		throw new Error('Esse usuário não possui conta no CalvoBank');
 	}
@@ -172,7 +174,7 @@ const help = createMethod('help', requester => requester.reply.withTemplate('Hel
 export const startCoinsHandler = () => {
 	const instance = createModule({
 		commands: {
-			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			boundariesToHandle: ['*'],
 			methods: {
 				...getInfo,
 				...addCoins,

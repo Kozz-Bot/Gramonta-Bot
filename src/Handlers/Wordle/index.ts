@@ -1,9 +1,14 @@
 import { createMethod, createModule } from 'kozz-module-maker';
 import { loadTemplates } from 'kozz-module-maker/dist/Message';
 import { guessWord } from 'src/misc/Wordle';
+import fs from 'fs/promises';
+
 const templatePath = 'src/Handlers/Wordle/messages.kozz.md';
 
-const guess = createMethod('fallback', requester => {
+/**
+ * Using try-catch as control-flow???? pls kill me :v
+ */
+const guess = createMethod('fallback', async requester => {
 	try {
 		const query = requester.rawCommand?.method;
 		if (!query) {
@@ -18,6 +23,20 @@ const guess = createMethod('fallback', requester => {
 		const tries = game.guesses.length;
 
 		if (game.win) {
+			const recebaGnoseSticker = await fs.readFile(
+				'./media/saved/receba-gnose.webp',
+				'base64url'
+			);
+
+			requester.reply.withSticker({
+				data: recebaGnoseSticker,
+				fileName: 'receba-gnose.webp',
+				mimeType: 'image/webp',
+				sizeInBytes: recebaGnoseSticker.length,
+				stickerTags: [],
+				transportType: 'b64',
+			});
+
 			return requester.reply.withTemplate('Win', {
 				tries,
 				history: prettyResult,
@@ -51,7 +70,7 @@ export const startWordleModule = () => {
 	const instance = createModule({
 		name: 'wordle',
 		commands: {
-			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			boundariesToHandle: ['*'],
 			methods: {
 				...guess,
 				...help,

@@ -1,4 +1,4 @@
-// Shamelessly stolen from 
+// Shamelessly stolen from
 // https://github.com/vgarciasc/termooo-solver/blob/main/database.py
 
 export const validGuesses = [

@@ -1,4 +1,5 @@
 import { createModule, createMethod } from 'kozz-module-maker';
+import fs from 'fs/promises';
 
 const messageInfo = createMethod('default', async requester => {
 	const {
@@ -11,7 +12,10 @@ const messageInfo = createMethod('default', async requester => {
 		fromHostAccount,
 		to,
 		media,
-	} = requester.rawCommand!.message.quotedMessage || requester.message;
+	} = requester.message.quotedMessage || requester.message;
+
+	console.log(requester.message.quotedMessage ?? requester.message);
+
 	const response = [
 		`Contact Info: \`\`\`${JSON.stringify(contact, undefined, '  ')}\`\`\``,
 		``,
@@ -27,12 +31,26 @@ const messageInfo = createMethod('default', async requester => {
 	].join('\n');
 
 	requester.reply(response);
+
+	const recebaGnoseSticker = await fs.readFile(
+		'./media/saved/receba-gnose.webp',
+		'base64url'
+	);
+
+	requester.reply.withSticker({
+		data: recebaGnoseSticker,
+		fileName: 'receba-gnose.webp',
+		mimeType: 'image/webp',
+		sizeInBytes: recebaGnoseSticker.length,
+		stickerTags: [],
+		transportType: 'b64',
+	});
 });
 
 export const startDebugHandler = () =>
 	createModule({
 		commands: {
-			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			boundariesToHandle: ['*'],
 			methods: {
 				...messageInfo,
 			},

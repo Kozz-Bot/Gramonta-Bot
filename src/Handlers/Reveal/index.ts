@@ -83,7 +83,7 @@ export const startRevealHandler = () => {
 
 	const instance = createModule({
 		commands: {
-			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			boundariesToHandle: ['*'],
 			methods: {
 				...defaultMethod,
 				...autoReveal,

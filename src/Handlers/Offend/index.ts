@@ -54,7 +54,7 @@ const templatePath = './src/Handlers/Offend/reply.kozz.md';
 export const startOffenseHandler = () => {
 	const instance = createModule({
 		commands: {
-			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],
+			boundariesToHandle: ['*'],
 			methods: {
 				...o,
 				...a,

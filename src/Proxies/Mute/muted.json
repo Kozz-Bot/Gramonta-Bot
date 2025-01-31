@@ -35,6 +35,18 @@
                     "lastMessageSent": 1720718049547
                 }
             ]
+        },
+        {
+            "id": "14074339262@c.us",
+            "mutes": [
+                {
+                    "chat": "120363145764693476@g.us",
+                    "reason": "gringa chata att",
+                    "expiration": 1722275650978,
+                    "prettyExpiration": "29/07/2024 14:54:10",
+                    "lastMessageSent": 1722275452403
+                }
+            ]
         }
     ]
 }
