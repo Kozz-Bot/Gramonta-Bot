@@ -35,6 +35,7 @@ const guess = createMethod('fallback', async requester => {
 				sizeInBytes: recebaGnoseSticker.length,
 				stickerTags: [],
 				transportType: 'b64',
+				duration: null,
 			});
 
 			return requester.reply.withTemplate('Win', {

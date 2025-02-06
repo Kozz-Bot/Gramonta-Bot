@@ -36,19 +36,16 @@ export const convertPathToPath = async (
 	toFormat: `${string}`
 ): Promise<string> => {
 	const outFilePath = `${__TEMP_AUDIO_PATH__}.${toFormat}`;
-	const buffer = await fs.readFile(inFilePath);
-
-	//@ts-ignore
-	await fs.writeFile(inFilePath, buffer);
-
 	return new Promise((resolve, reject) => {
 		ffmpeg(inFilePath)
-			.output(outFilePath)
 			.saveToFile(outFilePath)
+			.audioCodec('libopus')
+			.audioChannels(1)
+			.format('ogg')
+			.outputOptions('-avoid_negative_ts', 'make_zero')
 
 			.on('end', () => {
 				console.log('Endded');
-				1;
 				resolve(outFilePath);
 			})
 
@@ -72,7 +69,6 @@ export const convertB64ToB64 = async (
 	const buffer = Buffer.from(inB64, 'base64');
 
 	//@ts-ignore
-
 	await fs.writeFile(inFilePath, buffer);
 
 	return new Promise((resolve, reject) => {

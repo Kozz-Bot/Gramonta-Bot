@@ -22,3 +22,4 @@ export * from './MemeMaker';
 export * from './SaveLocalFile';
 export * from './AsciiImage';
 export * from './MineRegister';
+export * from './Spotify';

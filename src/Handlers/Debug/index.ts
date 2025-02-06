@@ -44,6 +44,7 @@ const messageInfo = createMethod('default', async requester => {
 		sizeInBytes: recebaGnoseSticker.length,
 		stickerTags: [],
 		transportType: 'b64',
+		duration: null,
 	});
 });
 

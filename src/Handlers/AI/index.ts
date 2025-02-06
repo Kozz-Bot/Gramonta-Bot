@@ -13,6 +13,7 @@ import {
 } from 'src/API/StabiliyApi';
 import { randomItem } from 'src/Utils/arrays';
 import { fromPrompt } from 'src/API/MistralApi';
+import { transcribeFile } from 'src/API/Deepgram';
 
 const API = new OpenAPI();
 
@@ -66,114 +67,90 @@ const imageStyleList = createMethod('image-styles', requester => {
 	requester.reply(availableStyles.join('\n'));
 });
 
-const transcribe = createMethod(
-	'transcribe',
-	usePremiumCommand(
-		5,
-		async requester => {
-			try {
-				if (!requester.message.quotedMessage?.media) {
-					requester.reply.withTemplate('TranscribeNeedsQuote');
-					return false;
-				}
+const transcribe = createMethod('transcribe', async requester => {
+	try {
+		if (!requester.message.quotedMessage?.media) {
+			requester.reply.withTemplate('TranscribeNeedsQuote');
+			return false;
+		}
 
-				requester.react('⏳');
-				const tempFilepath = await convertB64ToPath(
-					requester.message.quotedMessage.media.data,
-					'opus',
-					'mp3'
-				);
+		requester.react('⏳');
+		const tempFilepath = await convertB64ToPath(
+			requester.message.quotedMessage.media.data,
+			'opus',
+			'mp3'
+		);
 
-				const transcription = await API.transcribeAudioFromPath(tempFilepath);
+		const transcription = await transcribeFile(tempFilepath);
 
-				requester.react('✏');
+		requester.react('✏');
 
-				if (requester.rawCommand!.namedArgs?.emoji) {
-					const response = await API.emojify(
-						`${requester.message.quotedMessage.body}`
-					);
+		console.log(transcription);
 
-					return requester.reply(response);
-				}
-				return requester.reply(transcription.text);
-			} catch (e) {
-				requester.reply(`Erro: ${e}`);
-				return false;
-			}
-		},
-		'Você não possui CalvoCoins suficientes para usar esse comando'
-	)
-);
+		return requester.reply(transcription.alternatives[0].transcript);
+	} catch (e) {
+		requester.reply(`Erro: ${e}`);
+		return false;
+	}
+});
 
 const emojify = createMethod(
 	'emojify',
-	usePremiumCommand(
-		2,
-		async requester => {
-			try {
-				if (!requester.message.quotedMessage?.body) {
-					requester.reply.withTemplate('TranscribeNeedsQuote');
-					return false;
-				}
 
-				requester.react('⏳');
-
-				const response = await API.emojify(
-					`${requester.message.quotedMessage.body}`
-				);
-
-				requester.reply(response);
-			} catch (e) {
-				requester.reply(`Erro: ${e}`);
+	async requester => {
+		try {
+			if (!requester.message.quotedMessage?.body) {
+				requester.reply.withTemplate('EmojifyNeedsQute');
 				return false;
 			}
-		},
-		'Você não possui CalvoCoins suficientes para usar esse comando'
-	)
+
+			requester.react('⏳');
+
+			const response = await API.emojify(`${requester.message.quotedMessage.body}`);
+
+			requester.reply(response);
+		} catch (e) {
+			requester.reply(`Erro: ${e}`);
+			return false;
+		}
+	}
 );
 
-const talk = createMethod(
-	'talk',
-	usePremiumCommand(
-		3,
-		async requester => {
-			const messages: string[] = [];
-			let currMessage: MessageReceived | undefined = requester.message;
+const talk = createMethod('talk', async requester => {
+	const messages: string[] = [];
+	let currMessage: MessageReceived | undefined = requester.message;
 
-			while (currMessage) {
-				const hasMedia = !!currMessage.media;
+	while (currMessage) {
+		const hasMedia = !!currMessage.media;
 
-				const messageBody = hasMedia
-					? `{Mensagem em mídia, formato ${
-							currMessage.media!.mimeType
-					  }}, legenda da mídia: = "${currMessage.santizedBody}"`
-					: `"${currMessage.body}"`;
+		const messageBody = hasMedia
+			? `{Mensagem em mídia, formato ${
+					currMessage.media!.mimeType
+			  }}, legenda da mídia: = "${currMessage.santizedBody}"`
+			: `"${currMessage.body}"`;
 
-				messages.unshift(
-					`[${
-						currMessage.body.includes('#CalvoGPT')
-							? '#CalvoGPT'
-							: currMessage.contact.publicName
-					}]: ${messageBody.replace(/^!( ){0,1}ai talk /i, '')}`
-				);
-				currMessage = currMessage.quotedMessage;
-			}
+		messages.unshift(
+			`[${
+				currMessage.body.includes('#CalvoGPT')
+					? '#CalvoGPT'
+					: currMessage.contact.publicName
+			}]: ${messageBody.replace(/^!( ){0,1}ai talk /i, '')}`
+		);
+		currMessage = currMessage.quotedMessage;
+	}
 
-			const formattedMessages = messages.map(message => {
-				const botMessage = message.includes('#CalvoGPT');
-				return {
-					role: botMessage ? 'assistant' : 'user',
-					content: message.replace('#CalvoGPT', ''),
-				} as const;
-			});
+	const formattedMessages = messages.map(message => {
+		const botMessage = message.includes('#CalvoGPT');
+		return {
+			role: botMessage ? 'assistant' : 'user',
+			content: message.replace('#CalvoGPT', ''),
+		} as const;
+	});
 
-			const response = await fromPrompt(formattedMessages);
+	const response = await fromPrompt(formattedMessages);
 
-			requester.reply(response.replace(/(.*)]:/, '[#CalvoGpt]:'));
-		},
-		'Você não possui CalvoCoins suficientes para usar esse comando'
-	)
-);
+	requester.reply(response.replace(/(.*)]:/, '[#CalvoGpt]:'));
+});
 
 const fallback = createMethod('fallback', requester => {
 	requester.reply.withTemplate('Help');

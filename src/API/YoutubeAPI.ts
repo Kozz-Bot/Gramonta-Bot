@@ -30,7 +30,7 @@ export const downloadMp3FromId = async (id: string): Promise<string | void> => {
  * @returns {string} mp3 path
  */
 export const downloadMp3FromUrl = (url: string): Promise<string | undefined> => {
-	const path = './media/ytSongs/song.webm';
+	const path = './media/ytSongs/song';
 	return ytDownload('audio', url, path);
 };
 
@@ -41,7 +41,7 @@ export const downloadMp3FromUrl = (url: string): Promise<string | undefined> => 
  * @returns {string} mp4 path
  */
 export const downloadVideoFromId = (id: string): Promise<string | undefined> => {
-	const path = './media/ytVideos/video.mp4';
+	const path = './media/ytVideos/video';
 
 	const ytUrl = `https://www.youtube.com/watch?v=${id}`;
 	return ytDownload('video', ytUrl, path);
@@ -54,7 +54,7 @@ export const downloadVideoFromId = (id: string): Promise<string | undefined> => 
  * @returns {string} mp4 path
  */
 export const downloadVideoFromUrl = (url: string): Promise<string | undefined> => {
-	const path = './media/ytVideos/video.mp4';
+	const path = './media/ytVideos/video';
 	return ytDownload('video', url, path);
 };
 
@@ -71,31 +71,47 @@ const ytDownload = async (
 	savePath: string
 ): Promise<string | undefined> => {
 	try {
-		const filePath: string = await new Promise(async (resolve, reject) => {
-			let info = await ytdl.getInfo(url.split('=')[1], { agent });
-			let format = ytdl.filterFormats(info.formats, 'audioandvideo')[0];
-			console.log('Format found!', format);
-			const videoPath = savePath + '.' + format.container;
+		return new Promise(async (resolve, reject) => {
+			let info = await ytdl.getInfo(url.split('=')[1]);
+			let format = ytdl.filterFormats(info.formats, format => {
+				if (type === 'audio') {
+					return (
+						format.audioCodec === 'opus' &&
+						!!format.audioBitrate &&
+						format.audioBitrate >= 128 &&
+						!format.hasVideo
+					);
+				} else {
+					return format.hasVideo && format.hasAudio && format.container === 'mp4';
+				}
+			})[0];
+
+			if (!format) {
+				console.warn('could not find correct format');
+				return undefined;
+			}
+
+			const mediaPath = savePath + '.' + format.container;
 
 			const download = ytdl(url, {
 				format,
-				agent,
-			}).pipe(oldFs.createWriteStream(videoPath));
+			}).pipe(oldFs.createWriteStream(mediaPath));
 
-			download.once('close', () => {
-				resolve(videoPath);
+			download.once('close', async () => {
+				if (type === 'audio') {
+					const newPath = await convertPathToPath(mediaPath, 'ogg');
+					resolve(newPath);
+				} else {
+					resolve(mediaPath);
+				}
+				console.log('done!');
 			});
 
 			download.once('error', err => {
+				console.warn(err);
 				reject(err);
 			});
 		});
-
-		if (type === 'video') {
-			return filePath;
-		}
-
-		return convertPathToPath(filePath, 'mp3');
 	} catch (e) {
 		console.warn(e);
 		return undefined;

@@ -47,6 +47,8 @@ const firstSong = createMethod('song', async requester => {
 				error: 'Falha ao salvar o arquivo',
 			});
 		}
+		console.log(mediaPath);
+
 		requester.react('🎶');
 		requester.reply.withMedia.fromPath(
 			mediaPath,

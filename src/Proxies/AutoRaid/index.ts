@@ -28,6 +28,7 @@ export const createAutoRaid = () => {
 								sizeInBytes: null,
 								transportType: 'b64',
 								stickerTags: [],
+								duration: null,
 							});
 
 							delay += delayIncrement + Math.random() * 1500;

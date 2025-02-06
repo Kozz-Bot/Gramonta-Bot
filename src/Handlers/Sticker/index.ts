@@ -37,6 +37,7 @@ const makeQuote = async (requester: MessageObj) => {
 		sizeInBytes: null,
 		transportType: 'b64',
 		stickerTags: ['💬', '🗯', '💭'],
+		duration: null,
 	};
 
 	requester.reply.withSticker(stickerMedia);
