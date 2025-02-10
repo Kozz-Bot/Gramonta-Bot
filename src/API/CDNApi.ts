@@ -24,7 +24,7 @@ const instance = () => {
 			data: dataInB64,
 		});
 
-		return data.fileUrl;
+		return data.fileUrl.replace('http', 'https');
 	};
 
 	const uploadFileFromUrl = async (

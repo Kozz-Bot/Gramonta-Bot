@@ -16,3 +16,4 @@ src/Handlers/Wordle/games.json
 src/Handlers/Reveal/revealDB.json
 src/Handlers/Copypasta/Copypastas.json
 ytCookies.json
+conversation

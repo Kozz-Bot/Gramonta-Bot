@@ -28,6 +28,8 @@ Esses comandos são PAGOS. Cada comando usa uma quantidade de CalvoCoins. Para s
 `| transcribe |   GRATIS!!!  |    !ai transcribe    |`
 `|    talk    |   GRATIS!!!  | !ai talk {{message}} |`
 `|  emojify   |   GRATIS!!!  | responda !ai emojify |`
+`| read-image |   GRATIS!!!  |    !ai read-image    |`
+`|  summary   |   GRATIS!!!  |      !ai summary     |`
 `|==================================================|`
 <br>
 
@@ -35,6 +37,12 @@ _*Image:*_ Gera uma imagem a partir do seu prompt usando Stable Diffusion (Servi
 _*Transcribe*_: Transcreve um video ou audio para texto usando Whisper-Ai
 _*Talk*_: Conversa com o chat-GPT. Responda as mensagens para continuar a conversa.
 _*Emojify*_ Insere um monte de emojis na mensagem que você responder
+_*Read-Image*_ Descreve uma imagem. Envie esse comando como legenda de uma imagem o responda uma mensagem cuja imagem você deseja analisar.
+_*Summary*_: Solicita um resumo da conversa do grupo à IA. Você também pode perguntar coisas para a IA fornecendo o grupo como contexto.
+
+- Por padrão, as últimas 200 mensagens são enviadas à IA para fornecer contexto.
+- Para alterar o tamanho do contexto, passe o atributo `--context {numero de mensagens}`. Exemplo: `!ai summary --context 50`.
+- Para fazer uma pergunta específica, digite logo após o comando `summary`. Exemplo: `!ai summary quem é a pessoa que está doente? --context 150`;
 
 > ---
 

@@ -46,6 +46,8 @@ export const uploadMedia = async (id: string, media: Media) => {
 	if (media.transportType !== 'b64') {
 		throw 'Uploading files from remote URL is not yet implemented';
 	}
+	console.log(`uploading ${fileName} to bucket`);
+
 	await bucket.file(id).save(Buffer.from(media.data, 'base64'));
 	return getMediaURLFromBucket(fileName);
 };

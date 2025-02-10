@@ -12,8 +12,10 @@ import {
 	textToImage,
 } from 'src/API/StabiliyApi';
 import { randomItem } from 'src/Utils/arrays';
-import { fromPrompt } from 'src/API/MistralApi';
+import { fromPrompt, interpretImage, summary } from 'src/API/MistralApi';
 import { transcribeFile } from 'src/API/Deepgram';
+import fs from 'fs/promises';
+import { isAxiosError } from 'axios';
 
 const API = new OpenAPI();
 
@@ -152,6 +154,58 @@ const talk = createMethod('talk', async requester => {
 	requester.reply(response.replace(/(.*)]:/, '[#CalvoGpt]:'));
 });
 
+const askSummary = createMethod(
+	'summary',
+	async (requester, { context }) => {
+		const message = requester.message;
+		const question = requester.rawCommand!.immediateArg;
+		console.log({ question });
+
+		const filePath = `./conversation/${message.boundaryName}/${message.chatId}.txt`;
+		const chat = await fs.readFile(filePath, {
+			encoding: 'utf-8',
+		});
+
+		const messages = chat
+			.split('\n')
+			.map(
+				message =>
+					({
+						role: 'user',
+						content: message,
+					} as const)
+			)
+			.slice(context ? context * -1 : -200);
+
+		const response = await summary(messages, question);
+
+		requester.reply(response);
+	},
+	{
+		context: 'number?',
+	}
+);
+
+const readImage = createMethod('read-image', async requester => {
+	try {
+		const media = requester.message.media || requester.message.quotedMessage?.media;
+
+		if (!media || !media.mimeType.startsWith('image')) {
+			return requester.reply('Por favor, envie ou marque uma imagem para a IA ler');
+		}
+
+		requester.react('⏳');
+		const interpreation = await interpretImage(media);
+		requester.react('✅');
+
+		requester.reply(interpreation);
+	} catch (e) {
+		console.log(e);
+		const errorMessage = isAxiosError(e) ? e.response?.data.message : e;
+		requester.reply(`Erro ao interpretar imagem: ${errorMessage}`);
+	}
+});
+
 const fallback = createMethod('fallback', requester => {
 	requester.reply.withTemplate('Help');
 });
@@ -168,6 +222,8 @@ export const startAIHandler = () => {
 				...emojify,
 				...talk,
 				...imageStyleList,
+				...askSummary,
+				...readImage,
 			},
 		},
 		name: 'ai',

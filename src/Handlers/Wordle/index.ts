@@ -50,6 +50,20 @@ const guess = createMethod('fallback', async requester => {
 
 			if (tries === 6) {
 				requester.reply(`A palavra era ${game.word}`);
+				const entrgueGnose = await fs.readFile(
+					'./media/saved/entregue_a_gnose.jpeg',
+					'base64url'
+				);
+
+				requester.reply.withSticker({
+					data: entrgueGnose,
+					fileName: 'entregue_a_gnose.webp',
+					mimeType: 'image/webp',
+					sizeInBytes: entrgueGnose.length,
+					stickerTags: [],
+					transportType: 'b64',
+					duration: null,
+				});
 			}
 		}
 	} catch (e) {
