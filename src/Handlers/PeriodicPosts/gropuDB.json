@@ -1,0 +1,102 @@
+{
+	"group": [
+		{
+			"boundaryName": "kozz-baileys",
+			"id": "120363145764693476@g.us",
+			"jobs": [
+				{
+					"cron": "45 7 * * * ",
+					"body": "!todes Bom fua, Baguncinha!"
+				},
+				{
+					"cron": "45 7 * * * ",
+					"body": "!tia bom dia"
+				},
+				{
+					"cron": " 1 8 * * 1 ",
+					"body": "",
+					"mediaPath": "./media/saved/segunda.m4a"
+				},
+				{
+					"cron": " 1 8 * * 2 ",
+					"body": "",
+					"mediaPath": "./media/saved/terca.mp4"
+				},
+				{
+					"cron": " 1 16 * * 3 ",
+					"body": "",
+					"mediaPath": "./media/saved/quarta.mp4"
+				},
+				{
+					"cron": " 1 8 * * 4 ",
+					"body": "",
+					"mediaPath": "./media/saved/quinta.mp4"
+				},
+				{
+					"cron": " 1 8 * * 5 ",
+					"body": "",
+					"mediaPath": "./media/saved/sexta.mp4"
+				},
+				{
+					"cron": " 1 8 * * 6",
+					"body": "",
+					"mediaPath": "./media/saved/sabado.mp4"
+				},
+				{
+					"cron": " 1 22 * * 7 ",
+					"body": "",
+					"mediaPath": "./media/saved/domingo.jpeg"
+				}
+			]
+		},
+		{
+			"boundaryName": "kozz-baileys",
+			"id": "5511947952409@s.whatsapp.net",
+			"jobs": [
+				{
+					"cron": "45 7 * * * ",
+					"body": "!todes Bom fua, Baguncinha!"
+				},
+				{
+					"cron": "45 7 * * * ",
+					"body": "!tia bom dia"
+				},
+				{
+					"cron": " 1 8 * * 1 ",
+					"body": "",
+					"mediaPath": "./media/saved/segunda.m4a"
+				},
+				{
+					"cron": " 1 8 * * 2 ",
+					"body": "",
+					"mediaPath": "./media/saved/terca.mp4"
+				},
+				{
+					"cron": " 1 16 * * 3 ",
+					"body": "",
+					"mediaPath": "./media/saved/quarta.mp4"
+				},
+				{
+					"cron": " 1 8 * * 4 ",
+					"body": "",
+					"mediaPath": "./media/saved/quinta.mp4"
+				},
+				{
+					"cron": " 1 8 * * 5 ",
+					"body": "",
+					"mediaPath": "./media/saved/sexta.mp4"
+				},
+				{
+					"cron": " 1 8 * * 6",
+					"body": "",
+					"mediaPath": "./media/saved/sabado.mp4"
+				},
+				{
+					"cron": " 1 22 * * 7 ",
+					"body": "",
+					"mediaPath": "./media/saved/domingo.jpeg"
+				}
+			]
+		}
+	]
+}

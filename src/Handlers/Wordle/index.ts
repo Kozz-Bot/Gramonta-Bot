@@ -1,9 +1,27 @@
 import { createMethod, createModule } from 'kozz-module-maker';
 import { loadTemplates } from 'kozz-module-maker/dist/Message';
-import { guessWord } from 'src/misc/Wordle';
+import { getGameFromRequester, guessWord } from 'src/misc/Wordle';
 import fs from 'fs/promises';
 
 const templatePath = 'src/Handlers/Wordle/messages.kozz.md';
+
+const resend = createMethod('resend', async requester => {
+	const game = getGameFromRequester(requester);
+
+	if (!game) {
+		return requester.reply('Você nao tem um jogo ativo ainda.');
+	}
+
+	const prettyResult = game.guesses
+		.map(guess => `${guess.guess.toUpperCase()}\n${guess.prettyResult}`)
+		.join('\n');
+	const tries = game.guesses.length;
+
+	requester.reply.withTemplate('GuessResult', {
+		tries,
+		history: prettyResult,
+	});
+});
 
 /**
  * Using try-catch as control-flow???? pls kill me :v
@@ -89,6 +107,7 @@ export const startWordleModule = () => {
 			methods: {
 				...guess,
 				...help,
+				...resend,
 			},
 		},
 		address: `${process.env.GATEWAY_URL}`,

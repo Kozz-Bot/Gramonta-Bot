@@ -56,6 +56,10 @@ const defaultMethod = createMethod(
 		}
 
 		if (quotedMessage?.media) {
+			if (quotedMessage.messageType === 'STICKER') {
+				return requester.reply.withSticker(quotedMessage.media);
+			}
+
 			if (
 				quotedMessage?.media &&
 				!['IMAGE', 'VIDEO', 'TEXT'].includes(quotedMessage.messageType)
@@ -86,6 +90,27 @@ const toImg = createMethod('toimg', message => {
 	return message.reply.withMedia(message.message.quotedMessage.media);
 });
 
+const fromLink = createMethod('from-link', requester => {
+	const link = requester.rawCommand?.immediateArg;
+	if (!link) {
+		return requester.reply('Por favor envie um link');
+	}
+	try {
+		const url = new URL(link);
+		return requester.reply.withSticker({
+			data: url.href,
+			duration: 0,
+			fileName: 'sticker',
+			mimeType: 'image/jpeg',
+			sizeInBytes: 0,
+			stickerTags: [],
+			transportType: 'url',
+		});
+	} catch (_) {
+		return requester.reply('The provided link is not valid.');
+	}
+});
+
 const templatePath = './src/Handlers/Sticker/reply.kozz.md';
 
 export const startStickerHandler = () => {
@@ -95,6 +120,7 @@ export const startStickerHandler = () => {
 			methods: {
 				...defaultMethod,
 				...toImg,
+				...fromLink,
 			},
 		},
 		name: 's',

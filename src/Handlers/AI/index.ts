@@ -3,7 +3,7 @@ import OpenAPI from 'src/API/OpenAi';
 import { usePremiumCommand } from 'src/Middlewares/Coins';
 import { convertB64ToPath } from 'src/Utils/ffmpeg';
 import { loadTemplates } from 'kozz-module-maker/dist/Message';
-import { MessageReceived } from 'kozz-types';
+import { Media, MessageReceived } from 'kozz-types';
 import {
 	StylePreset,
 	availableStyles,
@@ -16,6 +16,8 @@ import { fromPrompt, interpretImage, summary } from 'src/API/MistralApi';
 import { transcribeFile } from 'src/API/Deepgram';
 import fs from 'fs/promises';
 import { isAxiosError } from 'axios';
+import { tagMember } from 'kozz-module-maker/dist/InlineCommands';
+import { generateTTS } from 'src/API/ElevenLabs';
 
 const API = new OpenAPI();
 
@@ -87,9 +89,14 @@ const transcribe = createMethod('transcribe', async requester => {
 
 		requester.react('✏');
 
-		console.log(transcription);
-
-		return requester.reply(transcription.alternatives[0].transcript);
+		return requester.reply(
+			`Transcrição do audio de ${tagMember(
+				requester.message.quotedMessage.contact.id
+			)}:\n` +
+				'"' +
+				transcription.alternatives[0].transcript +
+				'"'
+		);
 	} catch (e) {
 		requester.reply(`Erro: ${e}`);
 		return false;
@@ -149,10 +156,49 @@ const talk = createMethod('talk', async requester => {
 		} as const;
 	});
 
-	const response = await fromPrompt(formattedMessages);
+	const response = await fromPrompt(
+		formattedMessages,
+		requester.message.fromHostAccount
+	);
 
 	requester.reply(response.replace(/(.*)]:/, '[#CalvoGpt]:'));
 });
+
+const speak = createMethod(
+	'speak',
+	usePremiumCommand(
+		5,
+		async requester => {
+			const targetMessage = requester.message.quotedMessage;
+			if (!targetMessage || !targetMessage.body) {
+				requester.reply(
+					'Responda uma mensagem de texto para a IA transformar em áudio'
+				);
+				return false;
+			}
+
+			const b64 = await generateTTS(targetMessage.body);
+
+			if (!b64) {
+				requester.reply('Erro ao tentar transcrever audio.');
+				return false;
+			}
+
+			const audio: Media = {
+				data: b64,
+				duration: null,
+				fileName: 'tts.mp3',
+				mimeType: 'audio/mp3',
+				sizeInBytes: null,
+				stickerTags: [],
+				transportType: 'b64',
+			};
+
+			requester.reply.withMedia(audio);
+		},
+		'Você não possui moedas o suficiente.'
+	)
+);
 
 const askSummary = createMethod(
 	'summary',
@@ -179,7 +225,7 @@ const askSummary = createMethod(
 
 		const response = await summary(messages, question);
 
-		requester.reply(response);
+		requester.reply('[Calvo GPT]: ' + response);
 	},
 	{
 		context: 'number?',
@@ -224,6 +270,7 @@ export const startAIHandler = () => {
 				...imageStyleList,
 				...askSummary,
 				...readImage,
+				...speak,
 			},
 		},
 		name: 'ai',

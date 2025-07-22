@@ -64,11 +64,25 @@ const createGame = (requester: MessageObj, gameId: string) => {
 	return game;
 };
 
-export const guessWord = (requester: MessageObj, guess: string) => {
+export const getGameFromRequester = (requester: MessageObj) => {
 	const gameId = `${new Date().toLocaleDateString('BR')}|${requester.message.from}-${
 		requester.message.to
 	}`;
-	const game = gameDb.getEntityById(gameId) ?? createGame(requester, gameId);
+	const game = gameDb.getEntityById(gameId);
+
+	return game;
+};
+
+export const guessWord = (requester: MessageObj, guess: string) => {
+	let game = getGameFromRequester(requester);
+
+	if (!game) {
+		const gameId = `${new Date().toLocaleDateString('BR')}|${
+			requester.message.from
+		}-${requester.message.to}`;
+
+		game = createGame(requester, gameId);
+	}
 
 	if (game.win || game.guesses.length > 5) {
 		throw 'GAME_OVER';
@@ -104,7 +118,7 @@ export const guessWord = (requester: MessageObj, guess: string) => {
 		win,
 	};
 
-	gameDb.updateEntity(gameId, updatedGame);
+	gameDb.updateEntity(game.id, updatedGame);
 
 	return updatedGame;
 };

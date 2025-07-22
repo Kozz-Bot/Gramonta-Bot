@@ -28,6 +28,7 @@ Esses comandos são PAGOS. Cada comando usa uma quantidade de CalvoCoins. Para s
 `| transcribe |   GRATIS!!!  |    !ai transcribe    |`
 `|    talk    |   GRATIS!!!  | !ai talk {{message}} |`
 `|  emojify   |   GRATIS!!!  | responda !ai emojify |`
+`|   speak    | 5 CalvoCoins |  responda !ai speak  |`
 `| read-image |   GRATIS!!!  |    !ai read-image    |`
 `|  summary   |   GRATIS!!!  |      !ai summary     |`
 `|==================================================|`
@@ -35,7 +36,8 @@ Esses comandos são PAGOS. Cada comando usa uma quantidade de CalvoCoins. Para s
 
 _*Image:*_ Gera uma imagem a partir do seu prompt usando Stable Diffusion (Serviço da Stability AI)
 _*Transcribe*_: Transcreve um video ou audio para texto usando Whisper-Ai
-_*Talk*_: Conversa com o chat-GPT. Responda as mensagens para continuar a conversa.
+_*Talk*_: Conversa com o CalvoGPT. Responda as mensagens para continuar a conversa.
+_*Speak*_: Transforma uma mensagem de texto em áudio, com a voz clássica do tiktok.
 _*Emojify*_ Insere um monte de emojis na mensagem que você responder
 _*Read-Image*_ Descreve uma imagem. Envie esse comando como legenda de uma imagem o responda uma mensagem cuja imagem você deseja analisar.
 _*Summary*_: Solicita um resumo da conversa do grupo à IA. Você também pode perguntar coisas para a IA fornecendo o grupo como contexto.

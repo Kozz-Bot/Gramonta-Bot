@@ -13,9 +13,9 @@ const API = axios.create({
 	},
 });
 
-export const fromPrompt = async (context: PreviousMessages) => {
+export const fromPrompt = async (context: PreviousMessages, bigModel?: boolean) => {
 	const response = await API.post<ChatGPTResponse>('/chat/completions', {
-		model: 'mistral-small-latest',
+		model: bigModel ? 'mistral-large-latest' : 'mistral-small-latest',
 		messages: [
 			{
 				role: 'system',
@@ -54,7 +54,7 @@ export const summary = async (
 	return response.data.choices[0].message.content;
 };
 
-export const interpretImage = async (media: Media) => {
+export const interpretImage = async (media: Media, prompt?: string) => {
 	const imgUrl = await (async () => {
 		if (media.transportType === 'url') {
 			return media.data;
@@ -71,8 +71,6 @@ export const interpretImage = async (media: Media) => {
 		}
 	})();
 
-	console.log({ imgUrl });
-
 	const response = await API.post<ChatGPTResponse>('/chat/completions', {
 		model: 'pixtral-12b-2409',
 		messages: [
@@ -81,7 +79,9 @@ export const interpretImage = async (media: Media) => {
 				content: [
 					{
 						type: 'text',
-						text: 'Por favor, descreva essa imagem e extraia os textos, caso houver.',
+						text:
+							prompt ??
+							'Por favor, descreva essa imagem e extraia os textos, caso houver.',
 					},
 					{
 						type: 'image_url',
