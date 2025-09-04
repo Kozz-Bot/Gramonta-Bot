@@ -118,11 +118,7 @@ const ytDownload = async (
 	}
 };
 
-export const searchResults = async (
-	query: string,
-	token?: string,
-	maxResults = 1
-) => {
+export const searchResults = async (query: string, _?: string, maxResults = 1) => {
 	try {
 		const options: YouTubeSearchOptions = {
 			maxResults,

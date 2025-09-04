@@ -17,7 +17,7 @@ class OffenseAPI {
 		return this.instance
 			.get<OffenseResponse>('/api')
 			.then(resp => resp.data)
-			.catch(e => undefined);
+			.catch(_ => undefined);
 	}
 }
 

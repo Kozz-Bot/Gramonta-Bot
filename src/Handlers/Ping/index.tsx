@@ -1,17 +1,25 @@
-import { createModule, createMethod } from 'kozz-module-maker';
+import { createModule, createMethod, Line, Bold } from 'kozz-module-maker';
 import { loadTemplates } from 'kozz-module-maker/dist/Message';
 import { rateLimit } from 'src/Middlewares/RateLimit';
 
+const Pong = ({ time }: { time: number }) => {
+	return (
+		<>
+			<Line>
+				<Bold>Pong!</Bold> Tempo de resposta: {time.toString()}
+			</Line>
+		</>
+	);
+};
+
 const defaultMethod = createMethod(
 	'default',
-	rateLimit(1000 * 60, 'ping', requester => {
+	rateLimit(1000 * 1, 'ping', requester => {
 		const now = new Date().getTime();
 		const requestTime = requester.message.timestamp;
 		const difference = (now - requestTime!) / 1000;
 
-		requester.reply.withTemplate('pong', {
-			difference,
-		});
+		requester.reply(<Pong time={difference} />);
 	})
 );
 

@@ -4,7 +4,7 @@ import { getPlayerStatus } from 'src/API/SpotifyApi';
 
 const templatePath = 'src/Handlers/Spotify/messages.kozz.md';
 
-const now = createMethod('now', async (requester, args) => {
+const now = createMethod('now', async requester => {
 	try {
 		const data = await getPlayerStatus();
 

@@ -1,0 +1,33 @@
+{
+	"presets": [
+		[
+			"@babel/env",
+			{
+				"targets": {
+					"node": "current"
+				}
+			}
+		],
+		"@babel/preset-typescript",
+		[
+			"@babel/preset-react",
+			{
+				"runtime": "automatic",
+				"importSource": "kozz-module-maker/dist"
+			}
+		]
+	],
+	"plugins": [
+		"@babel/plugin-proposal-class-properties",
+		"@babel/plugin-proposal-object-rest-spread",
+		[
+			"module-resolver",
+			{
+				"root": ["./src"],
+				"alias": {
+					"src": "./dist"
+				}
+			}
+		]
+	]
+}

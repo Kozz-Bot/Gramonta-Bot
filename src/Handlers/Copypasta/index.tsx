@@ -1,6 +1,15 @@
 import { MethodMap, createMethod, createModule } from 'kozz-module-maker';
 import { loadTemplates } from 'kozz-module-maker/dist/Message';
 import {
+	CopypastaSearchResult,
+	CopypastaSearchResultDeep,
+	CopypastaListItem,
+	NeedsQuote,
+	NeedsQuery,
+	NeedsBody,
+	Help,
+} from './messages';
+import {
 	addCopypasta,
 	deleteCopypastaById,
 	getCopypastaById,
@@ -20,18 +29,13 @@ const idCompare = (idA: string, idB: string) => {
 	return sanitizedIdA === sanitizedIdB;
 };
 
-const help = createMethod('default', requester =>
-	requester.reply.withTemplate('Help')
-);
+const help = createMethod('default', requester => <Help />);
 
 const list = createMethod('list', async requester => {
 	const copypastaList = getCopypastasList();
-	const responsePromises = copypastaList.map(copypasta =>
-		templatesHelper.getTextFromTemplate('CopypastaListItem', {
-			number: copypasta.index,
-			name: copypasta.id,
-		})
-	);
+	const responsePromises = copypastaList.map(copypasta => (
+		<CopypastaListItem number={copypasta.index} name={copypasta.id} />
+	));
 
 	const response = await Promise.all(responsePromises);
 
@@ -40,10 +44,10 @@ const list = createMethod('list', async requester => {
 
 const add = createMethod('add', requester => {
 	if (!requester.message.quotedMessage) {
-		return requester.reply.withTemplate('NeedsQuote');
+		return <NeedsQuote />;
 	}
 	if (requester.message.quotedMessage.messageType !== 'TEXT') {
-		return requester.reply.withTemplate('NeedsBody');
+		return <NeedsBody />;
 	}
 	if (!requester.rawCommand!.immediateArg) {
 		return requester.reply.withTemplate('NeedsName');
@@ -68,7 +72,7 @@ const search = createMethod(
 		const query = requester.rawCommand!.immediateArg;
 
 		if (!query) {
-			return requester.reply.withTemplate('NeedsQuery');
+			return <NeedsQuery />;
 		}
 
 		if (args.deep) {
@@ -79,11 +83,7 @@ const search = createMethod(
 						makeAccentsInsensitiveRegex(query),
 						`*--> ${query.toUpperCase()} <--*`
 					);
-					return templatesHelper.getTextFromTemplate('CopypastaSearchResultDeep', {
-						number: copy.index,
-						name: copy.id,
-						part,
-					});
+					return <CopypastaSearchResultDeep number={copy.index} name={copy.id} part={part} />;
 				})
 			);
 
@@ -93,10 +93,7 @@ const search = createMethod(
 
 			const message = await Promise.all(
 				found.map(copy => {
-					return templatesHelper.getTextFromTemplate('CopypastaSearchResult', {
-						number: copy.index,
-						name: copy.id,
-					});
+					return <CopypastaSearchResult number={copy.index} name={copy.id} />;
 				})
 			);
 
@@ -109,9 +106,7 @@ const search = createMethod(
 );
 
 const get = createMethod('fallback', requester => {
-	const query = `${requester.rawCommand!.method} ${
-		requester.rawCommand!.immediateArg || ''
-	}`.trim();
+	const query = `${requester.rawCommand!.method} ${requester.rawCommand!.immediateArg || ''}`.trim();
 
 	if (!query) {
 		return requester.reply.withTemplate('NeedsNameOrNumber');

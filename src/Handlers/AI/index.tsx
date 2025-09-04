@@ -18,6 +18,7 @@ import fs from 'fs/promises';
 import { isAxiosError } from 'axios';
 import { tagMember } from 'kozz-module-maker/dist/InlineCommands';
 import { generateTTS } from 'src/API/ElevenLabs';
+import { ImageStyleUnsupported } from './messages';
 
 const API = new OpenAPI();
 
@@ -38,9 +39,7 @@ const image = createMethod(
 
 				if (!isValidStyle(style)) {
 					style = randomItem(availableStyles);
-					requester.reply.withTemplate('Image-Style-Unsupported', {
-						style,
-					});
+					requester.reply(<ImageStyleUnsupported style={style} />);
 				}
 
 				const response = await textToImage(prompt, {

@@ -25,3 +25,5 @@ export * from './MineRegister';
 export * from './Spotify';
 export * from './PeriodicPosts';
 export * from './All';
+export * from './Poop';
+export * from './Water';

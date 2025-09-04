@@ -1,5 +1,5 @@
 import { createMethod, createModule } from 'kozz-module-maker';
-import { MessageObj, loadTemplates } from 'kozz-module-maker/dist/Message';
+import { MessageObj } from 'kozz-module-maker/dist/Message';
 import {
 	getMuteRegister,
 	isUserMutted,
@@ -9,7 +9,6 @@ import {
 	updateWhenMutedSendsMessage,
 } from './mutedDB';
 import { hostAccountOnly } from 'src/Middlewares/CheckContact';
-import { UseFn } from 'kozz-module-maker/dist/Instance/Common';
 import { tagMember } from 'kozz-module-maker/dist/InlineCommands';
 
 const feedbackIntervalTime = 60 * 1000; // 60 seconds
@@ -20,12 +19,17 @@ const mute = createMethod(
 		const taggedPeople = requester.message.taggedContacts;
 		taggedPeople.forEach(person => {
 			// Default time = 1h;
-			mutePerson(person, requester.message.to, reason, (time ?? 60) * 1000 * 60);
+			mutePerson(
+				person,
+				requester.message.to,
+				reason || 'no reason',
+				(time ?? 60) * 1000 * 60
+			);
 		});
 		requester.reply('Ok');
 	}),
 	{
-		reason: 'string',
+		reason: 'string?',
 		time: 'number?',
 	}
 );
@@ -69,20 +73,10 @@ const onUserMessage = (requester: MessageObj) => {
 	}
 };
 
-export const useMute: UseFn = command => {
-	const { contact, to: chat } = command.message;
-	if (isUserMutted(contact, chat)) {
-		if (!command.namedArgs) {
-			command.namedArgs = {};
-		}
-		command.namedArgs.abort = true;
-	}
-
-	return command;
-};
-
 const templatePath = './src/Handlers/Mute/messages.kozz.md';
 export const startMuteHandler = () => {
+	console.log('Starting Mute Handler');
+
 	const instance = createModule({
 		commands: {
 			boundariesToHandle: ['Gramonta-Wa', 'postman-test', 'postman-test-2'],

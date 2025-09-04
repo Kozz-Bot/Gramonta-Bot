@@ -1,3 +1,3 @@
 export * from './AutoRaid';
-export { startMuteHandler } from './Mute';
+export * from './Mute';
 export * from './Resumo';

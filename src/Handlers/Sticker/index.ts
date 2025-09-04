@@ -4,8 +4,6 @@ import { Media } from 'kozz-types';
 import { generateQuote } from 'src/API/QuoteApi';
 
 const makeQuote = async (requester: MessageObj) => {
-	console.log('making quote');
-
 	const { quotedMessage } = requester.message;
 
 	if (!quotedMessage || !quotedMessage.body) {
@@ -13,18 +11,8 @@ const makeQuote = async (requester: MessageObj) => {
 	}
 
 	const text = quotedMessage.taggedConctactFriendlyBody;
-	const name = quotedMessage.contact.publicName;
 
-	console.log(quotedMessage);
-
-	const profilePicUrl = await requester.ask.boundary(
-		requester.message.boundaryName,
-		'contact_profile_pic',
-		{
-			id: quotedMessage.from,
-		}
-	);
-	const quoteB64 = await generateQuote(text, name, profilePicUrl.response);
+	const quoteB64 = await generateQuote(requester);
 
 	if (!quoteB64) {
 		return requester.reply('erro');
@@ -33,7 +21,7 @@ const makeQuote = async (requester: MessageObj) => {
 	const stickerMedia: Media = {
 		data: quoteB64,
 		fileName: `${text}.png`,
-		mimeType: 'image',
+		mimeType: 'image/png',
 		sizeInBytes: null,
 		transportType: 'b64',
 		stickerTags: ['💬', '🗯', '💭'],

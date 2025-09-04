@@ -1,9 +1,11 @@
 import dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({
+	path: '.env',
+});
 
 import * as handleStarters from './Handlers/';
 import * as proxyStarters from './Proxies';
-import { useMute } from './Proxies/Mute';
+import { useMute } from './Proxies/Mute/middleware/useMute';
 
 let delay = 0;
 let delayIncrement = 1000; // 0,35s

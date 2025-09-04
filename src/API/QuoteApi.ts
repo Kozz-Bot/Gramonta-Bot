@@ -1,4 +1,5 @@
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, isAxiosError } from 'axios';
+import { MessageObj } from 'kozz-module-maker/dist/Message';
 
 type QuoteSuccess = {
 	ok: true;
@@ -18,50 +19,67 @@ type QuoteFail = {
 	};
 };
 
-export const generateQuote = async (
-	quote: string,
-	name: string,
-	imageUrl: string | undefined,
-	customColor?: string
-) => {
-	try {
-		const response = imageUrl
-			? await axios.get<Buffer>(imageUrl, {
-					responseType: 'arraybuffer',
-			  })
-			: undefined;
+export const extractQuoteInfoFromRequester = async (requester: MessageObj) => {
+	const { quotedMessage: firstQuote } = requester.message;
 
-		const json = {
-			type: 'quote',
-			format: 'png',
-			backgroundColor: customColor || '#353535',
-			width: 384,
-			height: 768,
-			scale: 2,
-			messages: [
-				{
-					entities: [],
-					avatar: true,
-					from: {
-						id: 1,
-						name: name || '__NAME_NOT_FOUND__',
-						photo: {
-							b64: response?.data.toString('base64'),
-						},
-					},
-					text: quote,
-					replyMessage: {},
-				},
-			],
+	if (!firstQuote || !firstQuote.body) {
+		return null;
+	}
+
+	const secondQuote = firstQuote.quotedMessage;
+
+	if (secondQuote && secondQuote.body) {
+		return {
+			mode: 'reply',
+			style: 'whatsappDark',
+			avatarSize: 100,
+			replyAuthor: secondQuote.contact.publicName || 'Sem nome',
+			replySnippet: secondQuote.body,
+			bodyText: firstQuote.body,
+			timeText: new Date(firstQuote.timestamp * 1000).toLocaleString('pt-BR'),
+			msgAuthor: firstQuote.contact.publicName || 'Sem nome',
+			avatarSrc: (
+				await requester.ask.boundary(
+					requester.message.boundaryName,
+					'contact_profile_pic',
+					{ id: firstQuote.from }
+				)
+			).response,
 		};
+	} else {
+		return {
+			avatarSize: 100,
+			mode: 'normal',
+			style: 'whatsappDark',
+			bodyText: firstQuote.body,
+			timeText: new Date(firstQuote.timestamp * 1000).toLocaleString('pt-BR'),
+			msgAuthor: firstQuote.contact.publicName || 'Sem nome',
+			avatarSrc: (
+				await requester.ask.boundary(
+					requester.message.boundaryName,
+					'contact_profile_pic',
+					{ id: firstQuote.from }
+				)
+			).response,
+		};
+	}
+};
 
-		const result = await axios
-			.post<QuoteSuccess>('http://192.168.15.4:8000/quote/generate', json)
-			.then(resp => resp.data);
+export const generateQuote = async (requester: MessageObj) => {
+	try {
+		const json = await extractQuoteInfoFromRequester(requester);
 
-		return result.result.image;
+		const response = await axios.post('http://localhost:3699/render', json, {
+			responseType: 'arraybuffer',
+		});
+
+		const base64 = Buffer.from(response.data, 'binary').toString('base64');
+
+		return base64;
 	} catch (e) {
-		console.warn(e);
-		throw e;
+		// console.warn(e);
+		if (isAxiosError(e)) {
+			console.warn('Erro no axios', e.response?.data, (e as AxiosError).code);
+		}
 	}
 };

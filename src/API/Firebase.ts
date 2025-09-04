@@ -1,13 +1,32 @@
-import admin from 'firebase-admin';
+// src/lib/firebase.ts
+import {
+	initializeApp,
+	applicationDefault,
+	getApp,
+	getApps,
+} from 'firebase-admin/app';
 import { getStorage, getDownloadURL } from 'firebase-admin/storage';
+import { Media, MessageReceived } from 'kozz-types';
 
-import { MessageReceived, Media } from 'kozz-types';
+// Accept both "my-bucket.appspot.com" and "gs://my-bucket.appspot.com"
+const rawBucket = process.env.FIREBASE_BUCKET || '';
+const bucketName = rawBucket.replace(/^gs:\/\//, '').trim();
 
-const firebase = admin.initializeApp({
-	credential: admin.credential.applicationDefault(),
-});
+if (!bucketName) {
+	throw new Error(
+		'FIREBASE_BUCKET env var is missing. Expected something like "my-project.appspot.com" (no protocol).'
+	);
+}
 
-export const bucket = getStorage(firebase).bucket(process.env.FIREBASE_BUCKET);
+const app = getApps().length
+	? getApp()
+	: initializeApp({
+			credential: applicationDefault(),
+			storageBucket: bucketName, // <-- set default bucket here
+	  });
+
+// Now you can omit the name because we set storageBucket above
+export const bucket = getStorage(app).bucket();
 
 const fileExtension = (media: Media) => {
 	if (media.mimeType === 'image/jpeg') {
