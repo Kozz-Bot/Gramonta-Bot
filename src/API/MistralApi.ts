@@ -1,21 +1,73 @@
 import axios from 'axios';
 import { ChatGPTResponse, PreviousMessages } from './OpenAi';
 import { Media } from 'kozz-types';
-import { uploadMedia } from './Firebase';
-import CDNApi from './CDNApi';
-import mime from 'mime-types';
-import { convertToJpeg } from 'src/Utils/ImageConverter';
 
 const API = axios.create({
-	baseURL: 'https://api.mistral.ai/v1/',
+	baseURL: process.env.LLM_BASE_URL ?? 'https://api.fuelix.ai/v1/',
 	headers: {
-		Authorization: `Bearer ${process.env.MISTRAL_TOKEN}`,
+		Authorization: `Bearer ${
+			process.env.LLM_API_KEY ??
+			process.env.OPENAI_API_KEY
+		}`,
 	},
 });
 
+const CHAT_MODEL = process.env.LLM_MODEL ?? 'gpt-5.4';
+
+export type ChatCompletionTool = {
+	type: 'function';
+	function: {
+		name: string;
+		description: string;
+		parameters: Record<string, unknown>;
+	};
+};
+
+export type ChatCompletionToolCall = {
+	id: string;
+	type: 'function';
+	function: {
+		name: string;
+		arguments: string;
+	};
+};
+
+type ChatCompletionChoice = {
+	message: {
+		role: 'assistant';
+		content: string | null;
+		tool_calls?: ChatCompletionToolCall[];
+	};
+};
+
+type RawChatCompletionResponse = {
+	choices: ChatCompletionChoice[];
+};
+
+export const createChatCompletion = async (payload: {
+	messages: Array<Record<string, unknown>>;
+	tools?: ChatCompletionTool[];
+	tool_choice?: 'auto' | 'none' | Record<string, unknown>;
+	temperature?: number;
+}) => {
+	const response = await API.post<RawChatCompletionResponse>('/chat/completions', {
+		model: CHAT_MODEL,
+		...payload,
+	});
+
+	return response.data.choices[0].message;
+};
+
+const getImageUrl = async (media: Media) => {
+	if (media.transportType === 'url') {
+		return media.data;
+	}
+
+	return `data:${media.mimeType};base64,${media.data}`;
+};
+
 export const fromPrompt = async (context: PreviousMessages, bigModel?: boolean) => {
-	const response = await API.post<ChatGPTResponse>('/chat/completions', {
-		model: bigModel ? 'mistral-large-latest' : 'mistral-small-latest',
+	const response = await createChatCompletion({
 		messages: [
 			{
 				role: 'system',
@@ -26,15 +78,14 @@ export const fromPrompt = async (context: PreviousMessages, bigModel?: boolean) 
 		],
 	});
 
-	return response.data.choices[0].message.content;
+	return response.content ?? '';
 };
 
 export const summary = async (
 	context: PreviousMessages,
 	question?: string | null
 ) => {
-	const response = await API.post<ChatGPTResponse>('/chat/completions', {
-		model: 'mistral-small-latest',
+	const response = await createChatCompletion({
 		messages: [
 			{
 				role: 'system',
@@ -51,28 +102,13 @@ export const summary = async (
 		],
 	});
 
-	return response.data.choices[0].message.content;
+	return response.content ?? '';
 };
 
 export const interpretImage = async (media: Media, prompt?: string) => {
-	const imgUrl = await (async () => {
-		if (media.transportType === 'url') {
-			return media.data;
-		} else {
-			const jpegImage = await convertToJpeg(media.data);
+	const imgUrl = await getImageUrl(media);
 
-			if (!jpegImage) {
-				return undefined;
-			}
-
-			const url = await CDNApi.uploadPublicFile('temp_image.jpg', jpegImage);
-
-			return url;
-		}
-	})();
-
-	const response = await API.post<ChatGPTResponse>('/chat/completions', {
-		model: 'pixtral-12b-2409',
+	const response = await createChatCompletion({
 		messages: [
 			{
 				role: 'user',
@@ -92,5 +128,5 @@ export const interpretImage = async (media: Media, prompt?: string) => {
 		],
 	});
 
-	return response.data.choices[0].message.content;
+	return response.content ?? '';
 };

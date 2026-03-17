@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const TiApi = axios.create({
-	baseURL: 'http://localhost:8000/tia',
+	baseURL: 'https://gramont.digital/tia',
 });
 
 export default TiApi;

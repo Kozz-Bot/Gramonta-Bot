@@ -1,7 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { Configuration, OpenAIApi } from 'openai';
 import fs from 'fs';
-import fsPromises from 'fs/promises';
 import FormData = require('form-data');
 
 export type ChatGPTResponse = {
@@ -26,10 +24,24 @@ export type ChatGPTResponse = {
 	];
 };
 
-type AssistantMessage = { role: 'assistant'; content: string };
-type UserMessage = { role: 'user'; content: string };
+export type LlmContentPart =
+	| {
+			type: 'text';
+			text: string;
+	  }
+	| {
+			type: 'image_url';
+			image_url: string;
+	  };
 
-export type Message = UserMessage | AssistantMessage;
+type AssistantMessage = {
+	role: 'assistant';
+	content: string | LlmContentPart[];
+};
+type UserMessage = { role: 'user'; content: string | LlmContentPart[] };
+type SystemMessage = { role: 'system'; content: string };
+
+export type Message = UserMessage | AssistantMessage | SystemMessage;
 
 export type PreviousMessages = Message[];
 
@@ -42,18 +54,17 @@ export type ImageGenerationResponse = {
 };
 
 export default class OpenAPI {
-	API: OpenAIApi;
 	static APIInstance: OpenAPI;
 	axiosInstance: AxiosInstance;
+	model: string;
 
 	constructor() {
-		const apiKey = process.env.OPENAI_API_KEY;
-		const config = new Configuration({
-			apiKey,
-		});
-		this.API = new OpenAIApi(config);
+		const apiKey =
+			process.env.LLM_API_KEY ??
+			process.env.OPENAI_API_KEY 
+		this.model = process.env.LLM_MODEL ?? 'gpt-5.4';
 		this.axiosInstance = axios.create({
-			baseURL: 'https://api.openai.com/v1',
+			baseURL: process.env.LLM_BASE_URL ?? 'https://api.fuelix.ai/v1/',
 			headers: {
 				Authorization: `Bearer ${apiKey}`,
 			},
@@ -67,10 +78,14 @@ export default class OpenAPI {
 	 * @param prompt
 	 */
 	private async isSafe(input: string) {
-		const response = await this.axiosInstance.post('/moderations', {
-			input,
-		});
-		return response.data.results[0].flagged !== 1;
+		try {
+			const response = await this.axiosInstance.post('/moderations', {
+				input,
+			});
+			return response.data.results[0].flagged !== 1;
+		} catch {
+			return true;
+		}
 	}
 
 	async emojify(prompt: string) {
@@ -80,7 +95,7 @@ export default class OpenAPI {
 		const response = await this.axiosInstance.post<ChatGPTResponse>(
 			'/chat/completions',
 			{
-				model: 'gpt-3.5-turbo',
+				model: this.model,
 				temperature: 0.25,
 				messages: [
 					{
@@ -125,7 +140,7 @@ export default class OpenAPI {
 
 	async fromPrompt(context: PreviousMessages) {
 		const safeMessages = await Promise.all(
-			context.map(message => this.isSafe(message.content))
+			context.map(message => this.isSafe(message.content as string))
 		);
 
 		const allSafe = safeMessages.reduce((allSafe, msgIsSafe) => {
@@ -137,7 +152,7 @@ export default class OpenAPI {
 		const response = await this.axiosInstance.post<ChatGPTResponse>(
 			'/chat/completions',
 			{
-				model: 'gpt-3.5-turbo-0125',
+				model: this.model,
 				temperature: 0.25,
 				messages: [
 					{
@@ -160,6 +175,7 @@ export default class OpenAPI {
 		const img = await this.axiosInstance.post<ImageGenerationResponse>(
 			'/images/generations',
 			{
+				model: this.model,
 				prompt,
 				n: 1,
 				size: '1024x1024',
