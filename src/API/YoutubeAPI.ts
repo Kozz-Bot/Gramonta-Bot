@@ -4,12 +4,6 @@ import YTSearch, { YouTubeSearchOptions } from 'youtube-search';
 import he from 'he';
 import { convertPathToPath } from 'src/Utils/ffmpeg';
 
-const agent = ytdl.createAgent(
-	JSON.parse(oldFs.readFileSync('./src/API/ytCookies.json', { encoding: 'utf-8' }))
-);
-
-console.log(agent);
-
 type DownloadType = 'video' | 'audio';
 
 /**

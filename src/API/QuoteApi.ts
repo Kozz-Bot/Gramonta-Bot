@@ -69,7 +69,7 @@ export const generateQuote = async (requester: MessageObj) => {
 	try {
 		const json = await extractQuoteInfoFromRequester(requester);
 
-		const response = await axios.post('http://localhost:3699/render', json, {
+		const response = await axios.post('https://gramont.digital/quote/render', json, {
 			responseType: 'arraybuffer',
 		});
 
