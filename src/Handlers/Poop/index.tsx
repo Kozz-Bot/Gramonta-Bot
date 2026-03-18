@@ -1,8 +1,7 @@
 import { createMethod, createModule } from 'kozz-module-maker';
 import { useJsonDB } from 'src/Utils/StaticJsonDb';
 import { randomUUID } from 'crypto';
-import { tagMember } from 'kozz-module-maker/dist/InlineCommands';
-import { RankingMessage, Total } from './messages';
+import { MonthlyRanking, RankingMessage, Total } from './messages';
 import { ContactPayload } from 'kozz-types';
 
 const __POOP_GROUP_ID__ = '120363421366397068@g.us';
@@ -102,6 +101,44 @@ const ranking = createMethod('ranking', async requester => {
 	return requester.reply(<RankingMessage ranking={rankingArray} />);
 });
 
+const monthly = createMethod('monthly', async requester => {
+	if (requester.message.chatId !== __POOP_GROUP_ID__) {
+		return;
+	}
+
+	const ranking: Record<string, number> = {};
+
+	const startOfMonth = new Date();
+	startOfMonth.setDate(1);
+	startOfMonth.setHours(0, 0, 0, 0);
+
+	poopDB.getAllEntities().forEach(poop => {
+		if (new Date(poop.timestamp) >= startOfMonth) {
+			ranking[poop.contactId] = ranking[poop.contactId]
+				? ranking[poop.contactId] + 1
+				: 1;
+		}
+	});
+
+	const rankingArray = await Promise.all(
+		Object.entries(ranking)
+			.sort((a, b) => b[1] - a[1])
+			.map(async ([id, count]) => {
+				const contactInfo = await requester.ask.boundary(
+					'kozz-baileys',
+					'contact_info',
+					{ id }
+				);
+				const publicName =
+					(contactInfo.response as ContactPayload | null)?.publicName || id;
+
+				return [publicName, count] as [string, number];
+			})
+	);
+
+	return requester.reply(<MonthlyRanking ranking={rankingArray} />);
+});
+
 export const startPoopModule = () => {
 	const instance = createModule({
 		commands: {
@@ -111,6 +148,7 @@ export const startPoopModule = () => {
 				...total,
 				...history,
 				...ranking,
+				...monthly,
 			},
 		},
 		name: 'poop',

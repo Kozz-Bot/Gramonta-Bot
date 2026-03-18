@@ -27,3 +27,4 @@ export * from './PeriodicPosts';
 export * from './All';
 export * from './Poop';
 export * from './Water';
+export * from './MineRegister';

@@ -19,23 +19,26 @@ type QuoteFail = {
 	};
 };
 
-export const extractQuoteInfoFromRequester = async (requester: MessageObj) => {
+export const extractQuoteInfoFromRequester = async (
+	requester: MessageObj,
+	full: boolean
+) => {
 	const { quotedMessage: firstQuote } = requester.message;
 
-	if (!firstQuote || !firstQuote.body) {
+	if (!firstQuote || !firstQuote.taggedConctactFriendlyBody) {
 		return null;
 	}
 
 	const secondQuote = firstQuote.quotedMessage;
 
-	if (secondQuote && secondQuote.body) {
+	if (secondQuote && secondQuote.taggedConctactFriendlyBody && full) {
 		return {
 			mode: 'reply',
 			style: 'whatsappDark',
 			avatarSize: 100,
 			replyAuthor: secondQuote.contact.publicName || 'Sem nome',
-			replySnippet: secondQuote.body,
-			bodyText: firstQuote.body,
+			replySnippet: secondQuote.taggedConctactFriendlyBody,
+			bodyText: firstQuote.taggedConctactFriendlyBody,
 			timeText: new Date(firstQuote.timestamp * 1000).toLocaleString('pt-BR'),
 			msgAuthor: firstQuote.contact.publicName || 'Sem nome',
 			avatarSrc: (
@@ -51,7 +54,7 @@ export const extractQuoteInfoFromRequester = async (requester: MessageObj) => {
 			avatarSize: 100,
 			mode: 'normal',
 			style: 'whatsappDark',
-			bodyText: firstQuote.body,
+			bodyText: firstQuote.taggedConctactFriendlyBody,
 			timeText: new Date(firstQuote.timestamp * 1000).toLocaleString('pt-BR'),
 			msgAuthor: firstQuote.contact.publicName || 'Sem nome',
 			avatarSrc: (
@@ -65,9 +68,9 @@ export const extractQuoteInfoFromRequester = async (requester: MessageObj) => {
 	}
 };
 
-export const generateQuote = async (requester: MessageObj) => {
+export const generateQuote = async (requester: MessageObj, full: boolean) => {
 	try {
-		const json = await extractQuoteInfoFromRequester(requester);
+		const json = await extractQuoteInfoFromRequester(requester, full);
 
 		const response = await axios.post('https://gramont.digital/quote/render', json, {
 			responseType: 'arraybuffer',
