@@ -9,8 +9,7 @@ type DB<EntityName extends string, DataType extends EntityWithID> = {
 };
 
 /**
- * Currently it reads and writes to the file each single operation. I know this is
- * not scalable, but I'm not gonna cache the thing in memory for now. That's a [TODO]
+ * Currently it reads and writes to the file each single operation.
  * @param entityName
  * @param JsonPath
  * @returns

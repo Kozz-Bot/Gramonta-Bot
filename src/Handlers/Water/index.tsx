@@ -10,7 +10,10 @@ import {
 	NoWaterAmount,
 	RankingMessage,
 	Total,
+	MonthlyRanking,
+	WeeklyRanking,
 } from './messages';
+import { formatWeekDates, getMonthName } from 'src/Utils/date';
 
 const __WATER_GROUP_ID__ = '120363420040249939@g.us';
 
@@ -127,11 +130,99 @@ const ranking = createMethod('ranking', async requester => {
 				);
 				const publicName =
 					(contactInfo.response as ContactPayload | null)?.publicName || id;
-				return [publicName, count] as [string, number];
+				return [publicName.split(' ')[0], count] as [string, number];
 			})
 	);
 
 	return requester.reply(<RankingMessage ranking={rankingArray} />);
+});
+
+const monthly = createMethod('monthly', async requester => {
+	if (requester.message.chatId !== __WATER_GROUP_ID__) {
+		return;
+	}
+
+	const ranking: Record<string, number> = {};
+
+	const startOfMonth = new Date();
+	startOfMonth.setDate(1);
+	startOfMonth.setHours(0, 0, 0, 0);
+
+	waterDb.getAllEntities().forEach(drink => {
+		if (new Date(drink.timestamp) >= startOfMonth) {
+			ranking[drink.contactId] = ranking[drink.contactId]
+				? ranking[drink.contactId] + drink.amount
+				: drink.amount;
+		}
+	});
+
+	const rankingArray = await Promise.all(
+		Object.entries(ranking)
+			.sort((a, b) => b[1] - a[1])
+			.map(async ([id, count]) => {
+				const contactInfo = await requester.ask.boundary(
+					'kozz-baileys',
+					'contact_info',
+					{ id }
+				);
+				const publicName =
+					(contactInfo.response as ContactPayload | null)?.publicName || id;
+
+				return [publicName.split(' ')[0], count] as [string, number];
+			})
+	);
+
+	const currentMonth = getMonthName(new Date().getMonth());
+
+	return requester.reply(
+		<MonthlyRanking ranking={rankingArray} period={currentMonth} />
+	);
+});
+
+const weekly = createMethod('weekly', async requester => {
+	if (requester.message.chatId !== __WATER_GROUP_ID__) {
+		return;
+	}
+
+	const ranking: Record<string, number> = {};
+
+	const startOfWeek = new Date();
+	const day = startOfWeek.getDay();
+	const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
+	startOfWeek.setDate(diff);
+	startOfWeek.setHours(0, 0, 0, 0);
+
+	const endOfWeek = new Date(startOfWeek);
+	endOfWeek.setDate(endOfWeek.getDate() + 6);
+	endOfWeek.setHours(23, 59, 59, 999);
+
+	waterDb.getAllEntities().forEach(drink => {
+		if (new Date(drink.timestamp) >= startOfWeek) {
+			ranking[drink.contactId] = ranking[drink.contactId]
+				? ranking[drink.contactId] + drink.amount
+				: drink.amount;
+		}
+	});
+
+	const period = formatWeekDates({ firstDay: startOfWeek, lastDay: endOfWeek });
+
+	const rankingArray = await Promise.all(
+		Object.entries(ranking)
+			.sort((a, b) => b[1] - a[1])
+			.map(async ([id, count]) => {
+				const contactInfo = await requester.ask.boundary(
+					'kozz-baileys',
+					'contact_info',
+					{ id }
+				);
+				const publicName =
+					(contactInfo.response as ContactPayload | null)?.publicName || id;
+
+				return [publicName.split(' ')[0], count] as [string, number];
+			})
+	);
+
+	return requester.reply(<WeeklyRanking ranking={rankingArray} period={period} />);
 });
 
 export const startWaterModule = () => {
@@ -143,6 +234,8 @@ export const startWaterModule = () => {
 				...total,
 				...history,
 				...ranking,
+				...monthly,
+				...weekly,
 			},
 		},
 		name: 'water',

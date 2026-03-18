@@ -2,7 +2,7 @@ import axios, { isAxiosError } from 'axios';
 import qs from 'qs';
 
 const MineRegisterApi = axios.create({
-	baseURL: 'https:gramont.ddns.net/mine-register/api/',
+	baseURL: 'https://gramont.digital/mine-register/api/',
 });
 
 type ApiSuccess = {

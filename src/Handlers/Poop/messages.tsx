@@ -39,13 +39,32 @@ export const History = ({ poops, name }: { poops: Poop[]; name: string }) => {
 };
 
 export const Total = ({ total }: { total: number }) => {
-	console.log(total);
-
 	return (
 		<>
 			<Line>
 				Você cagou um total de <Bold>{total}</Bold> vezes!
 			</Line>
+		</>
+	);
+};
+
+export const MonthlyRanking = ({ ranking }: { ranking: [string, number][] }) => {
+	return (
+		<>
+			<Line>
+				<Bold>Ranking mensal de cagadas!</Bold>
+			</Line>
+			<ForEach
+				data={ranking}
+				render={(entry, index) => {
+					const [userId, poopCount] = entry;
+					return (
+						<ListItem>{`${
+							index + 1
+						}: ${userId} já cagou ${poopCount} vezes!`}</ListItem>
+					);
+				}}
+			/>
 		</>
 	);
 };

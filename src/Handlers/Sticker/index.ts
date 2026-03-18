@@ -6,13 +6,15 @@ import { generateQuote } from 'src/API/QuoteApi';
 const makeQuote = async (requester: MessageObj) => {
 	const { quotedMessage } = requester.message;
 
+	const { full } = requester.rawCommand?.namedArgs || {};
+
 	if (!quotedMessage || !quotedMessage.body) {
 		return requester.reply.withTemplate('Help');
 	}
 
 	const text = quotedMessage.taggedConctactFriendlyBody;
 
-	const quoteB64 = await generateQuote(requester);
+	const quoteB64 = await generateQuote(requester, !!full);
 
 	if (!quoteB64) {
 		return requester.reply('erro');

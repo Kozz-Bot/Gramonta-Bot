@@ -1,20 +1,59 @@
-import { Bold, ForEach, Line, ListItem, Monospace } from 'kozz-module-maker';
+import {
+	Bold,
+	Code,
+	ForEach,
+	Italic,
+	Line,
+	ListItem,
+	Monospace,
+	Paragraph,
+	Render,
+} from 'kozz-module-maker';
 import { Poop } from 'src/Handlers/Poop';
 import { Water } from '.';
 
 export const RankingMessage = ({ ranking }: { ranking: [string, number][] }) => {
+	const largestNameLength = ranking.reduce((largest, [name]) => {
+		return name.length > largest ? name.length : largest;
+	}, 0);
+
+	const labelLength = '10: '.length;
+	const valueLength = '24.86L'.length;
+
 	return (
-		<ForEach
-			data={ranking}
-			render={(entry, index) => {
-				const [userId, amount] = entry;
-				return (
-					<ListItem>{`${index + 1}: ${userId} bebeu ${
-						amount > 1000 ? `${amount / 1000}L` : `${amount}ml`
-					} de água!`}</ListItem>
-				);
-			}}
-		/>
+		<>
+			<Line>
+				<Bold>Ranking Mensal de hidratação!</Bold>
+			</Line>
+			<Line />
+
+			<Code>
+				<ForEach
+					data={ranking}
+					render={(entry, index) => {
+						const [userId, amount] = entry;
+						return (
+							<>
+								<Line>
+									|{(index + 1).toString().padStart(2, '0')}:{' '}
+									{userId.padEnd(largestNameLength, ' ')} |
+									{(amount > 1000 ? `${amount / 1000}L` : `${amount}ml`).padEnd(
+										valueLength,
+										' '
+									)}
+									|
+								</Line>
+								<Render when={index !== ranking.length - 1}>
+									<Line>
+										|{'-'.repeat(labelLength + largestNameLength + valueLength + 2)}|
+									</Line>
+								</Render>
+							</>
+						);
+					}}
+				/>
+			</Code>
+		</>
 	);
 };
 
@@ -95,6 +134,114 @@ export const NoHistory = ({ name }: { name: string }) => {
 				<Bold>{name}</Bold> ainda não registrou nenhuma hidratação.
 			</Line>
 			<Line>Vamos lá, beba água e registre aqui!</Line>
+		</>
+	);
+};
+
+export const MonthlyRanking = ({
+	ranking,
+	period,
+}: {
+	ranking: [string, number][];
+	period: string;
+}) => {
+	const largestNameLength = ranking.reduce((largest, [name]) => {
+		return name.length > largest ? name.length : largest;
+	}, 0);
+
+	const labelLength = '10: '.length;
+	const valueLength = '24.86L'.length;
+
+	return (
+		<>
+			<Line>
+				<Bold>Ranking Mensal de hidratação!</Bold>
+			</Line>
+			<Line>
+				<Italic>Mês: {period}</Italic>
+			</Line>
+			<Line />
+
+			<Code>
+				<ForEach
+					data={ranking}
+					render={(entry, index) => {
+						const [userId, amount] = entry;
+						return (
+							<>
+								<Line>
+									|{(index + 1).toString().padStart(2, '0')}:{' '}
+									{userId.padEnd(largestNameLength, ' ')} |
+									{(amount > 1000 ? `${amount / 1000}L` : `${amount}ml`).padEnd(
+										valueLength,
+										' '
+									)}
+									|
+								</Line>
+								<Render when={index !== ranking.length - 1}>
+									<Line>
+										|{'-'.repeat(labelLength + largestNameLength + valueLength + 2)}|
+									</Line>
+								</Render>
+							</>
+						);
+					}}
+				/>
+			</Code>
+		</>
+	);
+};
+
+export const WeeklyRanking = ({
+	ranking,
+	period,
+}: {
+	ranking: [string, number][];
+	period: string;
+}) => {
+	const largestNameLength = ranking.reduce((largest, [name]) => {
+		return name.length > largest ? name.length : largest;
+	}, 0);
+
+	const labelLength = '10: '.length;
+	const valueLength = '24.86L'.length;
+
+	return (
+		<>
+			<Line>
+				<Bold>Ranking semanal de hidratação!</Bold>
+			</Line>
+			<Line>
+				<Italic>Periodo: {period}</Italic>
+			</Line>
+			<Line />
+
+			<Code>
+				<ForEach
+					data={ranking}
+					render={(entry, index) => {
+						const [userId, amount] = entry;
+						return (
+							<>
+								<Line>
+									|{(index + 1).toString().padStart(2, '0')}:{' '}
+									{userId.padEnd(largestNameLength, ' ')} |
+									{(amount > 1000 ? `${amount / 1000}L` : `${amount}ml`).padEnd(
+										valueLength,
+										' '
+									)}
+									|
+								</Line>
+								<Render when={index !== ranking.length - 1}>
+									<Line>
+										|{'-'.repeat(labelLength + largestNameLength + valueLength + 2)}|
+									</Line>
+								</Render>
+							</>
+						);
+					}}
+				/>
+			</Code>
 		</>
 	);
 };

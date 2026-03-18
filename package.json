@@ -34,13 +34,13 @@
 		"kozz-types": "^0.1.22",
 		"nodemon": "^2.0.22",
 		"patch-package": "^7.0.2",
-		"typescript": "^5.9.2"
+		"typescript": "^5.9.3"
 	},
 	"dependencies": {
 		"@deepgram/sdk": "^3.13.0",
 		"@distube/ytdl-core": "^4.16.12",
-		"@supabase/supabase-js": "^2.56.0",
-		"axios": "^1.11.0",
+		"@supabase/supabase-js": "^2.75.0",
+		"axios": "^1.12.2",
 		"cron": "^3.5.0",
 		"dotenv": "^16.6.1",
 		"express": "^4.21.2",
@@ -62,7 +62,7 @@
 	"_moduleAliases": {
 		"src": "dist"
 	},
-	"resolutions": {
-		"glob/minimatch": "7.4.6"
+	"overrides": {
+		"minimatch": "^9.0.0"
 	}
 }
