@@ -2,10 +2,10 @@ import path from "path";
 import { McpClient } from "src/Agent/McpClient";
 
 // Path to the compiled MCP server entry point — relative to this file's location
-// src/Agent/Tools → ../../../../web-search-mcp/dist/index.js
+// dist/Agent/Tools → ../../../../../web-search-mcp/dist/index.js
 const MCP_SERVER_PATH = path.resolve(
   __dirname,
-  "../../../../web-search-mcp/dist/index.js",
+  "../../../../../web-search-mcp/dist/index.js",
 );
 
 // Singleton client — one process shared for the lifetime of the bot
