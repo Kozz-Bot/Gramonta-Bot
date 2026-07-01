@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-	baseURL: 'http://gramont.ddns.net/cdn',
+	baseURL: 'http://gramont.digital/cdn',
 	headers: {
 		Authorization: process.env.CDN_TOKEN,
 	},
@@ -10,6 +10,22 @@ const api = axios.create({
 type UploadFileResponse = {
 	status: 'success' | 'failed';
 	fileUrl: string;
+};
+
+const normalizeFileUrl = (fileUrl: string) => {
+	const normalizedProtocolUrl = fileUrl.replace(/^http:\/\//, 'https://');
+
+	try {
+		const parsedUrl = new URL(normalizedProtocolUrl);
+
+		if (parsedUrl.hostname === 'gramont.ddns.net') {
+			parsedUrl.hostname = 'gramont.digital';
+		}
+
+		return parsedUrl.toString();
+	} catch {
+		return normalizedProtocolUrl;
+	}
 };
 
 const instance = () => {
@@ -24,7 +40,7 @@ const instance = () => {
 			data: dataInB64,
 		});
 
-		return data.fileUrl.replace('http', 'https');
+		return normalizeFileUrl(data.fileUrl);
 	};
 
 	const uploadFileFromUrl = async (

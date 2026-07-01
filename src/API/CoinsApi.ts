@@ -29,7 +29,7 @@ export type WithID<T extends keyof CoinsEntitiesModel> = {
 } & CoinsEntitiesModel[T];
 
 const instance = axios.create({
-	baseURL: 'http://192.168.15.4:8000/coins/',
+	baseURL: 'http://localhost:8000/coins/',
 	headers: {
 		Authorization: `${process.env.COINS_TOKEN}`,
 	},

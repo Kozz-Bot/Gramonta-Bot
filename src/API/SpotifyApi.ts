@@ -19,7 +19,7 @@ API.interceptors.request.use(config => {
 
 // This API is available to be downloaded at https://github.com/TramontaG/SpotifyApp
 const AuthAPI = axios.create({
-	baseURL: 'https://gramont.ddns.net/spotify',
+	baseURL: 'https://gramont.digital/spotify',
 });
 
 export const getTokenLink = async () => {

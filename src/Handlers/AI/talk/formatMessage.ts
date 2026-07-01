@@ -3,7 +3,7 @@ import { Media, MessageReceived } from 'kozz-types';
 import { convertB64ToPath } from 'src/Utils/ffmpeg';
 import { transcribeFile } from 'src/API/Deepgram';
 
-const talkCommandRegex = /^!( ){0,1}ai talk\s*/i;
+const talkCommandRegex = /^[!/]\s*ai(?:\s+talk)?\s*/i;
 
 export const stripTalkCommand = (text?: string | null): string => {
 	if (!text) return '';

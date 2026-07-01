@@ -47,6 +47,26 @@ export const talkTools: ChatCompletionTool[] = [
 			},
 		},
 	},
+	{
+		type: 'function',
+		function: {
+			name: 'get_chat_context',
+			description:
+				'Busca mensagens recentes APENAS do chat atual do WhatsApp. Use quando a pergunta depender do histórico da conversa, por exemplo "quem falou isso?", "qual festa o Pedro foi?", "o que combinaram?", "resume a conversa", ou quando precisar lembrar algo dito antes. A ferramenta não aceita chatId: você só escolhe quantas mensagens recentes quer consultar.',
+			parameters: {
+				type: 'object',
+				properties: {
+					limit: {
+						type: 'number',
+						description:
+							'Quantidade de mensagens recentes do chat atual a buscar. Use 50-100 para perguntas simples, 200-500 para contexto amplo, e até 1000 para resumos longos.',
+					},
+				},
+				required: ['limit'],
+				additionalProperties: false,
+			},
+		},
+	},
 ];
 
 export const extractToolArgs = (
