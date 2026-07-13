@@ -1,0 +1,60 @@
+{
+    "players": [
+        {
+            "id": "29287566553225@lid",
+            "playerId": 2,
+            "username": "tramonta",
+            "password": "rbcG30J607__",
+            "createdAt": 1783023107826
+        },
+        {
+            "id": "54159571185692@lid",
+            "playerId": 3,
+            "username": "rodriguinho pescador",
+            "password": "P-j6_16L9TuP",
+            "createdAt": 1783027309310
+        },
+        {
+            "id": "13417628848265@lid",
+            "playerId": 4,
+            "username": "thiaguinho varalonga",
+            "password": "PBA1x0HzPNjp",
+            "createdAt": 1783027335602
+        },
+        {
+            "id": "223445774262377@lid",
+            "playerId": 5,
+            "username": "pintomolis",
+            "password": "X-99d3MAJW-Z",
+            "createdAt": 1783030131417
+        },
+        {
+            "id": "52368586629204@lid",
+            "playerId": 6,
+            "username": "bebel",
+            "password": "6-a-MoD5on14",
+            "createdAt": 1783091979068
+        },
+        {
+            "id": "263986188685537@lid",
+            "playerId": 7,
+            "username": "{roberta}",
+            "password": "hUzN1r2WKPjJ",
+            "createdAt": 1783164938457
+        },
+        {
+            "id": "109135270011131@lid",
+            "playerId": 8,
+            "username": "alguem",
+            "password": "-8fscGVC1OPc",
+            "createdAt": 1783740876869
+        },
+        {
+            "id": "207339563020374@lid",
+            "playerId": 9,
+            "username": "helldan",
+            "password": "YZ277cWSYUM1",
+            "createdAt": 1783771543246
+        }
+    ]
+}

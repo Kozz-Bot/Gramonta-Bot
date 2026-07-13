@@ -31,7 +31,7 @@
 		"babel": "^6.23.0",
 		"babel-plugin-module-resolver": "^5.0.2",
 		"concurrently": "^7.6.0",
-		"kozz-types": "^0.1.22",
+		"kozz-types": "^0.1.23",
 		"nodemon": "^2.0.22",
 		"patch-package": "^7.0.2",
 		"typescript": "^5.9.3"
@@ -50,7 +50,7 @@
 		"he": "^1.2.0",
 		"html-memo": "^1.0.1",
 		"jsdom": "^22.1.0",
-		"kozz-module-maker": "^0.3.0",
+		"kozz-module-maker": "^0.3.1",
 		"link-module-alias": "^1.2.0",
 		"mime-types": "^2.1.35",
 		"openai": "^3.3.0",

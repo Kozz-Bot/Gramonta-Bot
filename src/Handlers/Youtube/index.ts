@@ -10,7 +10,7 @@ const firstVideo = createMethod('video', async requester => {
 			return requester.reply.withTemplate('EmptyQuery');
 		}
 		const results = await YoutubeApi.searchResults(query);
-		if (!results) {
+		if (!results?.results.length) {
 			return requester.reply.withTemplate('NoResults');
 		}
 		requester.react('⏳');
@@ -37,7 +37,7 @@ const firstSong = createMethod('song', async requester => {
 			return requester.reply.withTemplate('EmptyQuery');
 		}
 		const results = await YoutubeApi.searchResults(query);
-		if (!results) {
+		if (!results?.results.length) {
 			return requester.reply.withTemplate('NoResults');
 		}
 		requester.react('⏳');
@@ -52,7 +52,7 @@ const firstSong = createMethod('song', async requester => {
 		requester.react('🎶');
 		requester.reply.withMedia.fromPath(
 			mediaPath,
-			'audio/webm',
+			'audio/ogg; codecs=opus',
 			`🎥 ${results.results[0].title}`
 		);
 	} catch (e) {
