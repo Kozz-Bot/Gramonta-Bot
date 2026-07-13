@@ -19,5 +19,6 @@ Por enquanto, figurinhas animadas são enviadas apenas com o primeiro frame.
 
 Envie um video ou imagem com _*!s*_ na legenda, _ou_ responda um video ou imagem com _*!s*_.
 Responda uma figurinha com _*!s*_ para transforma-la em imagem.
+Responda uma mensagem de texto com _*!s full*_ para criar a figurinha incluindo a mensagem citada por ela.
 
 > ---

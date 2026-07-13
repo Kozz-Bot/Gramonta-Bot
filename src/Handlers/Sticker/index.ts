@@ -3,7 +3,7 @@ import { MessageObj, loadTemplates } from 'kozz-module-maker/dist/Message';
 import { Media } from 'kozz-types';
 import { generateQuote } from 'src/API/QuoteApi';
 
-const makeQuote = async (requester: MessageObj) => {
+const makeQuote = async (requester: MessageObj, includeQuotedMessage?: boolean) => {
 	const { quotedMessage } = requester.message;
 
 	const { full } = requester.rawCommand?.namedArgs || {};
@@ -14,7 +14,7 @@ const makeQuote = async (requester: MessageObj) => {
 
 	const text = quotedMessage.taggedConctactFriendlyBody;
 
-	const quoteB64 = await generateQuote(requester, !!full);
+	const quoteB64 = await generateQuote(requester, includeQuotedMessage ?? !!full);
 
 	if (!quoteB64) {
 		return requester.reply('erro');
@@ -72,6 +72,10 @@ const defaultMethod = createMethod(
 	}
 );
 
+const full = createMethod('full', requester => {
+	return makeQuote(requester, true);
+});
+
 const toImg = createMethod('toimg', message => {
 	if (!message.message.quotedMessage?.media) {
 		return message.reply.withTemplate('instructions_toimg');
@@ -109,6 +113,7 @@ export const startStickerHandler = () => {
 			boundariesToHandle: ['*'],
 			methods: {
 				...defaultMethod,
+				...full,
 				...toImg,
 				...fromLink,
 			},
