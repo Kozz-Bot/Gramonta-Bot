@@ -31,7 +31,7 @@
 		"babel": "^6.23.0",
 		"babel-plugin-module-resolver": "^5.0.2",
 		"concurrently": "^7.6.0",
-		"kozz-types": "^0.2.0",
+		"kozz-types": "^0.2.1",
 		"nodemon": "^2.0.22",
 		"patch-package": "^7.0.2",
 		"typescript": "^5.9.3"
