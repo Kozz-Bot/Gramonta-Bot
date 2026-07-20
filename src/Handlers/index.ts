@@ -7,6 +7,7 @@ export * from './Debug';
 export * from './Offend';
 export * from './Horoscope';
 export * from './Weather';
+export * from './Tags';
 export * from './Help';
 export * from './CalvoCoins';
 export * from './AI';

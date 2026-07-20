@@ -1,6 +1,7 @@
 import { createModule, createMethod } from 'kozz-module-maker';
-import { MessageObj, loadTemplates } from 'kozz-module-maker/dist/Message';
-import OffenseAPI, { OffenseResponse } from 'src/API/OffendApi';
+import { MessageObj } from 'kozz-module-maker/dist/Message';
+import OffenseAPI from 'src/API/OffendApi';
+import { Curse, Help, TagSomeone } from './messages';
 
 const [o, a, os, as] = ['o', 'a', 'os', 'as'].map(name =>
 	createMethod(name, requester => {
@@ -21,19 +22,16 @@ const offendPerson = async (person: string | null, requester: MessageObj) => {
 	const offense = await OffenseAPI.getRandomOffense();
 
 	if (!person) {
-		return requester.reply.withTemplate('tagSomeone', {
-			offense: offense?.xingamento,
-		});
+		return requester.reply(TagSomeone({ offense: offense?.xingamento }));
 	}
 
-	const curseVariant = ['curse1', 'curse2', 'curse3'].at(
-		Math.round(Math.random() * 2)
+	requester.reply(
+		Curse({
+			contact: person,
+			offense: offense?.xingamento,
+			variant: Math.round(Math.random() * 2),
+		})
 	);
-
-	requester.reply.withTemplate(curseVariant!, {
-		contact: person,
-		offense: offense?.xingamento,
-	});
 };
 
 const fallback = createMethod('fallback', async requester => {
@@ -48,8 +46,6 @@ const fallback = createMethod('fallback', async requester => {
 		requester.reply(`${e}`);
 	}
 });
-
-const templatePath = './src/Handlers/Offend/reply.kozz.md';
 
 export const startOffenseHandler = () => {
 	const instance = createModule({
@@ -67,10 +63,7 @@ export const startOffenseHandler = () => {
 		name: 'ofenda',
 		address: `${process.env.GATEWAY_URL}`,
 		customSocketPath: process.env.SOCKET_PATH,
-		templatePath,
-	}).resources.upsertResource('help', () =>
-		loadTemplates(templatePath).getTextFromTemplate('Help')
-	);
+	}).resources.upsertResource('help', () => Help());
 
 	return instance;
 };

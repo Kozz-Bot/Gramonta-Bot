@@ -1,6 +1,6 @@
 import { createModule, createMethod, Line, Bold } from 'kozz-module-maker';
-import { loadTemplates } from 'kozz-module-maker/dist/Message';
 import { rateLimit } from 'src/Middlewares/RateLimit';
+import { Help } from './messages';
 
 const Pong = ({ time }: { time: number }) => {
 	return (
@@ -23,8 +23,6 @@ const defaultMethod = createMethod(
 	})
 );
 
-const templatePath = './src/Handlers/Ping/reply.kozz.md';
-
 export const startPingHandler = () => {
 	const instance = createModule({
 		commands: {
@@ -36,10 +34,7 @@ export const startPingHandler = () => {
 		name: 'ping',
 		address: `${process.env.GATEWAY_URL}`,
 		customSocketPath: process.env.SOCKET_PATH,
-		templatePath,
-	}).resources.upsertResource('help', () =>
-		loadTemplates(templatePath).getTextFromTemplate('Help')
-	);
+	}).resources.upsertResource('help', () => <Help />);
 
 	return instance;
 };

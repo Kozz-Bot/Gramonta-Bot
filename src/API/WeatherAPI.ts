@@ -1,44 +1,35 @@
 import axios, { AxiosInstance } from 'axios';
 
 type WeatherData = {
-	coord: {
-		lon: number;
-		lat: number;
-	};
-	weather: [
-		{
-			id: number;
-			main: string;
-			description: string;
-			icon: string;
-		}
-	];
-	base: string;
-	main: {
-		temp: number;
-		feels_like: number;
-		temp_min: number;
-		temp_max: number;
-		pressure: number;
-		humidity: number;
-	};
-	visibility: number;
-	wind: {
-		speed: number;
-		deg: number;
-	};
-	sys: {
-		type: number;
-		id: number;
+	location: {
+		name: string;
+		region: string;
 		country: string;
-		sunrise: number;
-		sunset: number;
+		localtime: string;
 	};
-	timezone: number;
-	id: number;
-	name: string;
-	dt: number;
-	cod: number;
+	current: {
+		temp_c: number;
+		feelslike_c: number;
+		humidity: number;
+		wind_kph: number;
+		condition: {
+			text: string;
+		};
+	};
+	forecast: {
+		forecastday: {
+			date: string;
+			day: {
+				maxtemp_c: number;
+				mintemp_c: number;
+				avgtemp_c: number;
+				daily_chance_of_rain: number;
+				condition: {
+					text: string;
+				};
+			};
+		}[];
+	};
 };
 
 class WeatherAPI {
@@ -46,19 +37,22 @@ class WeatherAPI {
 
 	constructor() {
 		this.API = axios.create({
-			baseURL: 'https://weather.contrateumdev.com.br',
+			baseURL: 'https://api.weatherapi.com/v1',
 		});
 	}
 
 	async getWeatherFromCity(city: string) {
-		const weather = await this.API.get<WeatherData>('api/weather/city', {
+		const weather = await this.API.get<WeatherData>('forecast.json', {
 			params: {
-				city,
+				key: process.env.WEATHERAPI_KEY ?? process.env.WEATHER_TOKEN,
+				q: city,
+				days: 3,
+				lang: 'pt',
+				aqi: 'no',
+				alerts: 'no',
 			},
-			headers: {
-				token: process.env.WEATHER_TOKEN
-			}
 		});
+
 		return weather.data;
 	}
 }

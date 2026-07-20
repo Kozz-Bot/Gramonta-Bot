@@ -22,6 +22,8 @@ type MessageCount = {
 
 type Period = 'dia' | 'semana' | 'mes' | 'geral';
 
+const COMMAND_TIME_ZONE = 'America/Sao_Paulo';
+
 const periodLabels: Record<Period, string> = {
 	dia: 'Hoje',
 	semana: 'Semana',
@@ -38,26 +40,100 @@ const aliases: CommandAlias[] = [
 	},
 ];
 
+const getDatePartsInCommandTimeZone = (date = new Date()) => {
+	const parts = new Intl.DateTimeFormat('en-US', {
+		timeZone: COMMAND_TIME_ZONE,
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit',
+		weekday: 'short',
+	}).formatToParts(date);
+
+	const getPart = (type: string) =>
+		parts.find(part => part.type === type)?.value ?? '';
+	const weekdayMap: Record<string, number> = {
+		Sun: 0,
+		Mon: 1,
+		Tue: 2,
+		Wed: 3,
+		Thu: 4,
+		Fri: 5,
+		Sat: 6,
+	};
+
+	return {
+		year: Number(getPart('year')),
+		month: Number(getPart('month')),
+		day: Number(getPart('day')),
+		weekday: weekdayMap[getPart('weekday')] ?? 0,
+	};
+};
+
+const getCommandTimeZoneOffset = (date: Date) => {
+	const parts = new Intl.DateTimeFormat('en-US', {
+		timeZone: COMMAND_TIME_ZONE,
+		year: 'numeric',
+		month: '2-digit',
+		day: '2-digit',
+		hour: '2-digit',
+		minute: '2-digit',
+		second: '2-digit',
+		hourCycle: 'h23',
+	}).formatToParts(date);
+
+	const getPart = (type: string) =>
+		Number(parts.find(part => part.type === type)?.value ?? 0);
+	const zonedAsUtc = Date.UTC(
+		getPart('year'),
+		getPart('month') - 1,
+		getPart('day'),
+		getPart('hour'),
+		getPart('minute'),
+		getPart('second')
+	);
+
+	return Math.round((zonedAsUtc - date.getTime()) / 60000) * 60000;
+};
+
+const getTimestampInCommandTimeZone = ({
+	year,
+	month,
+	day,
+}: {
+	year: number;
+	month: number;
+	day: number;
+}) => {
+	const utcGuess = Date.UTC(year, month - 1, day, 0, 0, 0, 0);
+	const firstOffset = getCommandTimeZoneOffset(new Date(utcGuess));
+	const secondOffset = getCommandTimeZoneOffset(new Date(utcGuess - firstOffset));
+
+	return utcGuess - secondOffset;
+};
+
 const startOfDay = () => {
-	const date = new Date();
-	date.setHours(0, 0, 0, 0);
-	return date.getTime();
+	const { year, month, day } = getDatePartsInCommandTimeZone();
+
+	return getTimestampInCommandTimeZone({ year, month, day });
 };
 
 const startOfWeek = () => {
-	const date = new Date();
-	const day = date.getDay();
-	const diff = day === 0 ? 6 : day - 1;
-	date.setDate(date.getDate() - diff);
-	date.setHours(0, 0, 0, 0);
-	return date.getTime();
+	const { year, month, day, weekday } = getDatePartsInCommandTimeZone();
+	const weekStart = new Date(Date.UTC(year, month - 1, day));
+	const diff = weekday === 0 ? 6 : weekday - 1;
+	weekStart.setUTCDate(weekStart.getUTCDate() - diff);
+
+	return getTimestampInCommandTimeZone({
+		year: weekStart.getUTCFullYear(),
+		month: weekStart.getUTCMonth() + 1,
+		day: weekStart.getUTCDate(),
+	});
 };
 
 const startOfMonth = () => {
-	const date = new Date();
-	date.setDate(1);
-	date.setHours(0, 0, 0, 0);
-	return date.getTime();
+	const { year, month } = getDatePartsInCommandTimeZone();
+
+	return getTimestampInCommandTimeZone({ year, month, day: 1 });
 };
 
 const getPeriodStart = (period: Period) => {

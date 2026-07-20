@@ -67,6 +67,66 @@ export const talkTools: ChatCompletionTool[] = [
 			},
 		},
 	},
+	{
+		type: 'function',
+		function: {
+			name: 'generate_image',
+			description:
+				'Gera uma imagem nova a partir de um prompt textual. Use quando o usuário pedir para criar, gerar, desenhar, ilustrar, fazer uma imagem, imagem de, foto de, arte de, meme visual novo, ou qualquer pedido em que a resposta esperada seja uma imagem criada e não apenas texto.',
+			parameters: {
+				type: 'object',
+				properties: {
+					prompt: {
+						type: 'string',
+						description:
+							'Prompt detalhado para geração da imagem. Preserve a intenção do usuário e adicione detalhes visuais úteis, como estilo, composição, assunto, ambiente e clima, quando isso estiver implícito.',
+					},
+				},
+				required: ['prompt'],
+				additionalProperties: false,
+			},
+		},
+	},
+	{
+		type: 'function',
+		function: {
+			name: 'generate_speech',
+			description:
+				'Gera um áudio narrado a partir de texto. Use quando o usuário pedir áudio, voz, narrar, falar em voz alta, mandar em áudio, transformar texto em áudio, ou responder com uma mensagem falada.',
+			parameters: {
+				type: 'object',
+				properties: {
+					input: {
+						type: 'string',
+						description:
+							'Texto exato que deve ser falado no áudio. Escreva uma versão limpa e natural, sem markdown bruto, mantendo a intenção do usuário.',
+					},
+					voice: {
+						type: 'string',
+						enum: [
+							'alloy',
+							'ash',
+							'ballad',
+							'coral',
+							'echo',
+							'fable',
+							'nova',
+							'onyx',
+							'sage',
+							'shimmer',
+							'verse',
+							'marin',
+							'cedar',
+						],
+						description:
+							'Voz usada na narração. Use alloy por padrão quando o usuário não escolher uma voz.',
+					},
+				},
+				required: ['input'],
+				additionalProperties: false,
+			},
+		},
+	},
 ];
 
 export const extractToolArgs = (

@@ -142,3 +142,61 @@ export const NeedsBody = () => {
 		</Line>
 	);
 };
+
+export const NeedsName = () => {
+	return (
+		<Line>
+			<Bold>Erro: Dê um nome para a copypasta</Bold>
+		</Line>
+	);
+};
+
+export const NeedsNameOrNumber = () => {
+	return (
+		<Line>
+			<Bold>Erro: Dê um nome ou numero para a copypasta que deseja obter</Bold>
+		</Line>
+	);
+};
+
+export const InvalidCopypasta = () => {
+	return (
+		<Line>
+			<Bold>
+				Erro: Essa copypasta não existe. Consulte a lista de copypastas com
+				!copypasta list
+			</Bold>
+		</Line>
+	);
+};
+
+export const NotCopypastaOwner = () => {
+	return (
+		<Line>
+			<Bold>Erro: Você só pode deletar uma copypasta que você mesmo adicionou</Bold>
+		</Line>
+	);
+};
+
+export const CopypastaAdded = ({ name }: { name: string }) => {
+	return (
+		<Line>
+			Sucesso! Copypasta adicionada. Para fazer o bot envia-la basta digitar
+			!copypasta {name}
+		</Line>
+	);
+};
+
+export const CopypastaDeleted = () => {
+	return <Line>A copypasta foi deletada.</Line>;
+};
+
+export const Copypasta = ({ id, text }: { id: string; text: string }) => {
+	return (
+		<>
+			<Line>{id}</Line>
+			<Line />
+			<Line>{text}</Line>
+		</>
+	);
+};

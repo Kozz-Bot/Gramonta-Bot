@@ -1,9 +1,7 @@
 import { createMethod, createModule } from 'kozz-module-maker';
-import { loadTemplates } from 'kozz-module-maker/dist/Message';
 import { getGameFromRequester, guessWord } from 'src/misc/Wordle';
 import fs from 'fs/promises';
-
-const templatePath = 'src/Handlers/Wordle/messages.kozz.md';
+import { EmptyQuery, GameOver, GuessResult, Help, InvalidGuess, Win } from './messages';
 
 const resend = createMethod('resend', async requester => {
 	const game = getGameFromRequester(requester);
@@ -17,10 +15,10 @@ const resend = createMethod('resend', async requester => {
 		.join('\n');
 	const tries = game.guesses.length;
 
-	requester.reply.withTemplate('GuessResult', {
+	requester.reply(GuessResult({
 		tries,
 		history: prettyResult,
-	});
+	}));
 });
 
 /**
@@ -30,7 +28,7 @@ const guess = createMethod('fallback', async requester => {
 	try {
 		const query = requester.rawCommand?.method;
 		if (!query) {
-			return requester.reply.withTemplate('EmptyQuery');
+			return requester.reply(EmptyQuery());
 		}
 
 		const game = guessWord(requester, query);
@@ -56,15 +54,15 @@ const guess = createMethod('fallback', async requester => {
 				duration: null,
 			});
 
-			return requester.reply.withTemplate('Win', {
+			return requester.reply(Win({
 				tries,
 				history: prettyResult,
-			});
+			}));
 		} else {
-			requester.reply.withTemplate('GuessResult', {
+			requester.reply(GuessResult({
 				tries,
 				history: prettyResult,
-			});
+			}));
 
 			if (tries === 6) {
 				requester.reply(`A palavra era ${game.word}`);
@@ -86,17 +84,17 @@ const guess = createMethod('fallback', async requester => {
 		}
 	} catch (e) {
 		if (e === 'INVALID_GUESS') {
-			return requester.reply.withTemplate('InvalidGuess');
+			return requester.reply(InvalidGuess());
 		}
 		if (e === 'GAME_OVER') {
-			return requester.reply.withTemplate('GameOver');
+			return requester.reply(GameOver());
 		}
 		return requester.reply(`${e}`);
 	}
 });
 
 const help = createMethod('help', requester => {
-	requester.reply.withTemplate('Help');
+	requester.reply(Help());
 });
 
 export const startWordleModule = () => {
@@ -112,10 +110,7 @@ export const startWordleModule = () => {
 		},
 		address: `${process.env.GATEWAY_URL}`,
 		customSocketPath: process.env.SOCKET_PATH,
-		templatePath,
-	}).resources.upsertResource('help', () =>
-		loadTemplates(templatePath).getTextFromTemplate('Help')
-	);
+	}).resources.upsertResource('help', () => Help());
 
 	return instance;
 };

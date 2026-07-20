@@ -1,8 +1,6 @@
 import { createMethod, createModule } from 'kozz-module-maker';
-import { MessageObj, loadTemplates } from 'kozz-module-maker/dist/Message';
 import { getPlayerStatus } from 'src/API/SpotifyApi';
-
-const templatePath = 'src/Handlers/Spotify/messages.kozz.md';
+import { Help } from './messages';
 
 const now = createMethod('now', async requester => {
 	try {
@@ -35,7 +33,7 @@ const now = createMethod('now', async requester => {
 });
 
 const sendHelp = createMethod('fallback', requester => {
-	requester.reply.withTemplate('Help');
+	requester.reply(Help());
 });
 
 export const startSpotifyModule = () => {
@@ -50,10 +48,7 @@ export const startSpotifyModule = () => {
 		name: 'spotify',
 		address: `${process.env.GATEWAY_URL}`,
 		customSocketPath: process.env.SOCKET_PATH,
-		templatePath,
-	}).resources.upsertResource('help', () =>
-		loadTemplates(templatePath).getTextFromTemplate('Help')
-	);
+	}).resources.upsertResource('help', () => Help());
 
 	return instance;
 };

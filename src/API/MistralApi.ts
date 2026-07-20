@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { ChatGPTResponse, PreviousMessages } from './OpenAi';
 import { Media } from 'kozz-types';
+import { getTemporaryCdnMediaUrl } from './TemporaryCdnMedia';
 
 const API = axios.create({
 	baseURL: process.env.LLM_BASE_URL ?? 'https://api.fuelix.ai/v1/',
@@ -59,11 +60,7 @@ export const createChatCompletion = async (payload: {
 };
 
 const getImageUrl = async (media: Media) => {
-	if (media.transportType === 'url') {
-		return media.data;
-	}
-
-	return `data:${media.mimeType};base64,${media.data}`;
+	return getTemporaryCdnMediaUrl(media, 'ai-read-image');
 };
 
 export const fromPrompt = async (context: PreviousMessages, bigModel?: boolean) => {

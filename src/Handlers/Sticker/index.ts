@@ -1,7 +1,8 @@
 import { createModule, createMethod } from 'kozz-module-maker';
-import { MessageObj, loadTemplates } from 'kozz-module-maker/dist/Message';
+import { MessageObj } from 'kozz-module-maker/dist/Message';
 import { Media } from 'kozz-types';
 import { generateQuote } from 'src/API/QuoteApi';
+import { DefaultInstructions, Help, ToImgInstructions } from './messages';
 
 const makeQuote = async (requester: MessageObj, includeQuotedMessage?: boolean) => {
 	const { quotedMessage } = requester.message;
@@ -9,7 +10,7 @@ const makeQuote = async (requester: MessageObj, includeQuotedMessage?: boolean) 
 	const { full } = requester.rawCommand?.namedArgs || {};
 
 	if (!quotedMessage || !quotedMessage.body) {
-		return requester.reply.withTemplate('Help');
+		return requester.reply(Help());
 	}
 
 	const text = quotedMessage.taggedConctactFriendlyBody;
@@ -65,7 +66,7 @@ const defaultMethod = createMethod(
 			return makeQuote(requester);
 		}
 
-		requester.reply.withTemplate('instructions_default');
+		requester.reply(DefaultInstructions());
 	},
 	{
 		tags: 'string?',
@@ -78,7 +79,7 @@ const full = createMethod('full', requester => {
 
 const toImg = createMethod('toimg', message => {
 	if (!message.message.quotedMessage?.media) {
-		return message.reply.withTemplate('instructions_toimg');
+		return message.reply(ToImgInstructions());
 	}
 
 	return message.reply.withMedia(message.message.quotedMessage.media);
@@ -105,8 +106,6 @@ const fromLink = createMethod('from-link', requester => {
 	}
 });
 
-const templatePath = './src/Handlers/Sticker/reply.kozz.md';
-
 export const startStickerHandler = () => {
 	const instance = createModule({
 		commands: {
@@ -121,10 +120,7 @@ export const startStickerHandler = () => {
 		name: 's',
 		customSocketPath: process.env.SOCKET_PATH,
 		address: `${process.env.GATEWAY_URL}`,
-		templatePath,
-	}).resources.upsertResource('help', () =>
-		loadTemplates(templatePath).getTextFromTemplate('Help')
-	);
+	}).resources.upsertResource('help', () => Help());
 
 	return instance;
 };

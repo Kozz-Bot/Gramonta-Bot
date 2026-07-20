@@ -7,12 +7,11 @@ import {
 import { hostAccountOnly } from 'src/Middlewares/CheckContact';
 import { GroupChatData } from 'kozz-types';
 import { promiseIsFulfilled } from 'src/Utils/promises';
+import { Help } from './messages';
 
 const help = createMethod('help', requester => {
-	requester.reply.withTemplate('Help');
+	requester.reply(Help());
 });
-
-const templatePath = 'src/Handlers/Transmission/messages.kozz.md';
 
 const add = createMethod(
 	'add',
@@ -126,7 +125,6 @@ export const startTransmissionHandler = () => {
 		name: 'transmit',
 		address: `${process.env.GATEWAY_URL}`,
 		customSocketPath: process.env.SOCKET_PATH,
-		templatePath,
 	});
 
 	return instance;

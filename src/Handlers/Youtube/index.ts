@@ -1,17 +1,17 @@
 import { createModule, createMethod } from 'kozz-module-maker';
-import { loadTemplates } from 'kozz-module-maker/dist/Message';
 import * as YoutubeApi from 'src/API/YoutubeAPI';
 import { rateLimit } from 'src/Middlewares/RateLimit';
+import { EmptyQuery, ErrorMessage, Help, NoResults } from './messages';
 
 const firstVideo = createMethod('video', async requester => {
 	try {
 		const query = requester.rawCommand!.immediateArg;
 		if (!query) {
-			return requester.reply.withTemplate('EmptyQuery');
+			return requester.reply(EmptyQuery());
 		}
 		const results = await YoutubeApi.searchResults(query);
 		if (!results?.results.length) {
-			return requester.reply.withTemplate('NoResults');
+			return requester.reply(NoResults());
 		}
 		requester.react('⏳');
 		console.log(results.results[0].link);
@@ -26,7 +26,7 @@ const firstVideo = createMethod('video', async requester => {
 			`🎥 ${results.results[0].title}`
 		);
 	} catch (e) {
-		requester.reply.withTemplate('Error', { error: e });
+		requester.reply(ErrorMessage({ error: e }));
 	}
 });
 
@@ -34,37 +34,33 @@ const firstSong = createMethod('song', async requester => {
 	try {
 		const query = requester.rawCommand!.immediateArg;
 		if (!query) {
-			return requester.reply.withTemplate('EmptyQuery');
+			return requester.reply(EmptyQuery());
 		}
 		const results = await YoutubeApi.searchResults(query);
 		if (!results?.results.length) {
-			return requester.reply.withTemplate('NoResults');
+			return requester.reply(NoResults());
 		}
 		requester.react('⏳');
 		const mediaPath = await YoutubeApi.downloadMp3FromUrl(results.results[0].link);
 		if (!mediaPath) {
-			return requester.reply.withTemplate('Error', {
-				error: 'Falha ao salvar o arquivo',
-			});
+			return requester.reply(ErrorMessage({ error: 'Falha ao salvar o arquivo' }));
 		}
 		console.log(mediaPath);
 
 		requester.react('🎶');
 		requester.reply.withMedia.fromPath(
 			mediaPath,
-			'audio/ogg; codecs=opus',
+			'audio/webm',
 			`🎥 ${results.results[0].title}`
 		);
 	} catch (e) {
-		requester.reply.withTemplate('Error', { error: e });
+		requester.reply(ErrorMessage({ error: e }));
 	}
 });
 
 const help = createMethod('fallback', requester =>
-	requester.reply.withTemplate('Help')
+	requester.reply(Help())
 );
-
-const templatePath = 'src/Handlers/Youtube/messages.kozz.md';
 
 export const startYoutubeHandler = () => {
 	const instance = createModule({
@@ -79,10 +75,7 @@ export const startYoutubeHandler = () => {
 		name: 'yt',
 		address: `${process.env.GATEWAY_URL}`,
 		customSocketPath: process.env.SOCKET_PATH,
-		templatePath,
-	}).resources.upsertResource('help', () =>
-		loadTemplates(templatePath).getTextFromTemplate('Help')
-	);
+	}).resources.upsertResource('help', () => Help());
 
 	return instance;
 };

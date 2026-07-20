@@ -1,15 +1,19 @@
 import fs from 'fs/promises';
 import ffmpeg from 'fluent-ffmpeg';
+import { randomUUID } from 'crypto';
 
 const __TEMP_AUDIO_PATH__ = './media/temp';
+
+const tempAudioPath = (name: string, format: string) =>
+	`${__TEMP_AUDIO_PATH__}/${name}-${randomUUID()}.${format}`;
 
 export const convertBufferToPath = async (
 	buffer: Buffer,
 	fromFormat: string,
 	toFormat: `${string}`
 ): Promise<string> => {
-	const inFilePath = `${__TEMP_AUDIO_PATH__}/tempFile.${fromFormat}`;
-	const outFilePath = `${__TEMP_AUDIO_PATH__}/temp.${toFormat}`;
+	const inFilePath = tempAudioPath('tempFile', fromFormat);
+	const outFilePath = tempAudioPath('temp', toFormat);
 
 	//@ts-ignore
 
@@ -63,10 +67,10 @@ export const convertB64ToB64 = async (
 	fromFormat: string,
 	toFormat: `${string}`
 ): Promise<string> => {
-	const outFilePath = `${__TEMP_AUDIO_PATH__}/temp.${toFormat}`;
-	const inFilePath = `${__TEMP_AUDIO_PATH__}/tempFile.${fromFormat}`;
+	const outFilePath = tempAudioPath('temp', toFormat);
+	const inFilePath = tempAudioPath('tempFile', fromFormat);
 
-	const buffer = Buffer.from(inB64, 'base64');
+	const buffer = Buffer.from(inB64, 'base64url');
 
 	//@ts-ignore
 	await fs.writeFile(inFilePath, buffer);
@@ -95,10 +99,10 @@ export const convertB64ToPath = async (
 	fromFormat: string,
 	toFormat: `${string}`
 ): Promise<string> => {
-	const outFilePath = `${__TEMP_AUDIO_PATH__}/temp.${toFormat}`;
-	const inFilePath = `${__TEMP_AUDIO_PATH__}/tempFile.${fromFormat}`;
+	const outFilePath = tempAudioPath('temp', toFormat);
+	const inFilePath = tempAudioPath('tempFile', fromFormat);
 
-	const buffer = Buffer.from(inB64, 'base64');
+	const buffer = Buffer.from(inB64, 'base64url');
 
 	//@ts-ignore
 

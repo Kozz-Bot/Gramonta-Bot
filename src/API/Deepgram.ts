@@ -1,44 +1,71 @@
-import { createClient } from '@deepgram/sdk';
+import axios from 'axios';
 import fs from 'fs';
+import FormData = require('form-data');
 
-export const transcribeFile = async (filePath: string) => {
-	const deepgram = createClient(process.env.DEEPGRAM_API_KEY);
+type FuelIxTranscriptionResponse = {
+	text?: string;
+};
 
-	const { result, error } = await deepgram.listen.prerecorded.transcribeFile(
-		fs.readFileSync(filePath),
+type TranscriptionChannel = {
+	alternatives: [
 		{
-			model: 'nova-3',
-			smart_format: true,
-			detect_language: true,
-			punctuation: true,
-			diarization: true,
-			paragraphs: true,
-			filler_words: true,
+			transcript: string;
+		}
+	];
+};
+
+const api = axios.create({
+	baseURL: process.env.FUELIX_BASE_URL ?? process.env.LLM_BASE_URL ?? 'https://api.fuelix.ai/v1',
+	headers: {
+		Authorization: `Bearer ${
+			process.env.FUELIX_API_KEY ??
+			process.env.LLM_API_KEY ??
+			process.env.OPENAI_API_KEY
+		}`,
+	},
+});
+
+const toTranscriptionChannel = (text = ''): TranscriptionChannel => ({
+	alternatives: [
+		{
+			transcript: text,
+		},
+	],
+});
+
+const transcribeForm = async (form: FormData) => {
+	const { data } = await api.post<FuelIxTranscriptionResponse>(
+		'/audio/transcriptions',
+		form,
+		{
+			headers: form.getHeaders(),
 		}
 	);
 
-	if (error) throw error;
+	return toTranscriptionChannel(data.text?.trim() ?? '');
+};
 
-	return result.results.channels[0];
+export const transcribeFile = async (filePath: string) => {
+	const form = new FormData();
+	form.append('file', fs.createReadStream(filePath));
+	form.append('model', process.env.TRANSCRIPTION_MODEL ?? 'whisper-1');
+
+	return transcribeForm(form);
 };
 
 export const transcribeUrl = async (url: string) => {
-	const deepgram = createClient(process.env.DEEPGRAM_API_KEY);
-
-	const { result, error } = await deepgram.listen.prerecorded.transcribeUrl(
-		{ url },
+	const response = await axios.get<ArrayBuffer>(url, {
+		responseType: 'arraybuffer',
+	});
+	const form = new FormData();
+	form.append(
+		'file',
+		Buffer.from(response.data),
 		{
-			model: 'nova-3',
-			smart_format: true,
-			detect_language: true,
-			punctuation: true,
-			diarization: true,
-			paragraphs: true,
-			filler_words: true,
+			filename: 'audio.mp3',
 		}
 	);
+	form.append('model', process.env.TRANSCRIPTION_MODEL ?? 'whisper-1');
 
-	if (error) throw error;
-
-	return result.results.channels[0];
+	return transcribeForm(form);
 };

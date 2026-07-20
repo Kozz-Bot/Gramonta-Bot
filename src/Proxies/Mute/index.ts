@@ -73,7 +73,6 @@ const onUserMessage = (requester: MessageObj) => {
 	}
 };
 
-const templatePath = './src/Handlers/Mute/messages.kozz.md';
 export const startMuteHandler = () => {
 	console.log('Starting Mute Handler');
 
@@ -92,7 +91,6 @@ export const startMuteHandler = () => {
 		name: 'mute',
 		address: `${process.env.GATEWAY_URL}`,
 		customSocketPath: process.env.SOCKET_PATH,
-		templatePath,
 	});
 
 	return instance;

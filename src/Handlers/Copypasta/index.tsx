@@ -1,12 +1,18 @@
 import { MethodMap, createMethod, createModule } from 'kozz-module-maker';
-import { loadTemplates } from 'kozz-module-maker/dist/Message';
 import {
+	Copypasta,
+	CopypastaAdded,
+	CopypastaDeleted,
 	CopypastaSearchResult,
 	CopypastaSearchResultDeep,
 	CopypastaListItem,
+	InvalidCopypasta,
 	NeedsQuote,
 	NeedsQuery,
 	NeedsBody,
+	NeedsName,
+	NeedsNameOrNumber,
+	NotCopypastaOwner,
 	Help,
 } from './messages';
 import {
@@ -19,9 +25,6 @@ import {
 	searchCopypastaByName,
 } from './CopypastaManager';
 import { makeAccentsInsensitiveRegex, queryText } from 'src/Utils/strings';
-
-const templatePath = './src/Handlers/Copypasta/messages.kozz.md';
-const templatesHelper = loadTemplates(templatePath);
 
 const idCompare = (idA: string, idB: string) => {
 	const sanitizedIdA = idA.match(/^(\d)+/)![0];
@@ -50,7 +53,7 @@ const add = createMethod('add', requester => {
 		return <NeedsBody />;
 	}
 	if (!requester.rawCommand!.immediateArg) {
-		return requester.reply.withTemplate('NeedsName');
+		return requester.reply(<NeedsName />);
 	}
 
 	const contact = requester.rawCommand!.message.contact;
@@ -63,7 +66,7 @@ const add = createMethod('add', requester => {
 		chatId: requester.message.to,
 	});
 
-	requester.reply.withTemplate('CopypastaAdded', { name });
+	requester.reply(<CopypastaAdded name={name} />);
 });
 
 const search = createMethod(
@@ -109,7 +112,7 @@ const get = createMethod('fallback', requester => {
 	const query = `${requester.rawCommand!.method} ${requester.rawCommand!.immediateArg || ''}`.trim();
 
 	if (!query) {
-		return requester.reply.withTemplate('NeedsNameOrNumber');
+		return requester.reply(<NeedsNameOrNumber />);
 	}
 
 	const isNumber = query.match(/^(\d)+/);
@@ -123,15 +126,15 @@ const get = createMethod('fallback', requester => {
 	})();
 
 	if (!copypasta) {
-		return requester.reply.withTemplate('InvalidCopypasta');
+		return requester.reply(<InvalidCopypasta />);
 	}
 
-	return requester.reply.withTemplate('Copypasta', copypasta);
+	return requester.reply(<Copypasta id={copypasta.id} text={copypasta.text} />);
 });
 
 const del = createMethod('delete', requester => {
 	if (!requester.rawCommand!.immediateArg) {
-		return requester.reply.withTemplate('NeedsNameOrNumber');
+		return requester.reply(<NeedsNameOrNumber />);
 	}
 
 	const isNumber = requester.rawCommand!.immediateArg.match(/^(\d)+/);
@@ -145,19 +148,19 @@ const del = createMethod('delete', requester => {
 	})();
 
 	if (!copypasta) {
-		return requester.reply.withTemplate('InvalidCopypasta');
+		return requester.reply(<InvalidCopypasta />);
 	}
 
 	if (
 		!idCompare(copypasta.userIdWhoAdded, requester.rawCommand!.message.from) &&
 		!requester.rawCommand!.message.fromHostAccount
 	) {
-		return requester.reply.withTemplate('NotCopypastaOwner');
+		return requester.reply(<NotCopypastaOwner />);
 	}
 
 	deleteCopypastaById(copypasta.id);
 
-	return requester.reply.withTemplate('CopypastaDeleted', copypasta);
+	return requester.reply(<CopypastaDeleted />);
 });
 
 export const startCopypastaHandler = () => {
@@ -176,10 +179,7 @@ export const startCopypastaHandler = () => {
 		name: 'copypasta',
 		address: `${process.env.GATEWAY_URL}`,
 		customSocketPath: process.env.SOCKET_PATH,
-		templatePath,
-	}).resources.upsertResource('help', () =>
-		loadTemplates(templatePath).getTextFromTemplate('Help')
-	);
+	}).resources.upsertResource('help', () => <Help />);
 
 	return instance;
 };

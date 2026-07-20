@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-	baseURL: 'http://gramont.digital/cdn',
+	baseURL: process.env.CDN_BASE_URL ?? 'http://127.0.0.1:1589',
 	headers: {
 		Authorization: process.env.CDN_TOKEN,
 	},
@@ -57,12 +57,23 @@ const instance = () => {
 	const uploadPublicFile = (fileName: string, dataInB64: string) =>
 		uploadFile('public', fileName, dataInB64);
 
+	const deleteFile = async (userspace: string, fileName: string) => {
+		await api.post('/file/delete', {
+			userspace,
+			fileName,
+		});
+	};
+
+	const deletePublicFile = (fileName: string) => deleteFile('public', fileName);
+
 	const getPublicFile = (fileName: string) =>
 		api.get(`/file/public/${fileName}`).then(resp => resp.data);
 
 	return {
 		uploadFile,
 		uploadPublicFile,
+		deleteFile,
+		deletePublicFile,
 		getPublicFile,
 		uploadFileFromUrl,
 	};

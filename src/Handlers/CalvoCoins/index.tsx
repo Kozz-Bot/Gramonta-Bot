@@ -2,15 +2,21 @@ import { createModule, createMethod } from 'kozz-module-maker';
 import { tagMember } from 'kozz-module-maker/dist/InlineCommands';
 import { hostAccountOnly } from 'src/Middlewares/CheckContact';
 import * as CoinsApi from 'src/API/CoinsApi';
-import { loadTemplates } from 'kozz-module-maker/dist/Message';
 import { getFormattedDateAndTime } from 'src/Utils/date';
 import {
 	getCounterpart,
 	getTransactionDirection,
 	getTransactionType,
 } from './CoinsHelper';
-
-const templatePath = './src/Handlers/CalvoCoins/messages.kozz.md';
+import {
+	AddCoinsResponse,
+	CreateAccountResponse,
+	ErrorMessage,
+	formatTransactionListItem,
+	Help,
+	Info,
+	MakePremiumResponse,
+} from './messages';
 
 const assertUserExists = async (userId: string) => {
 	const { userExists } = await CoinsApi.assertUserExists(userId);
@@ -32,17 +38,17 @@ const getInfo = createMethod('default', async requester => {
 		const now = new Date().getTime();
 		const premium = premiumValidUntil > now;
 
-		requester.reply.withTemplate('Info', {
-			id: id,
-			userId: userId,
-			name: tagMember(userId),
-			coins,
-			premium: premium ? '✅' : '❌',
-		});
+		requester.reply(
+			<Info
+				id={id}
+				userId={userId}
+				name={tagMember(userId)}
+				coins={coins}
+				premium={premium}
+			/>
+		);
 	} catch (e) {
-		return requester.reply.withTemplate('Error', {
-			error: e,
-		});
+		return requester.reply(<ErrorMessage error={e} />);
 	}
 });
 
@@ -55,15 +61,11 @@ const addCoins = createMethod(
 		const amount = requester.rawCommand?.immediateArg;
 
 		if (!quotedUser || !amount) {
-			return requester.reply.withTemplate('Error', {
-				error: 'Comando mal-formado.',
-			});
+			return requester.reply(<ErrorMessage error="Comando mal-formado." />);
 		}
 
 		if (!/^[0-9]+$/.test(amount)) {
-			return requester.reply.withTemplate('Error', {
-				error: 'Quantidade deve ser um número',
-			});
+			return requester.reply(<ErrorMessage error="Quantidade deve ser um número" />);
 		}
 
 		await assertUserExists(quotedUser);
@@ -72,10 +74,9 @@ const addCoins = createMethod(
 
 		const { coins: userBalance } = await CoinsApi.getUserData(quotedUser);
 
-		requester.reply.withTemplate('AddCoinsResponse', {
-			amount,
-			userBalance,
-		});
+		requester.reply(
+			<AddCoinsResponse amount={amount} userBalance={userBalance} />
+		);
 	}, 'Apenas o dono do bot pode adicionar moedas ao saldo de alguém')
 );
 
@@ -88,9 +89,7 @@ const makePremium = createMethod(
 				requester.message.taggedContacts[0].id;
 
 			if (!quotedUser) {
-				return requester.reply.withTemplate('Error', {
-					error: 'Comando mal-formado.',
-				});
+				return requester.reply(<ErrorMessage error="Comando mal-formado." />);
 			}
 
 			const oneMonth = 1000 * 60 * 60 * 24 * 30; //in ms
@@ -99,13 +98,9 @@ const makePremium = createMethod(
 
 			await CoinsApi.makeUserPremium(quotedUser, oneMonth, requester.message);
 
-			requester.reply.withTemplate('MakePremiumResponse', {
-				quotedUser: tagMember(quotedUser),
-			});
+			requester.reply(<MakePremiumResponse quotedUser={tagMember(quotedUser)} />);
 		} catch (e) {
-			requester.reply.withTemplate('Error', {
-				error: e,
-			});
+			requester.reply(<ErrorMessage error={e} />);
 		}
 	}, 'Apenas o dono do bot pode fazer alguém premium')
 );
@@ -115,13 +110,9 @@ const createAccount = createMethod('create', async requester => {
 		const userId = requester.message.contact.id;
 
 		await CoinsApi.createUser(userId);
-		requester.reply.withTemplate('CreateAccountResponse', {
-			userId,
-		});
+		requester.reply(<CreateAccountResponse userId={userId} />);
 	} catch (e) {
-		requester.reply.withTemplate('Error', {
-			error: e,
-		});
+		requester.reply(<ErrorMessage error={e} />);
 	}
 });
 
@@ -152,24 +143,17 @@ const getHistory = createMethod('history', async requester => {
 			};
 		});
 
-		const messages = await Promise.all(
-			formattedTransactionList.map(transaction =>
-				loadTemplates(templatePath).getTextFromTemplate(
-					'TransactionListItem',
-					transaction
-				)
-			)
+		const messages = formattedTransactionList.map(transaction =>
+			formatTransactionListItem(transaction)
 		);
 
 		requester.reply(messages.join('\n___________________\n'));
 	} catch (e) {
-		return requester.reply.withTemplate('Error', {
-			error: e,
-		});
+		return requester.reply(<ErrorMessage error={e} />);
 	}
 });
 
-const help = createMethod('help', requester => requester.reply.withTemplate('Help'));
+const help = createMethod('help', requester => requester.reply(<Help />));
 
 export const startCoinsHandler = () => {
 	const instance = createModule({
@@ -187,10 +171,7 @@ export const startCoinsHandler = () => {
 		name: 'coins',
 		address: `${process.env.GATEWAY_URL}`,
 		customSocketPath: process.env.SOCKET_PATH,
-		templatePath,
-	}).resources.upsertResource('help', () =>
-		loadTemplates(templatePath).getTextFromTemplate('Help')
-	);
+	}).resources.upsertResource('help', () => <Help />);
 
 	return instance;
 };

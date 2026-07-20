@@ -1,9 +1,9 @@
 import { createModule, createMethod } from 'kozz-module-maker';
-import { loadTemplates } from 'kozz-module-maker/dist/Message';
 import { hostAccountOnly } from 'src/Middlewares/CheckContact';
 import { createAutoReveal } from 'src/Proxies/AutoReveal';
 import { RevealMapProxy, createAutoRevealMap } from 'src/Proxies/AutoRevealMap';
 import { useJsonDB } from 'src/Utils/StaticJsonDb';
+import { ErrorMessage, Help } from './messages';
 
 const revealBlockDB = useJsonDB('block', './src/Handlers/Reveal/revealDB.json');
 const RevealMapDB = useJsonDB<RevealMapProxy, 'map'>(
@@ -19,19 +19,23 @@ const defaultMethod = createMethod('default', requester => {
 	}
 
 	if (!quotedMessage) {
-		return requester.reply.withTemplate('Help');
+		return requester.reply(Help());
 	}
 
 	if (!quotedMessage.isViewOnce) {
-		return requester.reply.withTemplate('error', {
-			error: 'Apenas mensagens de visualização única podem ser reveladas',
-		});
+		return requester.reply(
+			ErrorMessage({
+				error: 'Apenas mensagens de visualização única podem ser reveladas',
+			})
+		);
 	}
 
 	if (!quotedMessage.media) {
-		return requester.reply.withTemplate('error', {
-			error: 'Erro: O bot não conseguiu encontrar mídia na mensagem',
-		});
+		return requester.reply(
+			ErrorMessage({
+				error: 'Erro: O bot não conseguiu encontrar mídia na mensagem',
+			})
+		);
 	}
 
 	return requester.reply.withMedia(quotedMessage.media);
@@ -75,7 +79,6 @@ const revealAllow = createMethod(
 	})
 );
 
-const templatePath = './src/Handlers/Reveal/reply.kozz.md';
 export const startRevealHandler = () => {
 	RevealMapDB.getAllEntities().forEach(proxy => {
 		createAutoRevealMap(proxy);
@@ -94,10 +97,7 @@ export const startRevealHandler = () => {
 		name: 'reveal',
 		address: `${process.env.GATEWAY_URL}`,
 		customSocketPath: process.env.SOCKET_PATH,
-		templatePath,
-	}).resources.upsertResource('help', () =>
-		loadTemplates(templatePath).getTextFromTemplate('Help')
-	);
+	}).resources.upsertResource('help', () => Help());
 
 	return instance;
 };

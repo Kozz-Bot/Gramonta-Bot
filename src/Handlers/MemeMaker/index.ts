@@ -1,8 +1,7 @@
 import { createMethod, createModule } from 'kozz-module-maker';
-import { MessageObj, loadTemplates } from 'kozz-module-maker/dist/Message';
+import { MessageObj } from 'kozz-module-maker/dist/Message';
 import MemeMakerApi from 'src/API/MemeMakerApi';
-
-const templatePath = 'src/Handlers/MemeMaker/messages.kozz.md';
+import { Help } from './messages';
 
 const getMemeId = (requester: MessageObj) => {
 	const whoRequestedTheMeme = requester.message.from;
@@ -20,7 +19,7 @@ const createMeme = createMethod(
 				(!args['bottom-text'] && !args['top-text']) ||
 				requester.message.quotedMessage?.messageType !== 'IMAGE'
 			) {
-				return requester.reply.withTemplate('Help');
+				return requester.reply(Help());
 			}
 
 			requester.react('⏳');
@@ -53,7 +52,7 @@ const createMeme = createMethod(
 );
 
 const sendHelp = createMethod('fallback', requester => {
-	requester.reply.withTemplate('Help');
+	requester.reply(Help());
 });
 
 export const startMemesModule = () => {
@@ -68,10 +67,7 @@ export const startMemesModule = () => {
 		name: 'meme',
 		address: `${process.env.GATEWAY_URL}`,
 		customSocketPath: process.env.SOCKET_PATH,
-		templatePath,
-	}).resources.upsertResource('help', () =>
-		loadTemplates(templatePath).getTextFromTemplate('Help')
-	);
+	}).resources.upsertResource('help', () => Help());
 
 	return instance;
 };
