@@ -18,7 +18,14 @@ export const Help = () => {
 				<Monospace>!ai cria uma imagem de um gato jogando basquete</Monospace>
 			</Line>
 			<Line>
+				Envie ou cite uma imagem com{' '}
+				<Monospace>!ai muda o fundo para azul</Monospace> para editá-la.
+			</Line>
+			<Line>
 				<Monospace>!ai transcreve esse áudio</Monospace>
+			</Line>
+			<Line>
+				<Monospace>!ai usage</Monospace> mostra uso recente, tokens e erros
 			</Line>
 		</>
 	);

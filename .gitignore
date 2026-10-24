@@ -3,6 +3,7 @@ dist
 coverage
 .env
 keys/*
+logs/*
 
 media/temp/*
 media/ytSongs/*
@@ -17,3 +18,13 @@ src/Handlers/Reveal/revealDB.json
 src/Handlers/Copypasta/Copypastas.json
 ytCookies.json
 conversation
+.runtime/
+/keys
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+/disparos.txt
+/media/saved/*
+!/media/saved/periodic/
+/src/Proxies/Mute/muted.json
+/src/Handlers/Group/disabledGroups.json

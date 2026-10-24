@@ -1,3 +1,5 @@
+// Deprecated: superseded by Services/PeriodicStatus. Kept for historical data;
+// no longer exported by the handler registry or started by the application.
 import { CronJob } from 'cron';
 import { createModule, createMethod } from 'kozz-module-maker';
 import { hostAccountOnly } from 'src/Middlewares/CheckContact';

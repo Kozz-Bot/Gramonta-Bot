@@ -21,10 +21,18 @@ export const useJsonDB = <DataType extends EntityWithID, EntityName extends stri
 	let DB: DB<EntityName, DataType> | null = null;
 
 	const getDB = () => {
-		const jsonAsString = fs.readFileSync(JsonPath, {
-			encoding: 'utf-8',
-		});
-		return JSON.parse(jsonAsString) as DB<EntityName, DataType>;
+		try {
+			const jsonAsString = fs.readFileSync(JsonPath, { encoding: 'utf-8' });
+			return JSON.parse(jsonAsString) as DB<EntityName, DataType>;
+		} catch (error) {
+			// Local runtime collections are not versioned; a fresh checkout starts empty.
+			if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+				const empty = {} as DB<EntityName, DataType>;
+				empty[entityName] = [];
+				return empty;
+			}
+			throw error;
+		}
 	};
 
 	const writeDB = async (db: DB<EntityName, DataType>): Promise<void> => {

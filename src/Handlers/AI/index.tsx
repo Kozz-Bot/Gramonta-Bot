@@ -1,11 +1,10 @@
 import { createModule, createMethod } from 'kozz-module-maker';
-import { Message } from 'src/API/OpenAi';
+import FuelIXApi, {
+	ChatCompletionToolCall,
+	Message,
+} from 'src/API/FuelIXApi';
 import { MessageObj } from 'kozz-module-maker/dist/Message';
 import { Media, MessageReceived } from 'kozz-types';
-import {
-	ChatCompletionToolCall,
-	createChatCompletion,
-} from 'src/API/MistralApi';
 import { isAxiosError } from 'axios';
 import { Help } from './messages';
 import { executeBotAction } from 'src/Agent/executeBotAction';
@@ -18,9 +17,8 @@ import {
 	getTiaMessage,
 	createTiaBotAction,
 } from './talk/tiaHandler';
-import { generateImage } from 'src/API/FuelIxImageApi';
-import { generateSpeech, normalizeSpeechVoice } from 'src/API/FuelIxSpeechApi';
 import { webSearchFull, webSearchSummaries } from 'src/Agent/Tools/WebSearch';
+import { summarizeAiUsage } from 'src/API/AiObservability';
 
 // ─── talk ─────────────────────────────────────────────────────────────────────
 
@@ -40,16 +38,50 @@ type ChatContextMessage = {
 	hasMedia: boolean;
 };
 
-const DEFAULT_CHAT_CONTEXT_LIMIT = 20;
+const parsePositiveIntEnv = (value: string | undefined, fallback: number) => {
+	const parsed = Number(value);
+	return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback;
+};
 
-const normalizeContextLimit = (limit: unknown, fallback = 200) => {
+const DEFAULT_CHAT_CONTEXT_LIMIT = parsePositiveIntEnv(
+	process.env.AI_DEFAULT_CHAT_CONTEXT_LIMIT,
+	8
+);
+const MAX_CHAT_CONTEXT_LIMIT = parsePositiveIntEnv(
+	process.env.AI_MAX_CHAT_CONTEXT_LIMIT,
+	300
+);
+const MAX_TOOL_ROUNDS = parsePositiveIntEnv(process.env.AI_MAX_TOOL_ROUNDS, 3);
+const MAX_AI_INPUT_CHARS = parsePositiveIntEnv(
+	process.env.AI_MAX_INPUT_CHARS,
+	12000
+);
+
+const sanitizeAiText = (value: unknown, limit = MAX_AI_INPUT_CHARS) =>
+	typeof value === 'string'
+		? value
+				.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '')
+				.replace(/\r\n?/g, '\n')
+				.trim()
+				.slice(0, limit)
+		: '';
+
+const getSanitizedMessageBody = (message: MessageReceived) =>
+	sanitizeAiText(message.santizedBody || message.body);
+
+const getAiCommandQuery = (requester: MessageObj) =>
+	sanitizeAiText(
+		requester.rawCommand?.query || getSanitizedMessageBody(requester.message)
+	);
+
+const normalizeContextLimit = (limit: unknown, fallback = 50) => {
 	const numericLimit = typeof limit === 'number' ? limit : Number(limit);
 
 	if (!Number.isFinite(numericLimit)) {
 		return fallback;
 	}
 
-	return Math.max(1, Math.min(Math.floor(numericLimit), 1000));
+	return Math.max(1, Math.min(Math.floor(numericLimit), MAX_CHAT_CONTEXT_LIMIT));
 };
 
 const fetchCurrentChatContext = async (
@@ -69,23 +101,6 @@ const fetchCurrentChatContext = async (
 	return Array.isArray(response) ? (response as ChatContextMessage[]) : [];
 };
 
-const fetchRecentChatContextWithMedia = async (
-	requester: MessageObj,
-	limit = DEFAULT_CHAT_CONTEXT_LIMIT
-): Promise<MessageReceived[]> => {
-	const { response } = await requester.ask.boundary(
-		requester.message.boundaryName,
-		'recent_chat_messages_with_media',
-		{
-			chatId: requester.message.to,
-			limit,
-			excludeMessageId: requester.message.id,
-		}
-	);
-
-	return Array.isArray(response) ? (response as MessageReceived[]) : [];
-};
-
 const normalizeContextTimestamp = (timestamp: number) =>
 	timestamp > 0 && timestamp < 1e12 ? timestamp * 1000 : timestamp;
 
@@ -101,7 +116,7 @@ const formatChatContextForLlm = (contextMessages: ChatContextMessage[]) => {
 				(message.fromHostAccount ? 'Dono do bot' : message.from);
 			const content =
 				message.taggedConctactFriendlyBody ||
-				message.body ||
+				sanitizeAiText(message.body) ||
 				(message.hasMedia
 					? `{enviou uma mídia do tipo ${message.messageType}}`
 					: '(mensagem sem texto)');
@@ -139,13 +154,15 @@ const fallbackContextMessageForLlm = (message: MessageReceived): Message => {
 		: Date.now();
 	const body =
 		message.taggedConctactFriendlyBody ||
-		message.body ||
+		getSanitizedMessageBody(message) ||
 		(message.media
 			? `{midia ${message.messageType}, formato ${message.media.mimeType}}`
 			: '(mensagem sem texto)');
 
 	return {
-		role: message.body.includes('#CalvoGPT') ? 'assistant' : 'user',
+		role: getSanitizedMessageBody(message).includes('#CalvoGPT')
+			? 'assistant'
+			: 'user',
 		content: `[${new Date(timestamp).toISOString()}] ${formatContextAuthor(
 			message
 		)}: ${body}`,
@@ -191,7 +208,8 @@ const createGeneratedAudio = (b64: string): Media => ({
 
 const executeToolCall = async (
 	requester: MessageObj,
-	toolCall: ChatCompletionToolCall
+	toolCall: ChatCompletionToolCall,
+	referenceImages: Media[]
 ): Promise<ToolExecutionResult> => {
 	if (toolCall.function.name === 'get_tia_message') {
 		const toolArgs = extractTiaQuery(toolCall);
@@ -210,7 +228,7 @@ const executeToolCall = async (
 
 	if (toolCall.function.name === 'generate_image') {
 		const args = extractToolArgs(toolCall);
-		const prompt = typeof args?.prompt === 'string' ? args.prompt.trim() : '';
+		const prompt = sanitizeAiText(args?.prompt, 4000);
 
 		if (!prompt) {
 			requester.reply(
@@ -223,13 +241,13 @@ const executeToolCall = async (
 		requester.react('🎨');
 		let image;
 		try {
-			image = await generateImage(prompt);
+			image = await FuelIXApi.generateImage(prompt, referenceImages);
 		} catch (e) {
-			const errorData = isAxiosError(e) ? e.response?.data : e;
-			console.warn(
-				'AI image generation failed:',
-				JSON.stringify(errorData, null, 2)
-			);
+			console.warn('AI image generation failed:', {
+				name: e instanceof Error ? e.name : undefined,
+				message: e instanceof Error ? e.message : String(e),
+				status: isAxiosError(e) ? e.response?.status : undefined,
+			});
 			requester.react('❌');
 			requester.reply(
 				'[#CalvoGPT]: Não consegui gerar essa imagem agora. Tenta mudar um pouco o pedido ou tentar de novo em instantes.'
@@ -241,7 +259,9 @@ const executeToolCall = async (
 			requester.reply.withMedia.fromUrl(
 				image.url,
 				'image',
-				'[#CalvoGPT]: imagem gerada'
+				referenceImages.length
+					? '[#CalvoGPT]: imagem editada'
+					: '[#CalvoGPT]: imagem gerada'
 			);
 			return { terminal: true };
 		}
@@ -249,15 +269,17 @@ const executeToolCall = async (
 		requester.reply.withMedia.fromB64(
 			image.b64_json!,
 			'image',
-			'[#CalvoGPT]: imagem gerada'
+			referenceImages.length
+				? '[#CalvoGPT]: imagem editada'
+				: '[#CalvoGPT]: imagem gerada'
 		);
 		return { terminal: true };
 	}
 
 	if (toolCall.function.name === 'generate_speech') {
 		const args = extractToolArgs(toolCall);
-		const input = typeof args?.input === 'string' ? args.input.trim() : '';
-		const voice = normalizeSpeechVoice(args?.voice);
+		const input = sanitizeAiText(args?.input, 4000);
+		const voice = FuelIXApi.normalizeSpeechVoice(args?.voice);
 
 		if (!input) {
 			requester.reply(
@@ -270,7 +292,7 @@ const executeToolCall = async (
 		requester.react('🔊');
 		let b64;
 		try {
-			b64 = await generateSpeech(input, voice);
+			b64 = await FuelIXApi.generateSpeech(input, voice);
 		} catch (e) {
 			const errorData = isAxiosError(e) ? e.response?.data : e;
 			console.warn(
@@ -292,7 +314,7 @@ const executeToolCall = async (
 
 	if (toolCall.function.name === 'search_web') {
 		const args = extractToolArgs(toolCall);
-		const query = typeof args?.query === 'string' ? args.query.trim() : '';
+		const query = sanitizeAiText(args?.query, 500);
 		const mode = args?.mode === 'full' ? 'full' : 'summary';
 
 		if (!query) {
@@ -347,35 +369,54 @@ const runTalk = async (requester: MessageObj) => {
 		currMessage = currMessage.quotedMessage;
 	}
 
-	let recentContext: MessageReceived[] = [];
+	let recentContext: ChatContextMessage[] = [];
 	try {
-		recentContext = await fetchRecentChatContextWithMedia(requester);
+		recentContext = await fetchCurrentChatContext(
+			requester,
+			normalizeContextLimit(DEFAULT_CHAT_CONTEXT_LIMIT, 8)
+		);
 	} catch (e) {
 		console.warn('Failed to fetch default AI chat context:', e);
 	}
 
 	const currentThreadIds = new Set(currentThread.map(message => message.id));
-	const contextMessages = await Promise.all(
-		recentContext
-			.filter(message => !currentThreadIds.has(message.id))
-			.map(formatContextMessageForLlm)
+	const recentContextText = formatChatContextForLlm(
+		recentContext.filter(message => !currentThreadIds.has(message.id))
 	);
 	const currentMessages = await Promise.all(
 		currentThread.map(message => formatMessageForLlm(message))
 	);
-	const messages: ChatRuntimeMessage[] = [
+	const referenceImages = currentThread
+		.map(message => message.media)
+		.filter((media): media is Media => !!media?.mimeType.startsWith('image/'))
+		.slice(-4);
+	let messages: ChatRuntimeMessage[] = [
 		{ role: 'system', content: toolTalkSystemPrompt },
-		...contextMessages,
+		{
+			role: 'user',
+			content: `Contexto textual recente do chat atual:\n${recentContextText}`,
+		},
 		...currentMessages,
 	];
-	const maxToolRounds = 5;
+	let previousResponseId: string | undefined;
 
-	for (let round = 0; round < maxToolRounds; round++) {
-		const response = await createChatCompletion({
+	for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+		const response = await FuelIXApi.createToolResponseCompletion({
 			messages,
 			tools: talkTools,
-			tool_choice: 'auto',
+			previousResponseId,
+			metadata: {
+				feature: 'ai_talk',
+				round,
+				boundaryName: requester.message.boundaryName,
+				chatId: requester.message.to,
+				messageId: requester.message.id,
+				from: requester.message.from,
+				currentThreadMessages: currentThread.length,
+				defaultContextMessages: recentContext.length,
+			},
 		});
+		previousResponseId = response.responseId;
 
 		if (!response.tool_calls?.length) {
 			const content =
@@ -384,14 +425,10 @@ const runTalk = async (requester: MessageObj) => {
 			return requester.reply(content.replace(/(.*)]:/, '[#CalvoGpt]:'));
 		}
 
-		messages.push({
-			role: 'assistant',
-			content: response.content ?? '',
-			tool_calls: response.tool_calls,
-		});
+		messages = [];
 
 		for (const toolCall of response.tool_calls) {
-			const result = await executeToolCall(requester, toolCall);
+			const result = await executeToolCall(requester, toolCall, referenceImages);
 
 			if (result.terminal) {
 				return;
@@ -414,7 +451,7 @@ const runTalk = async (requester: MessageObj) => {
 // ─── fallback ─────────────────────────────────────────────────────────────────
 
 const fallback = createMethod('fallback', async requester => {
-	if (requester.rawCommand?.query) {
+	if (getAiCommandQuery(requester)) {
 		try {
 			return await runTalk(requester);
 		} catch (e) {
@@ -428,6 +465,42 @@ const fallback = createMethod('fallback', async requester => {
 	return requester.reply(<Help />);
 });
 
+const formatNumber = (value: number) => value.toLocaleString('pt-BR');
+
+const usage = createMethod('usage', async requester => {
+	const requestedLimit = Number(requester.rawCommand?.query);
+	const limit =
+		Number.isFinite(requestedLimit) && requestedLimit > 0
+			? Math.min(Math.floor(requestedLimit), 1000)
+			: 200;
+	const summary = await summarizeAiUsage(limit);
+	const totalDurationSeconds = Math.round(summary.totals.durationMs / 1000);
+	const modelLines = Object.entries(summary.totals.byModel)
+		.sort(([, a], [, b]) => b.totalTokens - a.totalTokens || b.count - a.count)
+		.slice(0, 8)
+		.map(([key, item]) => {
+			const avgMs = item.count ? Math.round(item.durationMs / item.count) : 0;
+			return `- ${key}: ${item.count} chamadas, ${formatNumber(
+				item.totalTokens
+			)} tokens, ${item.errors} erros, media ${avgMs}ms`;
+		});
+
+	return requester.reply(
+		[
+			'[#CalvoGPT]: Uso recente de IA',
+			`Eventos analisados: ${summary.totals.count} (ultimos ${limit})`,
+			`Erros: ${summary.totals.errors}`,
+			`Tokens prompt: ${formatNumber(summary.totals.promptTokens)}`,
+			`Tokens resposta: ${formatNumber(summary.totals.completionTokens)}`,
+			`Tokens totais: ${formatNumber(summary.totals.totalTokens)}`,
+			`Duracao somada: ${totalDurationSeconds}s`,
+			'',
+			'Por evento/modelo:',
+			...(modelLines.length ? modelLines : ['- sem eventos ainda']),
+		].join('\n')
+	);
+});
+
 // ─── module ───────────────────────────────────────────────────────────────────
 
 export const startAIHandler = () => {
@@ -435,6 +508,7 @@ export const startAIHandler = () => {
 		commands: {
 			boundariesToHandle: ['*'],
 			methods: {
+				...usage,
 				...fallback,
 			},
 		},

@@ -42,7 +42,7 @@ class Horoscope {
 			`.previsoes-container > .${sign} > article > div > p`
 		)?.textContent;
 
-		return horoscope?.replace(/Compartilhar(\s*\n*)+$/, '');
+		return horoscope?.replace(/Compartilhar(\s*\n*)+$/, '').trim();
 	}
 }
 

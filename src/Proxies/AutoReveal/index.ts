@@ -1,3 +1,4 @@
+import { recoverViewOnceMedia } from 'src/Utils/ViewOnceMedia';
 import { createModule } from 'kozz-module-maker';
 import { MessageObj } from 'kozz-module-maker/dist/Message';
 
@@ -13,7 +14,7 @@ export const createAutoReveal = (msgObject: MessageObj) => {
 		name: `auto-reveal-${msgObject.message.to}`,
 		proxy: {
 			source: `${msgObject.rawCommand!.boundaryName}/${chatId}`,
-			onMessage: requester => {
+			onMessage: async requester => {
 				if (
 					requester.message.fromHostAccount &&
 					requester.message.body == '!reveal stop'
@@ -23,8 +24,10 @@ export const createAutoReveal = (msgObject: MessageObj) => {
 				}
 
 				if (requester.message.isViewOnce) {
+					const media = await recoverViewOnceMedia(requester);
+					if (!media) return;
 					requester.reply('Nada de segredos por aqui');
-					requester.reply.withMedia(requester.message.media!);
+					requester.reply.withMedia(media);
 				}
 			},
 		},

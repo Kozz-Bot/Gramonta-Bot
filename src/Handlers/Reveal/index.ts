@@ -1,3 +1,4 @@
+import { recoverViewOnceMedia } from 'src/Utils/ViewOnceMedia';
 import { createModule, createMethod } from 'kozz-module-maker';
 import { hostAccountOnly } from 'src/Middlewares/CheckContact';
 import { createAutoReveal } from 'src/Proxies/AutoReveal';
@@ -11,7 +12,7 @@ const RevealMapDB = useJsonDB<RevealMapProxy, 'map'>(
 	'./src/Handlers/Reveal/revealDB.json'
 );
 
-const defaultMethod = createMethod('default', requester => {
+const defaultMethod = createMethod('default', async requester => {
 	const { quotedMessage } = requester.message;
 
 	if (revealBlockDB.getEntityById(requester.message.to)) {
@@ -30,7 +31,8 @@ const defaultMethod = createMethod('default', requester => {
 		);
 	}
 
-	if (!quotedMessage.media) {
+	const media = await recoverViewOnceMedia(requester, quotedMessage);
+	if (!media) {
 		return requester.reply(
 			ErrorMessage({
 				error: 'Erro: O bot não conseguiu encontrar mídia na mensagem',
@@ -38,7 +40,7 @@ const defaultMethod = createMethod('default', requester => {
 		);
 	}
 
-	return requester.reply.withMedia(quotedMessage.media);
+	return requester.reply.withMedia(media);
 });
 
 const autoReveal = createMethod(

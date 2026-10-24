@@ -1,6 +1,6 @@
 import TiApi, { TiaMessage } from 'src/API/TiApi';
 import { BotAction } from 'src/Agent/BotAction';
-import { ChatCompletionToolCall } from 'src/API/MistralApi';
+import { ChatCompletionToolCall } from 'src/API/FuelIXApi';
 import { extractToolArgs } from 'src/Handlers/AI/tools';
 
 const stopWords = new Set([

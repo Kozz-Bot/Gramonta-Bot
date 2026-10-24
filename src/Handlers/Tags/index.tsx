@@ -2,7 +2,7 @@ import { randomUUID } from 'crypto';
 import { createMethod, createModule } from 'kozz-module-maker';
 import { MessageObj } from 'kozz-module-maker/dist/Message';
 import { MessageReceived } from 'kozz-types';
-import { createChatCompletion } from 'src/API/MistralApi';
+import FuelIXApi from 'src/API/FuelIXApi';
 import { useJsonDB } from 'src/Utils/StaticJsonDb';
 import {
 	EmptySummary,
@@ -112,7 +112,7 @@ const summarizeMentions = async (mentions: SavedMention[]) => {
 		.map((mention, index) => `#${index + 1}\n${formatMentionForLlm(mention)}`)
 		.join('\n\n');
 
-	const response = await createChatCompletion({
+	const response = await FuelIXApi.createChatCompletion({
 		temperature: 0.2,
 		messages: [
 			{

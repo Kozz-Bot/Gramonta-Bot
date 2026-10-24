@@ -1,3 +1,4 @@
+import { recoverViewOnceMedia } from 'src/Utils/ViewOnceMedia';
 import { createModule } from 'kozz-module-maker';
 import { bold } from 'kozz-module-maker/dist/Message';
 import { isUserMutted } from '../Mute/mutedDB';
@@ -17,12 +18,14 @@ export const createAutoRevealMap = ({ from, to, boundaryId }: RevealMapProxy) =>
 
 		proxy: {
 			source: `${boundaryId}/${from}`,
-			onMessage: requester => {
+			onMessage: async requester => {
 				if (isUserMutted(requester.message.contact, requester.message.to)) {
 					return;
 				}
 
 				if (requester.message.isViewOnce) {
+					const media = await recoverViewOnceMedia(requester);
+					if (!media) return;
 					const { contact, body, groupName } = requester.message;
 
 					const caption = [
@@ -35,13 +38,13 @@ export const createAutoRevealMap = ({ from, to, boundaryId }: RevealMapProxy) =>
 						return requester.sendMessage.withMedia(
 							'120363262672708597@g.us',
 							caption,
-							requester.message.media!
+							media
 						);
 					} else {
 						return requester.sendMessage.withMedia(
 							to,
 							caption,
-							requester.message.media!
+							media
 						);
 					}
 				}

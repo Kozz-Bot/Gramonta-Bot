@@ -5,11 +5,11 @@ import path from 'path';
 import { checkAndCreateFile } from 'src/Utils/Files';
 import { Media } from 'kozz-types';
 import { convertB64ToPath } from 'src/Utils/ffmpeg';
-import { transcribeFile } from 'src/API/Deepgram';
+import FuelIXApi from 'src/API/FuelIXApi';
 
 const transcribeAutdioToText = async (media: Media) => {
 	const tempFilepath = await convertB64ToPath(media.data, 'opus', 'mp3');
-	const transcription = await transcribeFile(tempFilepath);
+	const transcription = await FuelIXApi.transcribeFile(tempFilepath);
 	return transcription;
 };
 

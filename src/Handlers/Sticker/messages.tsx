@@ -18,7 +18,7 @@ export const ToImgInstructions = () => (
 			<Bold>Instrucoes!</Bold>
 		</Line>
 		<Line>Por favor responda uma figurinha para transforma-la em midia.</Line>
-		<Line>Por enquanto, figurinhas animadas sao enviadas apenas com o primeiro frame.</Line>
+		<Line>Figurinhas animadas sao convertidas e enviadas como video MP4.</Line>
 	</>
 );
 

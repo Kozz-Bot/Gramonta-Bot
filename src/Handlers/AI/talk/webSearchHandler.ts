@@ -1,5 +1,4 @@
-import { Message } from 'src/API/OpenAi';
-import { createChatCompletion } from 'src/API/MistralApi';
+import FuelIXApi, { Message } from 'src/API/FuelIXApi';
 import { webSearchSummaries, webSearchFull } from 'src/Agent/Tools/WebSearch';
 import { searchSynthesisSystemPrompt } from 'src/Handlers/AI/prompts';
 
@@ -38,7 +37,9 @@ const synthesizeSearchResult = async (
 		},
 	];
 
-	const result = await createChatCompletion({ messages: synthesisMessages });
+	const result = await FuelIXApi.createChatCompletion({
+		messages: synthesisMessages,
+	});
 
 	return (
 		result.content ??

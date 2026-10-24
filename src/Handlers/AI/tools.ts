@@ -1,4 +1,4 @@
-import { ChatCompletionTool, ChatCompletionToolCall } from 'src/API/MistralApi';
+import { ChatCompletionTool, ChatCompletionToolCall } from 'src/API/FuelIXApi';
 
 export const talkTools: ChatCompletionTool[] = [
 	{
@@ -52,14 +52,14 @@ export const talkTools: ChatCompletionTool[] = [
 		function: {
 			name: 'get_chat_context',
 			description:
-				'Busca mensagens recentes APENAS do chat atual do WhatsApp. Use quando a pergunta depender do histórico da conversa, por exemplo "quem falou isso?", "qual festa o Pedro foi?", "o que combinaram?", "resume a conversa", ou quando precisar lembrar algo dito antes. A ferramenta não aceita chatId: você só escolhe quantas mensagens recentes quer consultar.',
+				'Busca mensagens recentes APENAS do chat atual do WhatsApp. Antes de responder, use-a se o contexto disponível não bastar, a pergunta mencionar algo antigo ("antes", "ontem", "mais cedo") ou pedir resumo/análise da conversa. Não invente fatos ausentes do contexto. A ferramenta não aceita chatId: você só escolhe quantas mensagens recentes quer consultar.',
 			parameters: {
 				type: 'object',
 				properties: {
 					limit: {
 						type: 'number',
 						description:
-							'Quantidade de mensagens recentes do chat atual a buscar. Use 50-100 para perguntas simples, 200-500 para contexto amplo, e até 1000 para resumos longos.',
+							'Quantidade de mensagens recentes do chat atual a buscar. Escolha o menor limite suficiente: 20-50 para referência pontual, 50-100 para assunto em andamento, 100-200 para resumo/contexto amplo, e no máximo 300 para análise longa.',
 					},
 				},
 				required: ['limit'],
@@ -72,14 +72,14 @@ export const talkTools: ChatCompletionTool[] = [
 		function: {
 			name: 'generate_image',
 			description:
-				'Gera uma imagem nova a partir de um prompt textual. Use quando o usuário pedir para criar, gerar, desenhar, ilustrar, fazer uma imagem, imagem de, foto de, arte de, meme visual novo, ou qualquer pedido em que a resposta esperada seja uma imagem criada e não apenas texto.',
+				'Gera uma imagem ou edita imagens anexadas na mensagem atual ou nas mensagens citadas. Use quando o usuário pedir para criar, gerar, desenhar, ilustrar ou modificar uma imagem. As imagens disponíveis são enviadas automaticamente como referências para a edição.',
 			parameters: {
 				type: 'object',
 				properties: {
 					prompt: {
 						type: 'string',
 						description:
-							'Prompt detalhado para geração da imagem. Preserve a intenção do usuário e adicione detalhes visuais úteis, como estilo, composição, assunto, ambiente e clima, quando isso estiver implícito.',
+							'Instrução detalhada de criação ou edição. Para edição, descreva a mudança desejada e o que deve ser preservado nas imagens de referência.',
 					},
 				},
 				required: ['prompt'],

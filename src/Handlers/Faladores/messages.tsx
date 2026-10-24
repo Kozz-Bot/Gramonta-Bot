@@ -9,6 +9,8 @@ import {
 
 export type RankingEntry = {
 	contactId: string;
+	contactName: string;
+	contactNumber: string;
 	count: number;
 };
 
@@ -73,7 +75,8 @@ export const Help = () => {
 			</Line>
 			<Line />
 			<Line>
-				Os contatos do ranking e do <Bold>!mudos</Bold> são marcados na resposta.
+				No <Bold>!faladores</Bold> com período, o top 5 é marcado em uma seção
+				separada. Os contatos do <Bold>!mudos</Bold> também são marcados.
 			</Line>
 		</>
 	);
@@ -126,7 +129,8 @@ const RankingBlock = ({ section }: { section: RankingSection }) => {
 					data={section.entries}
 					render={(entry, index) => (
 						<Line>
-							{(index + 1).toString().padStart(2, '0')}. {entry.contactId} -{' '}
+							{(index + 1).toString().padStart(2, '0')}.{' '}
+							{entry.contactName}({entry.contactNumber}) -{' '}
 							{formatCount(entry.count)}
 						</Line>
 					)}
@@ -139,11 +143,9 @@ const RankingBlock = ({ section }: { section: RankingSection }) => {
 export const SummaryRankings = ({
 	groupName,
 	sections,
-	mutedContacts,
 }: {
 	groupName: string;
 	sections: RankingSection[];
-	mutedContacts: string[];
 }) => {
 	return (
 		<>
@@ -162,16 +164,6 @@ export const SummaryRankings = ({
 					</>
 				)}
 			/>
-			<Line />
-			<Line>
-				<Bold>!mudos de hoje</Bold>
-			</Line>
-			<Render when={mutedContacts.length === 0}>
-				<Line>Todo mundo já apareceu na store hoje.</Line>
-			</Render>
-			<Render when={mutedContacts.length > 0}>
-				<Line>{mutedContacts.join(' ')}</Line>
-			</Render>
 		</>
 	);
 };
@@ -179,11 +171,11 @@ export const SummaryRankings = ({
 export const FullRanking = ({
 	groupName,
 	section,
-	mutedContacts,
+	topMentionContacts,
 }: {
 	groupName: string;
 	section: RankingSection;
-	mutedContacts: string[];
+	topMentionContacts: string[];
 }) => {
 	return (
 		<>
@@ -194,13 +186,13 @@ export const FullRanking = ({
 			<RankingBlock section={section} />
 			<Line />
 			<Line>
-				<Bold>!mudos</Bold>
+				<Bold>Top 5 marcados</Bold>
 			</Line>
-			<Render when={mutedContacts.length === 0}>
-				<Line>Todo mundo já apareceu na store nesse período.</Line>
+			<Render when={topMentionContacts.length === 0}>
+				<Line>Ninguém para marcar nesse período.</Line>
 			</Render>
-			<Render when={mutedContacts.length > 0}>
-				<Line>{mutedContacts.join(' ')}</Line>
+			<Render when={topMentionContacts.length > 0}>
+				<Line>{topMentionContacts.join(' ')}</Line>
 			</Render>
 		</>
 	);

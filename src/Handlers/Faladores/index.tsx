@@ -16,6 +16,7 @@ import {
 
 type MessageCount = {
 	contactId: string;
+	name?: string;
 	count: number;
 	aliases?: string[];
 };
@@ -152,21 +153,41 @@ const asGroupChat = (response: unknown) => response as GroupChat | null | undefi
 
 const asMessageCounts = (response: unknown) => (response ?? []) as MessageCount[];
 
-const tagEntries = (counts: MessageCount[]): RankingEntry[] =>
-	counts.map(({ contactId, count }) => ({
-		contactId: tagMember(contactId),
-		count,
+const getContactNumber = (contactId: string) =>
+	contactId.replace(/\:[0-9]*\@/, '@').split('@')[0];
+
+const isJidLike = (value: string) => value.includes('@');
+
+const getContactName = ({ contactId, name }: MessageCount) => {
+	const contactNumber = getContactNumber(contactId);
+
+	return name && !isJidLike(name) ? name : contactNumber;
+};
+
+const createEntries = (
+	counts: MessageCount[],
+	{ shouldTag = false }: { shouldTag?: boolean } = {}
+): RankingEntry[] =>
+	counts.map(count => ({
+		contactId: shouldTag ? tagMember(count.contactId) : count.contactId,
+		contactName: getContactName(count),
+		contactNumber: getContactNumber(count.contactId),
+		count: count.count,
 	}));
 
-const getMutedContacts = (members: string[], counts: MessageCount[]) => {
+const createMentionContacts = (counts: MessageCount[]) =>
+	counts.map(({ contactId }) => tagMember(contactId));
+
+const getMutedContactIds = (members: string[], counts: MessageCount[]) => {
 	const talkingContactIds = new Set(
 		counts.flatMap(({ contactId, aliases }) => [contactId, ...(aliases ?? [])])
 	);
 
-	return members
-		.filter(member => !talkingContactIds.has(member))
-		.map(member => tagMember(member));
+	return members.filter(member => !talkingContactIds.has(member));
 };
+
+const getMutedContacts = (members: string[], counts: MessageCount[]) =>
+	getMutedContactIds(members, counts).map(member => tagMember(member));
 
 const getGroupMembers = (groupData: GroupChat | null | undefined) =>
 	groupData?.participants?.map(participant => participant.id) ?? [];
@@ -191,10 +212,14 @@ const askMessageCount = async (
 const createSection = (
 	period: Period,
 	counts: MessageCount[],
-	limit?: number
+	limit?: number,
+	{ shouldTag = false }: { shouldTag?: boolean } = {}
 ): RankingSection => ({
 	label: periodLabels[period],
-	entries: tagEntries(typeof limit === 'number' ? counts.slice(0, limit) : counts),
+	entries: createEntries(
+		typeof limit === 'number' ? counts.slice(0, limit) : counts,
+		{ shouldTag }
+	),
 });
 
 const parsePeriod = (period?: string | null): Period | null => {
@@ -219,14 +244,13 @@ const replySummary = createMethod('default', async requester => {
 		const [groupResponse, dailyCounts, weeklyCounts, monthlyCounts] =
 			await Promise.all([
 				requester.ask.boundary(requester.message.boundaryId, 'group_chat_info', {
-					id: chatId,
+					chatId,
 				}),
 				askMessageCount(requester, 'dia', chatId),
 				askMessageCount(requester, 'semana', chatId),
 				askMessageCount(requester, 'mes', chatId),
 			]);
 		const group = asGroupChat(groupResponse.response);
-		const members = getGroupMembers(group);
 
 		return requester.reply(
 			<SummaryRankings
@@ -236,7 +260,6 @@ const replySummary = createMethod('default', async requester => {
 					createSection('semana', weeklyCounts, 5),
 					createSection('mes', monthlyCounts, 5),
 				]}
-				mutedContacts={getMutedContacts(members, dailyCounts)}
 			/>
 		);
 	} catch (e) {
@@ -254,18 +277,17 @@ const replyPeriod = (period: Period) =>
 		try {
 			const [groupResponse, counts] = await Promise.all([
 				requester.ask.boundary(requester.message.boundaryId, 'group_chat_info', {
-					id: chatId,
+					chatId,
 				}),
 				askMessageCount(requester, period, chatId),
 			]);
 			const group = asGroupChat(groupResponse.response);
-			const members = getGroupMembers(group);
 
 			return requester.reply(
 				<FullRanking
 					groupName={group?.name ?? requester.message.groupName ?? 'grupo'}
 					section={createSection(period, counts)}
-					mutedContacts={getMutedContacts(members, counts)}
+					topMentionContacts={createMentionContacts(counts.slice(0, 5))}
 				/>
 			);
 		} catch (e) {
@@ -293,7 +315,7 @@ const muted = createMethod('mudos', async requester => {
 	try {
 		const [groupResponse, counts] = await Promise.all([
 			requester.ask.boundary(requester.message.boundaryId, 'group_chat_info', {
-				id: chatId,
+				chatId,
 			}),
 			askMessageCount(requester, period, chatId),
 		]);

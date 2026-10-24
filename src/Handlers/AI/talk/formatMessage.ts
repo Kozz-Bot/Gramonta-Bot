@@ -1,7 +1,6 @@
-import { LlmContentPart, Message } from 'src/API/OpenAi';
+import FuelIXApi, { LlmContentPart, Message } from 'src/API/FuelIXApi';
 import { Media, MessageReceived } from 'kozz-types';
 import { convertB64ToPath } from 'src/Utils/ffmpeg';
-import { transcribeFile } from 'src/API/Deepgram';
 import { getTemporaryCdnMediaUrl } from 'src/API/TemporaryCdnMedia';
 
 const talkCommandRegex = /^[!/]\s*ai(?:\s+talk)?\s*/i;
@@ -12,8 +11,15 @@ type FormatMessageOptions = {
 
 export const stripTalkCommand = (text?: string | null): string => {
 	if (!text) return '';
-	return text.replace(talkCommandRegex, '').trim();
+	return text
+		.replace(talkCommandRegex, '')
+		.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '')
+		.replace(/\r\n?/g, '\n')
+		.trim();
 };
+
+const getSafeBody = (message: MessageReceived) =>
+	message.santizedBody || message.body;
 
 const mediaToImagePart = async (media: Media): Promise<LlmContentPart> => ({
 	type: 'image_url',
@@ -21,7 +27,7 @@ const mediaToImagePart = async (media: Media): Promise<LlmContentPart> => ({
 });
 
 const mediaCaptionToText = (message: MessageReceived): string => {
-	const caption = stripTalkCommand(message.santizedBody || message.body);
+	const caption = stripTalkCommand(getSafeBody(message));
 	return caption
 		? `Legenda da imagem: "${caption}". Considere tambem a imagem anexada.`
 		: 'Considere a imagem anexada e responda com base nela.';
@@ -30,7 +36,7 @@ const mediaCaptionToText = (message: MessageReceived): string => {
 const transcribeAudioContext = async (media: Media): Promise<string> => {
 	const sourceFormat = media.mimeType.includes('mpeg') ? 'mp3' : 'opus';
 	const tempFilepath = await convertB64ToPath(media.data, sourceFormat, 'mp3');
-	const transcription = await transcribeFile(tempFilepath);
+	const transcription = await FuelIXApi.transcribeFile(tempFilepath);
 	return transcription.alternatives[0].transcript.trim();
 };
 
@@ -57,11 +63,11 @@ export const formatMessageForLlm = async (
 	message: MessageReceived,
 	options: FormatMessageOptions = {}
 ): Promise<Message> => {
-	const role = message.body.includes('#CalvoGPT') ? 'assistant' : 'user';
+	const role = getSafeBody(message).includes('#CalvoGPT') ? 'assistant' : 'user';
 	const media = message.media;
 
 	if (!media) {
-		const text = stripTalkCommand(message.body);
+		const text = stripTalkCommand(getSafeBody(message));
 		return {
 			role,
 			content: withContextHeader(
@@ -82,7 +88,7 @@ export const formatMessageForLlm = async (
 
 	if (media.mimeType.startsWith('audio')) {
 		const transcript = await transcribeAudioContext(media);
-		const prefix = stripTalkCommand(message.body || message.santizedBody);
+		const prefix = stripTalkCommand(getSafeBody(message));
 		const text = prefix
 			? `${prefix}\n\nTranscricao do audio: "${transcript}"`
 			: `Transcricao do audio: "${transcript}"`;
@@ -92,7 +98,7 @@ export const formatMessageForLlm = async (
 		};
 	}
 
-	const caption = stripTalkCommand(message.santizedBody || message.body);
+	const caption = stripTalkCommand(getSafeBody(message));
 	const text = caption
 		? `{Mensagem em midia, formato ${media.mimeType}}, legenda da midia: "${caption}"`
 		: `{Mensagem em midia, formato ${media.mimeType}}`;
