@@ -52,6 +52,32 @@ test('push announcements use persisted opt-ins, validate group types and avoid d
 	});
 	await publishUpdate({ ...args, commit: 'c'.repeat(40) });
 	assert.equal(sent.length, 3);
+	await publishUpdate({
+		...args,
+		commit: 'd'.repeat(40),
+		summary: '',
+		groupSummaries: {
+			'124@g.us': 'Correção exclusiva dos avisos.',
+			'126@g.us': 'Grupo não cadastrado.',
+		},
+	});
+	assert.equal(sent.length, 4);
+	assert.equal(sent.at(-1).id, '124@g.us');
+	assert.match(sent.at(-1).body, /Correção exclusiva/);
+	store.add(groups[0]);
+	await publishUpdate({
+		...args,
+		commit: 'e'.repeat(40),
+		summary: 'Melhoria geral.',
+		groupSummaries: { '124@g.us': 'Detalhe só dos avisos.' },
+	});
+	const mixed = sent.slice(-2);
+	assert.ok(mixed.every(s => s.body.includes('Melhoria geral.')));
+	assert.doesNotMatch(mixed.find(s => s.id === '123@g.us').body, /Detalhe só/);
+	assert.match(mixed.find(s => s.id === '124@g.us').body, /Detalhe só/);
+	await assert.rejects(
+		publishUpdate({ ...args, groupSummaries: { '11@lid': 'Destino inválido.' } })
+	);
 	await assert.rejects(publishUpdate({ ...args, commit: 'not-a-commit' }));
 	fs.writeFileSync(file, '{}');
 	assert.throws(() => store.list());

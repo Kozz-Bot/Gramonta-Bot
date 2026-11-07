@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { createUpdateGroupsStore } from './store';
+import { createUpdateGroupsStore, isUpdateGroupId } from './store';
 import { Announcement } from './messages';
 
 // A claim precedes emission: an interrupted/uncertain send is never repeated
@@ -10,6 +10,7 @@ export async function publishUpdate(args: {
 	repository: string;
 	commit: string;
 	summary: string;
+	groupSummaries?: Record<string, string>;
 	directory?: string;
 	groups: { id: string; name: string; groupType: string }[];
 	send: (chatId: string, body: string) => void;
@@ -17,14 +18,36 @@ export async function publishUpdate(args: {
 	if (
 		!/^[a-f0-9]{40,64}$/.test(args.commit) ||
 		!args.repository ||
-		!args.summary.trim() ||
+		(!args.summary.trim() && !Object.keys(args.groupSummaries || {}).length) ||
 		args.summary.length > 3500
 	)
 		throw new Error('Informe commit completo e resumo de 1 a 3500 caracteres.');
+	if (
+		args.groupSummaries &&
+		(typeof args.groupSummaries !== 'object' ||
+			Array.isArray(args.groupSummaries) ||
+			Object.entries(args.groupSummaries).some(
+				([id, summary]) =>
+					!isUpdateGroupId(id) ||
+					typeof summary !== 'string' ||
+					!summary.trim() ||
+					summary.length > 3500
+			))
+	)
+		throw new Error('Resumos por grupo inválidos.');
 	const directory = args.directory || '.runtime/updates';
 	const store = createUpdateGroupsStore(path.join(directory, 'groups.json'));
+	const summaryFor = (id: string) =>
+		[args.summary.trim(), args.groupSummaries?.[id]?.trim()]
+			.filter(Boolean)
+			.join('\n\n');
+	if (store.list().some(g => summaryFor(g.id).length > 3500))
+		throw new Error('O resumo combinado de um grupo excede 3500 caracteres.');
 	const results: { chatId: string; status: string }[] = [];
 	for (const group of store.list()) {
+		const summary = summaryFor(group.id);
+		// A group-only change must not produce even an empty announcement elsewhere.
+		if (!summary) continue;
 		const current = args.groups.find(g => g.id === group.id);
 		if (
 			!current ||
@@ -63,7 +86,7 @@ export async function publishUpdate(args: {
 			fs.closeSync(fd);
 		}
 		try {
-			args.send(group.id, Announcement({ summary: args.summary.trim() }));
+			args.send(group.id, Announcement({ summary }));
 			results.push({ chatId: group.id, status: 'forwarded_to_gateway' });
 		} catch {
 			results.push({ chatId: group.id, status: 'failed_or_unknown_do_not_retry' });

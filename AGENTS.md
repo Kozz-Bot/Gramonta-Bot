@@ -15,6 +15,9 @@ podem usar, exemplos curtos e melhorias perceptíveis. Omita comandos exclusivos
 do host sem interação com os membros; resuma melhorias técnicas. Não divulgue
 dados privados, logs ou credenciais. Use julgamento editorial e não use tagAll.
 Uma entrega conjunta com o framework recebe um único resumo, sem duplicação.
+Mudanças que afetem apenas um grupo devem ser anunciadas somente ao grupo
+afetado, desde que cadastrado. Para uma entrega mista, separe o resumo geral dos
+trechos específicos: cada grupo recebe só o geral e seu próprio trecho.
 
 Prepare um resumo em arquivo temporário e execute no cwd desta aplicação:
 
@@ -27,5 +30,10 @@ repositório/commit/grupo bloqueiam repetição e falhas incertas. Nunca remova 
 reserva para repetir sem conferir o WhatsApp. `forwarded_to_gateway` indica
 emissão, não entrega; reporte o resultado real ao dono. A autorização de envio
 para esses grupos já foi concedida, sem necessidade de nova confirmação.
+
+Para mudanças locais, passe `--group-summaries-file ARQUIVO_JSON`, com mapa de
+IDs de grupos para seus resumos. Omita `--summary-file` quando não houver
+novidade geral. O mapa não cadastra grupos e não permite enviar a destinos fora
+da seleção do dono. Consulte o README para o formato.
 
 Uso, testes e limites em `src/Services/Updates/README.md`.

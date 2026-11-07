@@ -9,9 +9,22 @@ const { createModule } = require('kozz-module-maker');
 
 async function main() {
 	const args = process.argv.slice(2);
-	if (args.length !== 4 || args[0] !== '--repo' || args[2] !== '--summary-file')
+	const options = {};
+	for (let i = 0; i < args.length; i += 2) {
+		if (
+			!['--repo', '--summary-file', '--group-summaries-file'].includes(args[i]) ||
+			!args[i + 1] ||
+			Object.hasOwn(options, args[i])
+		)
+			throw new Error('Opções de aviso inválidas.');
+		options[args[i]] = args[i + 1];
+	}
+	if (
+		!options['--repo'] ||
+		(!options['--summary-file'] && !options['--group-summaries-file'])
+	)
 		throw new Error(
-			'Uso: node --env-file=.env scripts/announce-update.cjs --repo CAMINHO_DO_REPO --summary-file ARQUIVO'
+			'Uso: node --env-file=.env scripts/announce-update.cjs --repo CAMINHO_DO_REPO [--summary-file RESUMO_GERAL] [--group-summaries-file JSON_POR_GRUPO]'
 		);
 	const selected = createUpdateGroupsStore().list();
 	if (!selected.length) {
@@ -19,7 +32,7 @@ async function main() {
 		return;
 	}
 	const git = (...command) =>
-		execFileSync('git', ['-C', args[1], ...command], {
+		execFileSync('git', ['-C', options['--repo'], ...command], {
 			encoding: 'utf8',
 			timeout: 20000,
 			stdio: ['ignore', 'pipe', 'pipe'],
@@ -44,8 +57,13 @@ async function main() {
 		throw new Error(
 			'O HEAD local ainda não é o commit publicado na branch remota. Faça o push primeiro.'
 		);
-	const summary = fs.readFileSync(args[3], 'utf8').trim();
-	if (!summary || summary.length > 3500)
+	const summary = options['--summary-file']
+		? fs.readFileSync(options['--summary-file'], 'utf8').trim()
+		: '';
+	const groupSummaries = options['--group-summaries-file']
+		? JSON.parse(fs.readFileSync(options['--group-summaries-file'], 'utf8'))
+		: undefined;
+	if ((!summary && !groupSummaries) || summary.length > 3500)
 		throw new Error('Resumo deve ter entre 1 e 3500 caracteres.');
 	if (!process.env.GATEWAY_URL) throw new Error('GATEWAY_URL indisponível.');
 	const runtime = createModule({
@@ -99,6 +117,7 @@ async function main() {
 			repository,
 			commit,
 			summary,
+			groupSummaries,
 			groups,
 			send: (id, body) => {
 				if (!runtime.socket.connected) throw new Error('Gateway desconectado.');

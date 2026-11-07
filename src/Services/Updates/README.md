@@ -32,12 +32,22 @@ Critério editorial do dono: priorizar o que os outros participantes podem usar
 ou perceber; omitir controles exclusivos do host sem interação com os membros e
 resumir melhorias técnicas. Uma entrega conjunta de aplicação/framework recebe
 um único aviso público para não repetir o resumo nos grupos.
+Mudanças específicas de um grupo são anunciadas somente nele, se estiver
+cadastrado. Entregas mistas combinam novidades gerais com o trecho exclusivo
+de cada destinatário, sem revelar esse trecho nos demais grupos.
 
 No cwd da aplicação, após build/ativação e push:
 
 ```sh
 node --env-file=.env scripts/announce-update.cjs --repo /CAMINHO/DO/REPO --summary-file /tmp/resumo-novidades.txt
 ```
+
+Para novidades específicas, use `--group-summaries-file /tmp/resumos-grupos.json`.
+O arquivo é um objeto JSON cujas chaves são os IDs `@g.us` dos grupos e os valores
+são os respectivos resumos. A seleção persistente continua obrigatória: o mapa
+não cadastra destinos. `--summary-file` é opcional nesse modo; sem ele, somente
+os grupos do mapa recebem aviso. Com ambos, cada grupo recebe o resumo geral
+mais seu próprio trecho, em uma única mensagem de até 3500 caracteres.
 
 O script compara HEAD com a branch de acompanhamento no remoto, consulta a
 prontidão do WhatsApp e os tipos atuais dos grupos, e lê a seleção persistente.
