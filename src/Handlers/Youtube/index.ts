@@ -1,18 +1,24 @@
 import { createModule, createMethod } from 'kozz-module-maker';
 import path from 'path';
+import { readFile } from 'node:fs/promises';
 import * as YoutubeApi from 'src/API/YoutubeAPI';
 import { rateLimit } from 'src/Middlewares/RateLimit';
 import { EmptyQuery, ErrorMessage, Help, NoResults } from './messages';
 
 const audioMimeTypeForPath = (mediaPath: string) => {
 	switch (path.extname(mediaPath).toLowerCase()) {
-		case '.mp3': return 'audio/mpeg' as const;
+		case '.mp3':
+			return 'audio/mpeg' as const;
 		case '.m4a':
-		case '.mp4': return 'audio/mp4' as const;
-		case '.webm': return 'audio/webm' as const;
-		case '.wav': return 'audio/wav' as const;
+		case '.mp4':
+			return 'audio/mp4' as const;
+		case '.webm':
+			return 'audio/webm' as const;
+		case '.wav':
+			return 'audio/wav' as const;
 		case '.ogg':
-		default: return 'audio/ogg; codecs=opus' as const;
+		default:
+			return 'audio/ogg; codecs=opus' as const;
 	}
 };
 
@@ -51,11 +57,7 @@ const firstVideo = createMethod('video', async requester => {
 			return requester.reply('erro');
 		}
 		requester.react('🎥');
-		requester.reply.withMedia.fromPath(
-			mediaPath,
-			'video',
-			`🎥 ${video.title}`
-		);
+		requester.reply.withMedia.fromPath(mediaPath, 'video', `🎥 ${video.title}`);
 	} catch (e) {
 		requester.reply(ErrorMessage({ error: e }));
 	}
@@ -78,10 +80,19 @@ const firstSong = createMethod('song', async requester => {
 		}
 		console.log(mediaPath);
 
+		const audio = await readFile(mediaPath);
 		requester.react('🎶');
-		requester.reply.withMedia.fromPath(
-			mediaPath,
-			audioMimeTypeForPath(mediaPath),
+		requester.reply.withMedia(
+			{
+				data: audio.toString('base64'),
+				transportType: 'b64',
+				mimeType: audioMimeTypeForPath(mediaPath),
+				fileName: `${path.parse(mediaPath).name}.ogg`,
+				sizeInBytes: audio.length,
+				duration: 0,
+				stickerTags: undefined,
+				asVoiceNote: true,
+			},
 			`🎥 ${video.title}`
 		);
 	} catch (e) {
@@ -89,9 +100,7 @@ const firstSong = createMethod('song', async requester => {
 	}
 });
 
-const help = createMethod('fallback', requester =>
-	requester.reply(Help())
-);
+const help = createMethod('fallback', requester => requester.reply(Help()));
 
 export const startYoutubeHandler = () => {
 	const instance = createModule({

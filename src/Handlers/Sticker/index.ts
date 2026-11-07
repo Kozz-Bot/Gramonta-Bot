@@ -2,7 +2,64 @@ import { createModule, createMethod } from 'kozz-module-maker';
 import { MessageObj } from 'kozz-module-maker/dist/Message';
 import { Media } from 'kozz-types';
 import { generateQuote } from 'src/API/QuoteApi';
-import { DefaultInstructions, Help, ToImgInstructions } from './messages';
+import {
+	DefaultInstructions,
+	Help,
+	ToImgInstructions,
+	BackgroundError,
+} from './messages';
+import { stickerPhoto } from './background';
+import {
+	backgroundRemover,
+	BackgroundRemovalError,
+} from '../../Services/BackgroundRemoval';
+import { registerStickerContract } from './ai';
+import { reportCommandOutcome } from '../../Services/OwnerAI/contracts';
+
+const activeBackgroundRequests = new Set<string>();
+const withoutBackground = async (r: MessageObj, tags?: string) => {
+	const key = `${r.message.boundaryId}:${r.message.from}`;
+	if (activeBackgroundRequests.has(key)) {
+		const error =
+			'Você já tem uma foto em processamento. Aguarde a figurinha antes de enviar outra.';
+		reportCommandOutcome(r.rawCommand, { success: false, error });
+		return r.reply(BackgroundError({ message: error }));
+	}
+	if (activeBackgroundRequests.size >= 4) {
+		const error =
+			'Tem algumas fotos na fila. Aguarde um pouco antes de enviar outra.';
+		reportCommandOutcome(r.rawCommand, { success: false, error });
+		return r.reply(BackgroundError({ message: error }));
+	}
+	activeBackgroundRequests.add(key);
+	try {
+		const bytes = await stickerPhoto(r);
+		r.react('✂️');
+		const result = await backgroundRemover.remove(bytes);
+		r.reply.withSticker(
+			{
+				data: result.bytes.toString('base64'),
+				transportType: 'b64',
+				mimeType: 'image/png',
+				fileName: 'figurinha-sem-fundo.png',
+				sizeInBytes: result.bytes.length,
+				duration: null,
+				stickerTags: tags?.split('') || [],
+			},
+			tags?.split('') || []
+		);
+		reportCommandOutcome(r.rawCommand, { success: true, status: 'submitted' });
+	} catch (error) {
+		const message =
+			error instanceof BackgroundRemovalError
+				? error.message
+				: 'Não consegui acessar ou processar essa foto agora. Reenvie a imagem e tente novamente.';
+		reportCommandOutcome(r.rawCommand, { success: false, error: message });
+		return r.reply(BackgroundError({ message }));
+	} finally {
+		activeBackgroundRequests.delete(key);
+	}
+};
 
 const makeQuote = async (requester: MessageObj, includeQuotedMessage?: boolean) => {
 	const { quotedMessage } = requester.message;
@@ -36,7 +93,8 @@ const makeQuote = async (requester: MessageObj, includeQuotedMessage?: boolean) 
 
 const defaultMethod = createMethod(
 	'default',
-	(requester, { tags }) => {
+	(requester, { tags, 'sem-fundo': semFundo, sf }) => {
+		if (semFundo || sf) return withoutBackground(requester, tags);
 		const { quotedMessage, media } = requester.message;
 
 		if (media) {
@@ -70,6 +128,8 @@ const defaultMethod = createMethod(
 	},
 	{
 		tags: 'string?',
+		'sem-fundo': 'boolean?',
+		sf: 'boolean?',
 	}
 );
 
@@ -107,6 +167,7 @@ const fromLink = createMethod('from-link', requester => {
 });
 
 export const startStickerHandler = () => {
+	registerStickerContract();
 	const instance = createModule({
 		commands: {
 			boundariesToHandle: ['*'],
@@ -115,6 +176,7 @@ export const startStickerHandler = () => {
 				...full,
 				...toImg,
 				...fromLink,
+				...createMethod('help', requester => requester.reply(Help())),
 			},
 		},
 		name: 's',

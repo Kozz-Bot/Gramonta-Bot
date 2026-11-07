@@ -26,8 +26,7 @@ export type AiError = {
 export const normalizeAiError = (e: unknown): AiError =>
 	e && typeof e === 'object' ? (e as AiError) : {};
 
-const AI_USAGE_LOG_PATH =
-	process.env.AI_USAGE_LOG_PATH ?? './logs/ai-usage.jsonl';
+const AI_USAGE_LOG_PATH = process.env.AI_USAGE_LOG_PATH ?? './logs/ai-usage.jsonl';
 
 export const logAiUsage = async (event: AiUsageEvent) => {
 	const logPath = path.resolve(process.cwd(), AI_USAGE_LOG_PATH);

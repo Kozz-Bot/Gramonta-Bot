@@ -2,7 +2,10 @@ import { Bold, Line } from 'kozz-module-maker';
 
 export const Help = () => (
 	<>
-		<Line>Digite !tia seguido de palavras chaves para eu enviar uma mensagem de tia do zap!</Line>
+		<Line>
+			Digite !tia seguido de palavras chaves para eu enviar uma mensagem de tia do
+			zap!
+		</Line>
 		<Line>_Exemplo_:</Line>
 		<Line>- `!tia bom dia`</Line>
 		<Line>- `!tia feliz aniversario`</Line>

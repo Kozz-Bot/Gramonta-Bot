@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="pt-BR">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="light" />
+		<meta name="referrer" content="no-referrer" />
+		<title>Gramonta — Central de comando</title>
+		<link rel="stylesheet" href="./styles.css" />
+		<script src="./app.js" defer></script>
+	</head>
+	<body>
+		<svg class="svg-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+			<defs>
+				<symbol id="i-grid" viewBox="0 0 24 24">
+					<rect x="3" y="3" width="7" height="7" rx="2" />
+					<rect x="14" y="3" width="7" height="7" rx="2" />
+					<rect x="3" y="14" width="7" height="7" rx="2" />
+					<rect x="14" y="14" width="7" height="7" rx="2" />
+				</symbol>
+				<symbol id="i-chat" viewBox="0 0 24 24">
+					<path
+						d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5H4l-2 2V11.5A8.5 8.5 0 0 1 10.5 3h2a8.5 8.5 0 0 1 8.5 8.5Z"
+					/>
+					<path d="M7 10h10M7 14h6" />
+				</symbol>
+				<symbol id="i-bolt" viewBox="0 0 24 24">
+					<path d="m13 2-9 12h7l-1 8 10-12h-8l1-8Z" />
+				</symbol>
+				<symbol id="i-terminal" viewBox="0 0 24 24">
+					<rect x="2" y="4" width="20" height="16" rx="3" />
+					<path d="m6 9 3 3-3 3m7 0h5" />
+				</symbol>
+				<symbol id="i-clock" viewBox="0 0 24 24">
+					<circle cx="12" cy="12" r="9" />
+					<path d="M12 7v5l3 2" />
+				</symbol>
+				<symbol id="i-shield" viewBox="0 0 24 24">
+					<path d="m12 2 9 4v6c0 5-9 10-9 10S3 17 3 12V6l9-4Z" />
+					<path d="m8 12 3 3 5-6" />
+				</symbol>
+				<symbol id="i-arrow" viewBox="0 0 24 24">
+					<path d="M5 12h14m-5-5 5 5-5 5" />
+				</symbol>
+				<symbol id="i-send" viewBox="0 0 24 24">
+					<path d="m4 4 17 8-17 8 3-8-3-8Zm3 8h14" />
+				</symbol>
+				<symbol id="i-search" viewBox="0 0 24 24">
+					<circle cx="10.5" cy="10.5" r="6.5" />
+					<path d="m16 16 5 5" />
+				</symbol>
+				<symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6" /></symbol>
+				<symbol id="i-exit" viewBox="0 0 24 24">
+					<path d="M10 4H4v16h6m4-12 4 4-4 4m-5-4h12" />
+				</symbol>
+				<symbol id="i-menu" viewBox="0 0 24 24">
+					<path d="M4 6h16M4 12h16M4 18h16" />
+				</symbol>
+			</defs>
+		</svg>
+
+		<section id="login-screen" class="login-screen" aria-labelledby="login-title">
+			<div class="login-story">
+				<a class="brand" href="./"
+					><span class="brand-mark">g<span>↗</span></span
+					><span
+						>gramonta<span class="brand-label">CENTRAL DE COMANDO</span></span
+					></a
+				>
+				<div class="login-copy">
+					<span class="eyebrow">SEU ASSISTENTE. SEU ESPAÇO.</span>
+					<h1>Seu WhatsApp.<br />Sob seu<br /><em>comando.</em></h1>
+					<p>
+						Converse com a IA, acompanhe seus grupos e coloque suas automações em
+						movimento.
+					</p>
+				</div>
+				<div class="login-orbit" aria-hidden="true">
+					<div class="orbit-ring"></div>
+					<span class="orbit-node node-one">!ai</span
+					><span class="orbit-node node-two">↗</span
+					><span class="orbit-node node-three">⚡</span>
+					<div class="orbit-core">g<span>↗</span></div>
+					<span class="orbit-label">TUDO CONECTADO A VOCÊ</span>
+				</div>
+				<div class="login-footer">
+					<span class="status-dot"></span> Projetado para manter você no controle.
+				</div>
+			</div>
+			<div class="login-access">
+				<div class="access-card">
+					<div class="icon-tile lime">
+						<svg><use href="#i-shield" /></svg>
+					</div>
+					<span class="eyebrow">ACESSO DO PROPRIETÁRIO</span>
+					<h2 id="login-title">Entre na sua central.</h2>
+					<p id="login-description">
+						Conecte este navegador à sua conta para começar. Apenas você pode
+						autorizar o acesso.
+					</p>
+					<div id="login-controls"></div>
+					<p id="login-feedback" class="feedback" role="status"></p>
+					<div class="access-note">
+						<svg><use href="#i-shield" /></svg
+						><span
+							>Históricos e ações ficam protegidos. Nenhum dado do WhatsApp é exibido
+							antes da autenticação.</span
+						>
+					</div>
+				</div>
+				<span class="access-signature"
+					>GRAMONTA <span>•</span> SEU ESPAÇO PRIVADO</span
+				>
+			</div>
+		</section>
+
+		<div id="workspace" class="workspace" hidden>
+			<aside id="sidebar" class="sidebar">
+				<a class="brand" href="./"
+					><span class="brand-mark">g<span>↗</span></span
+					><span
+						>gramonta<span class="brand-label">CENTRAL DE COMANDO</span></span
+					></a
+				>
+				<div class="workspace-label">
+					<span class="avatar">G</span>
+					<div>Meu espaço<small>Conta proprietária</small></div>
+					<span class="workspace-dot"></span>
+				</div>
+				<span class="nav-caption">PRINCIPAL</span>
+				<nav aria-label="Navegação principal">
+					<button class="nav-item active" data-page="overview">
+						<svg><use href="#i-grid" /></svg>Visão geral
+					</button>
+					<button class="nav-item" data-page="assistant">
+						<svg><use href="#i-bolt" /></svg>Assistente IA<span class="nav-tag"
+							>FUEL IX</span
+						>
+					</button>
+					<button class="nav-item" data-page="chats">
+						<svg><use href="#i-chat" /></svg>Chats e histórico
+					</button>
+					<button class="nav-item" data-page="automations">
+						<svg><use href="#i-clock" /></svg>Posts periódicos
+					</button>
+					<button class="nav-item" data-page="commands">
+						<svg><use href="#i-terminal" /></svg>Comandos
+					</button>
+					<button class="nav-item" data-page="agents">
+						<svg><use href="#i-shield" /></svg>Agentes externos
+					</button>
+					<button class="nav-item" data-page="activity">
+						<svg><use href="#i-shield" /></svg>Ações e atividade<span
+							id="pending-count"
+							class="count"
+							hidden
+							>0</span
+						>
+					</button>
+				</nav>
+				<div class="sidebar-bottom">
+					<div class="private-card">
+						<svg><use href="#i-shield" /></svg
+						><strong>Você decide o que acontece.</strong>
+						<p>Revise ações e escolha quais agentes podem executar com autonomia.</p>
+					</div>
+					<button id="logout" class="logout">
+						<svg><use href="#i-exit" /></svg>Sair da central</button
+					><button id="logout-all" class="logout">
+						<svg><use href="#i-shield" /></svg>Encerrar todos os acessos
+					</button>
+				</div>
+			</aside>
+			<div class="main-wrap">
+				<header class="topbar">
+					<button id="mobile-menu" class="icon-button" aria-label="Abrir menu">
+						<svg><use href="#i-menu" /></svg></button
+					><span
+						>Meu espaço <span class="breadcrumb">/</span>
+						<strong id="breadcrumb">Visão geral</strong></span
+					>
+					<div class="topbar-right">
+						<span id="session-status" class="session-pill"
+							><span class="status-dot"></span>Sessão privada</span
+						><span class="avatar small">G</span>
+					</div>
+				</header>
+				<main id="main-content" tabindex="-1"></main>
+				<footer class="main-footer">
+					<span>Gramonta, do seu jeito.</span
+					><span>Powered by Fuel IX <span class="footer-dot">•</span> ZAPO</span>
+				</footer>
+			</div>
+		</div>
+		<div id="toast" class="toast" role="status" hidden></div>
+		<dialog id="confirmation-dialog" aria-labelledby="confirmation-title">
+			<div class="dialog-heading">
+				<span class="icon-tile lime"
+					><svg><use href="#i-shield" /></svg></span
+				><button id="close-dialog" class="icon-button" aria-label="Fechar">×</button>
+			</div>
+			<span class="eyebrow">VOCÊ TEM A ÚLTIMA PALAVRA</span>
+			<h2 id="confirmation-title">Revisar ação</h2>
+			<pre id="confirmation-preview"></pre>
+			<p class="muted">
+				Confira o destino e o conteúdo. A aprovação vale apenas para esta ação.
+			</p>
+			<div class="dialog-actions">
+				<button id="reject-action" class="button secondary">Recusar</button
+				><button id="accept-action" class="button primary">
+					Aceitar e executar <svg><use href="#i-arrow" /></svg>
+				</button>
+			</div>
+		</dialog>
+		<dialog id="agent-policy-dialog" aria-labelledby="agent-policy-title">
+			<form id="agent-policy-form">
+				<div class="dialog-heading">
+					<span class="icon-tile lime"
+						><svg><use href="#i-shield" /></svg></span
+					><button
+						id="close-agent-policy"
+						type="button"
+						class="icon-button"
+						aria-label="Fechar"
+					>
+						×
+					</button>
+				</div>
+				<span class="eyebrow">AUTORIZAÇÃO DESTE AGENTE</span>
+				<h2 id="agent-policy-title">Configurar acesso</h2>
+				<p id="agent-policy-name"></p>
+				<pre id="agent-policy-summary" class="history-body"></pre>
+				<div class="field">
+					<label for="agent-approval-mode">Aprovação das ações</label
+					><select id="agent-approval-mode">
+						<option value="manual">Exigir minha aprovação para cada ação</option>
+						<option value="automatic">
+							Permitir execução autônoma, sem pedir aprovação
+						</option>
+					</select>
+				</div>
+				<div id="agent-commands-section">
+					<label
+						><input type="checkbox" id="agent-all-commands" /> Autorizar todos os
+						métodos</label
+					>
+					<p class="muted">
+						Inclui todos os métodos atuais e os adicionados futuramente ao catálogo.
+						Essa opção exige que o agente já tenha permissão de comandos e todos os
+						chats.
+					</p>
+					<div class="field" id="agent-commands-list">
+						<label for="agent-methods">Métodos permitidos (um por linha)</label
+						><textarea
+							id="agent-methods"
+							rows="4"
+							placeholder="ping.default"
+						></textarea>
+					</div>
+				</div>
+				<div id="agent-policy-consent" hidden>
+					<p class="muted">
+						No modo autônomo, o agente poderá enviar mensagens e executar alterações
+						dentro das permissões acima, sem novas confirmações. O acesso continua
+						com o prazo atual e pode ser revogado.
+					</p>
+					<label
+						><input id="agent-policy-understood" type="checkbox" /> Entendi e
+						autorizo estas permissões para este agente.</label
+					>
+					<div class="field">
+						<label for="agent-policy-confirmation"
+							>Digite AUTORIZAR para confirmar</label
+						><input
+							id="agent-policy-confirmation"
+							autocomplete="off"
+							maxlength="9"
+						/>
+					</div>
+				</div>
+				<p id="agent-policy-feedback" class="feedback" role="status"></p>
+				<div class="dialog-actions">
+					<button id="cancel-agent-policy" type="button" class="button secondary">
+						Cancelar</button
+					><button id="save-agent-policy" class="button primary">
+						Salvar autorização
+					</button>
+				</div>
+			</form>
+		</dialog>
+	</body>
+</html>

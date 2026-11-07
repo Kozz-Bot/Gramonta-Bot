@@ -20,8 +20,9 @@ const search = createMethod('fallback', async requester => {
 		requester.reply.withMedia(
 			{
 				data: sound.mp3,
-				fileName: `${sound.id}.mp3`,
+				fileName: `${sound.id}.ogg`,
 				mimeType: 'audio/mpeg',
+				asVoiceNote: true,
 				sizeInBytes: null,
 				transportType: 'url',
 				stickerTags: undefined,

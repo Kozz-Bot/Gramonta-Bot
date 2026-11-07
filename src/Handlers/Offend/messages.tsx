@@ -20,7 +20,21 @@ export const Curse = ({
 	offense?: string;
 	variant: number;
 }) => {
-	if (variant === 0) return <Line>Ae, {contact} seu {offense}</Line>;
-	if (variant === 1) return <Line>{contact}, tu e um {offense}</Line>;
-	return <Line>Fiquei sabendo que {contact} e {offense}</Line>;
+	if (variant === 0)
+		return (
+			<Line>
+				Ae, {contact} seu {offense}
+			</Line>
+		);
+	if (variant === 1)
+		return (
+			<Line>
+				{contact}, tu e um {offense}
+			</Line>
+		);
+	return (
+		<Line>
+			Fiquei sabendo que {contact} e {offense}
+		</Line>
+	);
 };

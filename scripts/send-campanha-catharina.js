@@ -19,10 +19,7 @@ const { createModule } = require('kozz-module-maker');
 const SCRIPT_DIR = __dirname;
 const PROJECT_DIR = path.resolve(SCRIPT_DIR, '..');
 const LIST_PATH = path.join(PROJECT_DIR, 'disparos.txt');
-const IMAGE_PATH = path.join(
-	PROJECT_DIR,
-	'media/saved/Campanha_Catharina.jpeg'
-);
+const IMAGE_PATH = path.join(PROJECT_DIR, 'media/saved/Campanha_Catharina.jpeg');
 const TEST_RECIPIENT = '5511947952409';
 const SUPPORTED_BOUNDARIES = new Set(['kozz-baileys', 'kozz-zapo']);
 const DEFAULT_BOUNDARY = process.env.CAMPAIGN_BOUNDARY || 'kozz-baileys';
@@ -42,7 +39,9 @@ Variáveis opcionais:
 
 const readCampaign = async () => {
 	const raw = await fs.readFile(LIST_PATH, 'utf8');
-	const messageMatch = raw.match(/\[MENSAGEM\]\s*\r?\n([\s\S]*?)\r?\n?\[\/MENSAGEM\]/i);
+	const messageMatch = raw.match(
+		/\[MENSAGEM\]\s*\r?\n([\s\S]*?)\r?\n?\[\/MENSAGEM\]/i
+	);
 
 	if (!messageMatch?.[1].trim()) {
 		throw new Error(
@@ -51,12 +50,16 @@ const readCampaign = async () => {
 	}
 
 	const recipientText = raw.replace(messageMatch[0], '');
-	const recipients = [...recipientText.matchAll(/(?:\+?55)?\D*(\d{2})\D*(\d{4,5})\D*(\d{4})(?!\d)/g)]
+	const recipients = [
+		...recipientText.matchAll(/(?:\+?55)?\D*(\d{2})\D*(\d{4,5})\D*(\d{4})(?!\d)/g),
+	]
 		.map(([, ddd, first, last]) => `55${ddd}${first}${last}`)
 		.filter((number, index, all) => all.indexOf(number) === index);
 
 	if (!recipients.length) {
-		throw new Error('Nenhum telefone brasileiro válido foi encontrado em disparos.txt.');
+		throw new Error(
+			'Nenhum telefone brasileiro válido foi encontrado em disparos.txt.'
+		);
 	}
 
 	return { message: messageMatch[1].trim(), recipients };
@@ -77,7 +80,8 @@ const createImageMedia = async () => {
 	};
 };
 
-const normalizePhone = value => value.replace(/\D/g, '').replace(/^55(?=\d{10,11}$)/, '55');
+const normalizePhone = value =>
+	value.replace(/\D/g, '').replace(/^55(?=\d{10,11}$)/, '55');
 
 const optionValue = (args, name) => {
 	const equalsArg = args.find(arg => arg.startsWith(`${name}=`));
@@ -112,11 +116,15 @@ const main = async () => {
 		throw new Error('--start-at só pode ser usado com --all.');
 	}
 	if (!SUPPORTED_BOUNDARIES.has(boundary)) {
-		throw new Error(`Boundary inválida: ${boundary}. Use kozz-baileys ou kozz-zapo.`);
+		throw new Error(
+			`Boundary inválida: ${boundary}. Use kozz-baileys ou kozz-zapo.`
+		);
 	}
 
 	if (!process.env.GATEWAY_URL) {
-		throw new Error('GATEWAY_URL não foi configurada. Execute pelo npm script, que carrega .env.');
+		throw new Error(
+			'GATEWAY_URL não foi configurada. Execute pelo npm script, que carrega .env.'
+		);
 	}
 
 	const [{ message, recipients }, media] = await Promise.all([
@@ -132,7 +140,9 @@ const main = async () => {
 	}
 
 	if (!/^55\d{10,11}$/.test(testRecipient)) {
-		throw new Error('CAMPAIGN_TEST_RECIPIENT deve ter código do país, DDD e número.');
+		throw new Error(
+			'CAMPAIGN_TEST_RECIPIENT deve ter código do país, DDD e número.'
+		);
 	}
 
 	console.log(
@@ -159,7 +169,9 @@ const main = async () => {
 					message,
 					media
 				);
-				console.log(`Envio ${index + 1}/${targets.length} encaminhado para ${recipient}.`);
+				console.log(
+					`Envio ${index + 1}/${targets.length} encaminhado para ${recipient}.`
+				);
 
 				if (index < targets.length - 1) {
 					await new Promise(resolve => setTimeout(resolve, PAUSE_BETWEEN_SENDS_MS));

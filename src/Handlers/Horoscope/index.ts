@@ -3,9 +3,7 @@ import HoroscopeApi from 'src/API/HoroscopeAPI';
 import { normalizeString } from 'src/Utils/strings';
 import { Help, Horoscope, NotFound } from './messages';
 
-const defaultMethod = createMethod('default', requester =>
-	requester.reply(Help())
-);
+const defaultMethod = createMethod('default', requester => requester.reply(Help()));
 
 const signs = [
 	'aries',

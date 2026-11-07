@@ -32,10 +32,7 @@ import {
 	SkillsMessage,
 	StatusMessage,
 } from './messages';
-import {
-	formatErrorMessage,
-	formatItemName,
-} from './formatters';
+import { formatErrorMessage, formatItemName } from './formatters';
 
 type RegisteredPlayer = {
 	id: string;
@@ -110,8 +107,7 @@ const getMessageGroupId = (message: { chatId: string; to: string }) => {
 	return null;
 };
 
-const getRegisteredPlayer = (contactId: string) =>
-	playerDB.getEntityById(contactId);
+const getRegisteredPlayer = (contactId: string) => playerDB.getEntityById(contactId);
 
 const requireRegisteredPlayer = (contactId: string) => {
 	const player = getRegisteredPlayer(contactId);
@@ -135,10 +131,7 @@ const findBait = (baits: BaitShopItem[], query: string) => {
 	);
 };
 
-const listPlayerBaits = (
-	inventory: ChatRPGInventoryItem[],
-	baits: BaitShopItem[]
-) =>
+const listPlayerBaits = (inventory: ChatRPGInventoryItem[], baits: BaitShopItem[]) =>
 	baits
 		.map(bait => ({
 			...bait,
@@ -155,7 +148,9 @@ const findInventorySlot = (
 ) => {
 	const numericSlot = Number(query.replace(/^slot\s+/i, '').trim());
 	if (Number.isInteger(numericSlot) && numericSlot > 0) {
-		return inventory.find((slot, index) => (slot.slotNumber ?? index + 1) === numericSlot);
+		return inventory.find(
+			(slot, index) => (slot.slotNumber ?? index + 1) === numericSlot
+		);
 	}
 
 	const normalizedQuery = normalize(query);
@@ -194,7 +189,10 @@ const upsertGroupGuild = async (groupId: string) => {
 
 	try {
 		return (
-			await ChatRPGApi.createGuild(groupId, 'Guilda criada automaticamente pelo bot.')
+			await ChatRPGApi.createGuild(
+				groupId,
+				'Guilda criada automaticamente pelo bot.'
+			)
 		).guild;
 	} catch (error) {
 		const guild = (await ChatRPGApi.listGuilds()).guilds.find(
@@ -402,7 +400,9 @@ const fish = createMethod('fish', async requester => {
 			FishingSuccess({
 				itemName: item?.name ?? 'desconhecido',
 				quality: quality?.label ?? 'normal',
-				weight: fishWeight ? `${fishWeight.value.toFixed(2)} ${fishWeight.unit}` : '-',
+				weight: fishWeight
+					? `${fishWeight.value.toFixed(2)} ${fishWeight.unit}`
+					: '-',
 				xp: item?.xpGained ?? 0,
 				sellValue: item?.sellValue ?? 0,
 				randomEvent: randomEvent.occurred ? randomEvent.event?.name : undefined,
@@ -457,10 +457,7 @@ const chances = createMethod('chances', async requester => {
 			}
 		}
 
-		const result = await ChatRPGApi.getFishingProbabilities(
-			player.playerId,
-			params
-		);
+		const result = await ChatRPGApi.getFishingProbabilities(player.playerId, params);
 
 		return requester.reply(
 			FishingProbabilitiesMessage({ probabilities: result.probabilities })
@@ -529,9 +526,7 @@ const skills = createMethod('skills', async requester => {
 		const player = requireRegisteredPlayer(requester.message.contact.id);
 		const { progression } = await ChatRPGApi.getUserProgression(player.playerId);
 
-		return requester.reply(
-			SkillsMessage({ skills: progression.skills })
-		);
+		return requester.reply(SkillsMessage({ skills: progression.skills }));
 	} catch (error) {
 		return requester.reply(
 			RpgError({
@@ -603,7 +598,8 @@ const sell = createMethod('sell', async requester => {
 			return requester.reply(
 				RpgError({
 					title: 'Item nao encontrado',
-					message: 'Confira seu inventario com !inventario e tente vender pelo slot.',
+					message:
+						'Confira seu inventario com !inventario e tente vender pelo slot.',
 				})
 			);
 		}

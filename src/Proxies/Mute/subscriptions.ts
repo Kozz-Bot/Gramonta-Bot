@@ -1,9 +1,13 @@
-import { Socket } from 'socket.io-client';
+import type { createModule } from 'kozz-module-maker';
 import { getActiveMuteRoutes } from './mutedDB';
+import { currentChatScope } from '../../Services/ChatCommands/scope';
 
-export const createMuteSubscriptions = (socket: Socket) => {
+export const createMuteSubscriptions = (
+	socket: ReturnType<typeof createModule>['socket']
+) => {
 	let ready = false;
 	let expirationTimer: ReturnType<typeof setTimeout> | undefined;
+	const scopedTimers = new Map<string, ReturnType<typeof setTimeout>>();
 	const subscribed = new Map<string, { boundary: string; chats: string[] }>();
 
 	const clearExpirationTimer = () => {
@@ -12,12 +16,35 @@ export const createMuteSubscriptions = (socket: Socket) => {
 	};
 
 	const sync = () => {
-		clearExpirationTimer();
+		const scope = currentChatScope();
+		const scopeKey = scope
+			? JSON.stringify([scope.boundaryName, scope.chatId])
+			: undefined;
+		if (scopeKey) {
+			clearTimeout(scopedTimers.get(scopeKey));
+			scopedTimers.delete(scopeKey);
+		} else {
+			clearExpirationTimer();
+			for (const timer of scopedTimers.values()) clearTimeout(timer);
+			scopedTimers.clear();
+		}
 		if (!ready) return;
-		const routes = getActiveMuteRoutes();
-		const desired = new Set(routes.map(route => JSON.stringify([route.boundary, route.chat])));
+		const routes = getActiveMuteRoutes().filter(
+			route =>
+				!scope ||
+				(route.boundary === scope.boundaryName && route.chat === scope.chatId)
+		);
+		const desired = new Set(
+			routes.map(route => JSON.stringify([route.boundary, route.chat]))
+		);
 
 		for (const [key, source] of subscribed) {
+			if (
+				scope &&
+				(source.boundary !== scope.boundaryName ||
+					source.chats.some(chat => chat !== scope.chatId))
+			)
+				continue;
 			if (desired.has(key)) continue;
 			socket.emit('revoke_proxy', { subscriber: 'mute', source });
 			subscribed.delete(key);
@@ -33,14 +60,21 @@ export const createMuteSubscriptions = (socket: Socket) => {
 		if (routes.length) {
 			const nextExpiration = Math.min(...routes.map(route => route.expiration));
 			// Node timers cannot represent delays above a signed 32-bit integer.
-			expirationTimer = setTimeout(sync, Math.min(2_147_483_647, Math.max(1, nextExpiration - Date.now())));
-			expirationTimer.unref();
+			const timer = setTimeout(
+				sync,
+				Math.min(2_147_483_647, Math.max(1, nextExpiration - Date.now()))
+			);
+			timer.unref();
+			if (scopeKey) scopedTimers.set(scopeKey, timer);
+			else expirationTimer = timer;
 		}
 	};
 
 	socket.on('disconnect', () => {
 		ready = false;
 		subscribed.clear();
+		for (const timer of scopedTimers.values()) clearTimeout(timer);
+		scopedTimers.clear();
 		clearExpirationTimer();
 	});
 	socket.on('introduction_ack', (ack: { success?: boolean }) => {

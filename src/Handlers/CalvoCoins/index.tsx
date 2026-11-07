@@ -74,9 +74,7 @@ const addCoins = createMethod(
 
 		const { coins: userBalance } = await CoinsApi.getUserData(quotedUser);
 
-		requester.reply(
-			<AddCoinsResponse amount={amount} userBalance={userBalance} />
-		);
+		requester.reply(<AddCoinsResponse amount={amount} userBalance={userBalance} />);
 	}, 'Apenas o dono do bot pode adicionar moedas ao saldo de alguém')
 );
 

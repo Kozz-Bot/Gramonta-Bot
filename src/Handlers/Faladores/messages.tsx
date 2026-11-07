@@ -1,11 +1,4 @@
-import {
-	Bold,
-	ForEach,
-	Line,
-	ListItem,
-	Monospace,
-	Render,
-} from 'kozz-module-maker';
+import { Bold, ForEach, Line, ListItem, Monospace, Render } from 'kozz-module-maker';
 
 export type RankingEntry = {
 	contactId: string;
@@ -43,8 +36,7 @@ export const Help = () => {
 			</Line>
 			<Line>
 				<ListItem>
-					<Monospace>!faladores semana</Monospace> mostra o ranking semanal
-					completo.
+					<Monospace>!faladores semana</Monospace> mostra o ranking semanal completo.
 				</ListItem>
 			</Line>
 			<Line>
@@ -69,8 +61,7 @@ export const Help = () => {
 			</Line>
 			<Line>
 				<ListItem>
-					<Monospace>!mudos mes</Monospace> tambem aceita dia, semana, mes ou
-					geral.
+					<Monospace>!mudos mes</Monospace> tambem aceita dia, semana, mes ou geral.
 				</ListItem>
 			</Line>
 			<Line />
@@ -85,9 +76,7 @@ export const Help = () => {
 export const GroupOnly = () => {
 	return (
 		<>
-			<Line>
-				Esse comando só funciona em grupos.
-			</Line>
+			<Line>Esse comando só funciona em grupos.</Line>
 		</>
 	);
 };
@@ -95,9 +84,7 @@ export const GroupOnly = () => {
 export const LoadingError = () => {
 	return (
 		<>
-			<Line>
-				Não consegui buscar os dados de mensagens desse grupo agora.
-			</Line>
+			<Line>Não consegui buscar os dados de mensagens desse grupo agora.</Line>
 		</>
 	);
 };
@@ -129,9 +116,8 @@ const RankingBlock = ({ section }: { section: RankingSection }) => {
 					data={section.entries}
 					render={(entry, index) => (
 						<Line>
-							{(index + 1).toString().padStart(2, '0')}.{' '}
-							{entry.contactName}({entry.contactNumber}) -{' '}
-							{formatCount(entry.count)}
+							{(index + 1).toString().padStart(2, '0')}. {entry.contactName}(
+							{entry.contactNumber}) - {formatCount(entry.count)}
 						</Line>
 					)}
 				/>

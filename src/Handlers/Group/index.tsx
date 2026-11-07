@@ -1,10 +1,13 @@
 import { createMethod, createModule } from 'kozz-module-maker';
 import { MessageObj } from 'kozz-module-maker/dist/Message';
+import { disableCommandsForGroup, enableCommandsForGroup } from './groupState';
 import {
-	disableCommandsForGroup,
-	enableCommandsForGroup,
-} from './groupState';
-import { CommandsDisabled, CommandsEnabled, GroupOnly, Help, HostOnly } from './messages';
+	CommandsDisabled,
+	CommandsEnabled,
+	GroupOnly,
+	Help,
+	HostOnly,
+} from './messages';
 
 const getGroupId = (requester: MessageObj) => {
 	const { chatId, to } = requester.message;

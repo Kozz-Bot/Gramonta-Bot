@@ -2,8 +2,10 @@ import { Bold, Line } from 'kozz-module-maker';
 
 export const Help = () => (
 	<>
-		<Line>Esse modulo pesquisa no youtube e baixa o primeiro resultado que encontrar.</Line>
-		<Line>!yt song (pesquisa) para baixar como musica</Line>
+		<Line>
+			Esse modulo pesquisa no youtube e baixa o primeiro resultado que encontrar.
+		</Line>
+		<Line>!yt song (pesquisa) para baixar e enviar como voz em OGG/Opus</Line>
 		<Line>!yt video (pesquisa) para baixar como video</Line>
 		<Line>Tambem aceita uma URL do YouTube no lugar da pesquisa.</Line>
 		<Line>Reacoes:</Line>

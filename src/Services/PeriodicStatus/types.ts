@@ -20,7 +20,9 @@ export type StatusContext = {
 };
 
 export type StatusContent = { body: string; media?: Media };
-export type StatusProvider = (context: StatusContext) => StatusContent | Promise<StatusContent>;
+export type StatusProvider = (
+	context: StatusContext
+) => StatusContent | Promise<StatusContent>;
 
 export type StatusRecord = {
 	date: string;

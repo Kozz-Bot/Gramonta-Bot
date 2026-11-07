@@ -126,8 +126,8 @@ export const MakePremiumResponse = ({ quotedUser }: { quotedUser: string }) => {
 				<Bold>Feito!</Bold>
 			</Line>
 			<Line>
-				{quotedUser} agora é premium. Você pode consultar seu status usando o
-				comando `!coins`
+				{quotedUser} agora é premium. Você pode consultar seu status usando o comando
+				`!coins`
 			</Line>
 		</>
 	);

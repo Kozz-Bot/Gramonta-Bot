@@ -22,8 +22,8 @@ const scheduleCleanup = (fileName: string) => {
 	const timer = setTimeout(async () => {
 		try {
 			await CDNApi.deletePublicFile(fileName);
-		} catch (e) {
-			console.warn(`Failed to delete temporary CDN file ${fileName}`, e);
+		} catch {
+			console.warn(`Failed to delete temporary CDN file ${fileName}`);
 		}
 	}, TEMPORARY_CDN_MEDIA_TTL_MS);
 

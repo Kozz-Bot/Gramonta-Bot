@@ -6,7 +6,10 @@ export const getMuteChat = (message: { chatId?: string; to: string }) => {
 	return message.to?.endsWith('@g.us') ? message.to : null;
 };
 
-export const resolveMuteContact = async (requester: Pick<MessageObj, 'ask' | 'message'>, contact: MuteContact): Promise<MuteContact> => {
+export const resolveMuteContact = async (
+	requester: Pick<MessageObj, 'ask' | 'message'>,
+	contact: MuteContact
+): Promise<MuteContact> => {
 	const isLid = contact.id.endsWith('@lid');
 	if (!isLid && !contact.id.endsWith('@s.whatsapp.net')) return contact;
 	const result = await requester.ask.boundary(
@@ -16,5 +19,8 @@ export const resolveMuteContact = async (requester: Pick<MessageObj, 'ask' | 'me
 	);
 	const response = result?.response as { jid?: string; lid?: string } | undefined;
 	const alias = isLid ? response?.jid : response?.lid;
-	return { ...contact, aliases: [...(contact.aliases ?? []), ...(alias ? [alias] : [])] };
+	return {
+		...contact,
+		aliases: [...(contact.aliases ?? []), ...(alias ? [alias] : [])],
+	};
 };

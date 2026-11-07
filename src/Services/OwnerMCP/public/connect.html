@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-BR">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<meta name="referrer" content="no-referrer" />
+		<title>Conectar agente — Gramonta</title>
+		<link rel="stylesheet" href="/wpp/styles.css" />
+		<link rel="stylesheet" href="/wpp/oauth/connect.css" />
+		<script src="/wpp/oauth/connect.js" defer></script>
+	</head>
+	<body>
+		<main class="mcp-connect card card-pad">
+			<span class="eyebrow">GRAMONTA · AGENTE EXTERNO</span>
+			<h1>Autorizar uma conexão</h1>
+			<p>
+				Escolha o acesso que este agente terá ao seu WhatsApp. Envios e alterações
+				exigirão sua aprovação no painel.
+			</p>
+			<p id="feedback" role="status">Carregando solicitação…</p>
+			<section id="login" hidden>
+				<p>Entre na central em outra aba e volte aqui para continuar.</p>
+				<a href="/wpp/" target="_blank" rel="noopener" class="button primary"
+					>Abrir central</a
+				><button id="retry" class="button secondary">Já entrei, continuar</button>
+			</section>
+			<section id="details" hidden>
+				<dl>
+					<dt>Nome informado pelo cliente</dt>
+					<dd id="client-name"></dd>
+					<dt>Endereço de retorno</dt>
+					<dd id="redirect"></dd>
+					<dt>Identificador do cliente</dt>
+					<dd id="client-id"></dd>
+				</dl>
+				<p class="hint">
+					O nome é informado pelo cliente e não comprova sua identidade. Continue
+					apenas se você iniciou esta conexão e reconhece o endereço de retorno.
+				</p>
+				<form id="consent">
+					<fieldset>
+						<legend>Ferramentas autorizadas</legend>
+						<div id="scopes"></div>
+					</fieldset>
+					<fieldset>
+						<legend>Conversas autorizadas</legend>
+						<label
+							><input type="checkbox" id="all-chats" /> Permitir todos os chats da
+							conta</label
+						>
+						<p class="hint">
+							Executar módulos ou controlar posts periódicos exige todos os chats:
+							essas operações podem afetar outros destinos e configurações globais.
+						</p>
+						<div id="chat-search">
+							<label for="query">Buscar contato ou grupo</label
+							><input
+								id="query"
+								maxlength="120"
+								placeholder="Nome do contato ou grupo"
+							/><button id="search" type="button" class="button secondary">
+								Buscar
+							</button>
+							<div id="matches"></div>
+							<div id="selected"></div>
+						</div>
+					</fieldset>
+					<div id="command-area" hidden>
+						<label
+							><input type="checkbox" id="all-commands" /> Autorizar todos os
+							métodos</label
+						>
+						<p class="hint">
+							Inclui todos os módulos e métodos disponíveis agora e os que forem
+							adicionados futuramente ao catálogo. Exige autorização para todos os
+							chats.
+						</p>
+						<div id="command-list">
+							<label for="commands">Métodos permitidos (um por linha)</label
+							><textarea
+								id="commands"
+								placeholder="ping.default"
+								rows="4"
+							></textarea>
+							<p class="hint">
+								Use os nomes canônicos exibidos em Comandos na central. Apenas os
+								métodos listados poderão ser chamados.
+							</p>
+						</div>
+					</div>
+					<label for="days">Duração do acesso</label
+					><select id="days">
+						<option value="1">1 dia</option>
+						<option value="7">7 dias</option>
+						<option value="30">30 dias</option>
+					</select>
+					<p>
+						Leituras autorizadas serão enviadas ao agente externo e poderão ser
+						processadas pelo provedor de IA dele.
+					</p>
+					<button class="button primary">Preparar autorização pelo WhatsApp</button>
+				</form>
+			</section>
+			<section id="phone" hidden>
+				<h2>Confirme pelo seu WhatsApp</h2>
+				<p>No chat consigo mesmo, envie:</p>
+				<pre id="command"></pre>
+				<button id="copy" class="button secondary">Copiar comando</button>
+				<p>
+					Confira as permissões na resposta do bot e envie o comando de confirmação
+					indicado. Esta janela continuará automaticamente.
+				</p>
+			</section>
+		</main>
+	</body>
+</html>

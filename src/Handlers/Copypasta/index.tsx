@@ -86,7 +86,13 @@ const search = createMethod(
 						makeAccentsInsensitiveRegex(query),
 						`*--> ${query.toUpperCase()} <--*`
 					);
-					return <CopypastaSearchResultDeep number={copy.index} name={copy.id} part={part} />;
+					return (
+						<CopypastaSearchResultDeep
+							number={copy.index}
+							name={copy.id}
+							part={part}
+						/>
+					);
 				})
 			);
 
@@ -109,7 +115,8 @@ const search = createMethod(
 );
 
 const get = createMethod('fallback', requester => {
-	const query = `${requester.rawCommand!.method} ${requester.rawCommand!.immediateArg || ''}`.trim();
+	const query =
+		`${requester.rawCommand!.method} ${requester.rawCommand!.immediateArg || ''}`.trim();
 
 	if (!query) {
 		return requester.reply(<NeedsNameOrNumber />);

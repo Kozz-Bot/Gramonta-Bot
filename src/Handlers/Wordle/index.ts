@@ -1,7 +1,14 @@
 import { createMethod, createModule } from 'kozz-module-maker';
 import { getGameFromRequester, guessWord } from 'src/misc/Wordle';
 import fs from 'fs/promises';
-import { EmptyQuery, GameOver, GuessResult, Help, InvalidGuess, Win } from './messages';
+import {
+	EmptyQuery,
+	GameOver,
+	GuessResult,
+	Help,
+	InvalidGuess,
+	Win,
+} from './messages';
 
 const resend = createMethod('resend', async requester => {
 	const game = getGameFromRequester(requester);
@@ -15,10 +22,12 @@ const resend = createMethod('resend', async requester => {
 		.join('\n');
 	const tries = game.guesses.length;
 
-	requester.reply(GuessResult({
-		tries,
-		history: prettyResult,
-	}));
+	requester.reply(
+		GuessResult({
+			tries,
+			history: prettyResult,
+		})
+	);
 });
 
 /**
@@ -54,15 +63,19 @@ const guess = createMethod('fallback', async requester => {
 				duration: null,
 			});
 
-			return requester.reply(Win({
-				tries,
-				history: prettyResult,
-			}));
+			return requester.reply(
+				Win({
+					tries,
+					history: prettyResult,
+				})
+			);
 		} else {
-			requester.reply(GuessResult({
-				tries,
-				history: prettyResult,
-			}));
+			requester.reply(
+				GuessResult({
+					tries,
+					history: prettyResult,
+				})
+			);
 
 			if (tries === 6) {
 				requester.reply(`A palavra era ${game.word}`);

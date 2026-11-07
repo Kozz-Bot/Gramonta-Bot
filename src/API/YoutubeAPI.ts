@@ -113,7 +113,10 @@ const writeFile = (filePath: string, data: Buffer) => {
 	return filePath;
 };
 
-const extensionFromContentType = (contentType: string | undefined, type: DownloadType) => {
+const extensionFromContentType = (
+	contentType: string | undefined,
+	type: DownloadType
+) => {
 	if (contentType?.includes('ogg')) return 'ogg';
 	if (contentType?.includes('webm')) return 'webm';
 	if (contentType?.includes('mpeg')) return 'mp3';
@@ -129,7 +132,8 @@ const parseJsonBuffer = (response: AxiosResponse<Buffer>) => {
 	return JSON.parse(response.data.toString('utf8'));
 };
 
-const getString = (value: unknown) => (typeof value === 'string' ? value : undefined);
+const getString = (value: unknown) =>
+	typeof value === 'string' ? value : undefined;
 
 const getMediaUrl = (data: any) =>
 	getString(data?.url) ||
@@ -214,7 +218,9 @@ const ytDownload = async (
 	}
 };
 
-const normalizeResult = (result: YoutubeApiSearchResult): YoutubeSearchResult | null => {
+const normalizeResult = (
+	result: YoutubeApiSearchResult
+): YoutubeSearchResult | null => {
 	const link = result.link || result.url || result.videoUrl || result.watchUrl;
 	if (!link) return null;
 

@@ -76,7 +76,7 @@ const uploadAllMediaToBucket = async (
 					...message.media,
 					transportType: 'url',
 					data: fileUrl!,
-			  }
+				}
 			: undefined,
 		quotedMessage: message.quotedMessage
 			? await uploadAllMediaToBucket(message.quotedMessage)

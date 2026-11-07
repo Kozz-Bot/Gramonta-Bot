@@ -4,9 +4,14 @@ import path from 'node:path';
 import type { StatusRecord, StatusStore } from './types';
 
 export const createStatusStore = (directory: string): StatusStore => {
-	const fileFor = (record: Pick<StatusRecord, 'date' | 'destination' | 'publicationId'>) => {
-		if (!/^\d{4}-\d{2}-\d{2}$/.test(record.date)) throw new Error('Data inválida no histórico de status');
-		const identity = record.publicationId ? JSON.stringify([record.destination, record.publicationId]) : record.destination;
+	const fileFor = (
+		record: Pick<StatusRecord, 'date' | 'destination' | 'publicationId'>
+	) => {
+		if (!/^\d{4}-\d{2}-\d{2}$/.test(record.date))
+			throw new Error('Data inválida no histórico de status');
+		const identity = record.publicationId
+			? JSON.stringify([record.destination, record.publicationId])
+			: record.destination;
 		const key = createHash('sha256').update(identity).digest('hex');
 		return path.join(directory, `${record.date}-${key}.json`);
 	};

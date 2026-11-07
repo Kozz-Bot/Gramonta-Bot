@@ -2,16 +2,9 @@ import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 
 export type ChatRPGUserRole = 'master' | 'player';
 export type ChatRPGItemCategory =
-	| 'equipment'
-	| 'consumable'
-	| 'material'
-	| 'treasure';
+	'equipment' | 'consumable' | 'material' | 'treasure';
 export type ChatRPGItemRarity =
-	| 'common'
-	| 'uncommon'
-	| 'rare'
-	| 'epic'
-	| 'legendary';
+	'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 export type ChatRPGItemStatus = 'active' | 'deprecated' | 'disabled';
 export type ChatRPGSkill =
 	| 'fishing'
@@ -29,11 +22,7 @@ export type ChatRPGSkill =
 	| 'alchemy'
 	| 'potionbrewing';
 export type ChatRPGAttribute =
-	| 'strength'
-	| 'vitality'
-	| 'dexterity'
-	| 'intelligence'
-	| 'luck';
+	'strength' | 'vitality' | 'dexterity' | 'intelligence' | 'luck';
 
 export type ChatRPGBaitEffects = {
 	treasureChanceBonus?: number;
@@ -170,9 +159,7 @@ export type ChatRPGCreateItemPayload = {
 	status?: ChatRPGItemStatus;
 };
 
-export type ChatRPGUpdateItemPayload = Partial<
-	Omit<ChatRPGCreateItemPayload, 'id'>
->;
+export type ChatRPGUpdateItemPayload = Partial<Omit<ChatRPGCreateItemPayload, 'id'>>;
 
 export type ChatRPGFishingActionPayload = {
 	baitItemId?: string;

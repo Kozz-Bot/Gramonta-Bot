@@ -109,8 +109,8 @@ export const Weather = ({
 export const Help = () => (
 	<>
 		<Line>
-			Digite <Monospace>!clima</Monospace> seguido do nome do local para consultar
-			o tempo e a previsão dos próximos 3 dias!
+			Digite <Monospace>!clima</Monospace> seguido do nome do local para consultar o
+			tempo e a previsão dos próximos 3 dias!
 		</Line>
 		<Line />
 		<Line>

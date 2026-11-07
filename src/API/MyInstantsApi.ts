@@ -52,8 +52,11 @@ export const parseFirstSound = (html: string): MyInstantsSound | null => {
 		return null;
 	}
 
-	const instantPath = firstResult?.querySelector('a[href*="/instant/"]')?.getAttribute('href');
-	const id = instantPath?.match(/\/instant\/([^/]+)/)?.[1] || mp3.split('/').pop() || 'sound';
+	const instantPath = firstResult
+		?.querySelector('a[href*="/instant/"]')
+		?.getAttribute('href');
+	const id =
+		instantPath?.match(/\/instant\/([^/]+)/)?.[1] || mp3.split('/').pop() || 'sound';
 	dom.window.close();
 
 	return {

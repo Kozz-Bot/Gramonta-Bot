@@ -3,13 +3,18 @@ dotenv.config({
 	path: '.env',
 });
 
+import { startOwnerPanel } from './Services/OwnerPanel/server';
+import { registerOwnerAiModule } from './Services/OwnerAI/modules';
+
 import * as handleStarters from './Handlers/';
 import * as proxyStarters from './Proxies';
 import { useGroupCommands } from './Middlewares/GroupCommands';
+import { useBans } from './Middlewares/Bans';
 import { useMute } from './Proxies/Mute/middleware/useMute';
 import { startReactionPayloadListener } from './Services/ReactionPayloadListener';
-import { startBaguncinhaCountdown } from './Services/BaguncinhaCountdown';
 import { startPeriodicStatus } from './Services/PeriodicStatus';
+import { startBaguncinhaNews } from './Services/BaguncinhaNews';
+import { startGroupMembershipService } from './Services/GroupMembership';
 
 let delay = 0;
 let delayIncrement = 1000; // 0,35s
@@ -21,12 +26,17 @@ Object.values({ ...handleStarters, ...proxyStarters }).forEach(starter => {
 		const module = starter();
 
 		if (module) {
+			module.use(useBans);
 			module.use(useGroupCommands);
 			module.use(useMute);
+			registerOwnerAiModule(module);
 		}
 	}, delay);
 	delay += delayIncrement;
 });
 startReactionPayloadListener();
-startBaguncinhaCountdown();
 startPeriodicStatus();
+startBaguncinhaNews();
+startGroupMembershipService();
+
+startOwnerPanel();

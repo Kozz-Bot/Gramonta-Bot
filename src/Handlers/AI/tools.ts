@@ -1,6 +1,6 @@
-import { ChatCompletionTool, ChatCompletionToolCall } from 'src/API/FuelIXApi';
+import { ResponseTool, ChatCompletionToolCall } from 'src/API/FuelIXApi';
 
-export const talkTools: ChatCompletionTool[] = [
+export const talkTools: ResponseTool[] = [
 	{
 		type: 'function',
 		function: {
@@ -21,28 +21,40 @@ export const talkTools: ChatCompletionTool[] = [
 			},
 		},
 	},
+	{ type: 'web_search' },
 	{
 		type: 'function',
 		function: {
-			name: 'search_web',
+			name: 'get_chat_media',
 			description:
-				'Pesquisa informações atualizadas na internet. Use SEMPRE que a pergunta envolver: notícias, eventos recentes, preços, clima, resultados esportivos, lançamentos, dados que mudam com o tempo, ou qualquer coisa que você não tem certeza se seu conhecimento está atualizado. Na dúvida, pesquise — é melhor pesquisar desnecessariamente do que dar uma resposta desatualizada ou inventada. Use mode="full" quando precisar de detalhes aprofundados ou quando o resultado resumido não for suficiente.',
+				'Recupera e interpreta fotos, figurinhas, áudios ou vídeos de mensagens DESTE chat, quando o contexto textual não bastar. Use IDs do histórico/pedido; consulte get_chat_context antes se não souber quais mídias existem. Retorna imagens/quadros e transcrição como contexto multimodal, com autor e relações de resposta. Não aceita chatId, URL ou identidade. Vídeos/áudios são analisados por trechos de até 180s, até 8 quadros por vídeo; no máximo quatro mídias/trechos por pedido. Não invente conteúdo de arquivos indisponíveis.',
 			parameters: {
 				type: 'object',
 				properties: {
-					query: {
-						type: 'string',
+					messageIds: {
+						type: 'array',
+						minItems: 1,
+						maxItems: 2,
+						items: { type: 'string' },
 						description:
-							'Consulta de busca em português ou inglês, otimizada para mecanismo de busca. Seja específico e inclua palavras-chave relevantes.',
+							'IDs exatos de uma ou duas mensagens com mídia apresentadas no contexto deste chat.',
 					},
-					mode: {
-						type: 'string',
-						enum: ['summary', 'full'],
+					startSeconds: {
+						type: 'number',
+						minimum: 0,
+						maximum: 3600,
 						description:
-							'Use "summary" (padrão) para respostas rápidas com snippets. Use "full" quando precisar de conteúdo completo das páginas para responder com precisão.',
+							'Opcional: início do trecho em segundos do arquivo original. Padrão 0.',
+					},
+					endSeconds: {
+						type: 'number',
+						minimum: 0,
+						maximum: 3600,
+						description:
+							'Opcional: fim do trecho, no máximo 180s após o início. Padrão: até 180s ou fim do arquivo.',
 					},
 				},
-				required: ['query'],
+				required: ['messageIds'],
 				additionalProperties: false,
 			},
 		},

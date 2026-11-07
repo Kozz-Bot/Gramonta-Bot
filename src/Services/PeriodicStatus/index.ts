@@ -3,6 +3,7 @@ import { createModule } from 'kozz-module-maker';
 import { statusProviders, statusSchedule } from './config';
 import { createStatusRunner, validateSlots } from './scheduler';
 import { createStatusStore } from './store';
+import { groupDestinations, periodicGroups } from './groups';
 
 export const startPeriodicStatus = () => {
 	validateSlots(statusSchedule, statusProviders);
@@ -20,7 +21,8 @@ export const startPeriodicStatus = () => {
 		if (!module.socket.connected) throw new Error('Gateway desconectado');
 		let replyEvent: string | undefined;
 		const capture = (event: string, data: { request?: { id?: string } }) => {
-			if (event === 'ask_resource' && data.request?.id) replyEvent = `reply_resource/${data.request.id}`;
+			if (event === 'ask_resource' && data.request?.id)
+				replyEvent = `reply_resource/${data.request.id}`;
 		};
 		module.socket.onAnyOutgoing(capture);
 		const request = module.ask.boundary('kozz-zapo', resource, payload);
@@ -31,7 +33,10 @@ export const startPeriodicStatus = () => {
 			const result = await Promise.race([
 				request,
 				new Promise<never>((_, reject) => {
-					timeout = setTimeout(() => reject(new Error('ZAPO não respondeu no prazo')), timeoutMs);
+					timeout = setTimeout(
+						() => reject(new Error('ZAPO não respondeu no prazo')),
+						timeoutMs
+					);
 				}),
 			]);
 			return result.response;
@@ -42,31 +47,86 @@ export const startPeriodicStatus = () => {
 	};
 	const tick = createStatusRunner({
 		slots: statusSchedule,
+		getSlots: () => {
+			try {
+				const groups = groupDestinations(periodicGroups.load());
+				return statusSchedule.map(slot => ({
+					...slot,
+					destinations: [...slot.destinations, ...groups],
+				}));
+			} catch {
+				console.warn(
+					'[PeriodicStatus] Configuração de grupos inválida; envios para grupos bloqueados.'
+				);
+				return statusSchedule;
+			}
+		},
+		allowed: destination => {
+			if (destination.kind === 'status') return true;
+			try {
+				return groupDestinations(periodicGroups.load()).some(
+					d => d.kind === 'group' && d.chatId === destination.chatId
+				);
+			} catch {
+				return false;
+			}
+		},
 		providers: statusProviders,
 		store: createStatusStore(path.resolve('.runtime/periodic-status')),
 		ready: async () => {
 			if (!module.socket.connected) return false;
-			const status = await ask('chat_status') as { connected?: boolean; registered?: boolean; hasQr?: boolean } | undefined;
-			return status?.connected === true && status.registered === true && status.hasQr === false;
+			const status = (await ask('chat_status')) as
+				{ connected?: boolean; registered?: boolean; hasQr?: boolean } | undefined;
+			return (
+				status?.connected === true &&
+				status.registered === true &&
+				status.hasQr === false
+			);
 		},
 		publish: async (content, destination, context) => {
-			const result = await ask('publish_periodic_post', { content, destination }) as { published?: boolean; messageId?: string; recipientCount?: number } | undefined;
+			// A filesystem reservation yields the event loop: honor controls received during it.
+			if (
+				destination.kind === 'group' &&
+				!groupDestinations(periodicGroups.load()).some(
+					d => d.kind === 'group' && d.chatId === destination.chatId
+				)
+			) {
+				throw new Error('Envio cancelado pelo controle de grupos');
+			}
+			const result = (await ask('publish_periodic_post', {
+				content,
+				destination,
+			})) as
+				| { published?: boolean; messageId?: string; recipientCount?: number }
+				| undefined;
 			if (result?.published !== true) throw new Error('Publicação não confirmada');
-			console.info(`[PeriodicStatus] Publicação confirmada statusId=${context.slot.statusId} date=${context.date} recipients=${result.recipientCount ?? 'unknown'} messageId=${result.messageId ?? 'unknown'}`);
+			console.info(
+				`[PeriodicStatus] Publicação confirmada statusId=${context.slot.statusId} date=${context.date} recipients=${result.recipientCount ?? 'unknown'} messageId=${result.messageId ?? 'unknown'}`
+			);
 		},
 	});
 	let started = false;
 	module.socket.on('introduction_ack', (ack: { success?: boolean }) => {
 		if (!ack?.success || started) return;
 		started = true;
-		console.info(`[PeriodicStatus] Agenda ativa: ${statusSchedule.length} publicações semanais, fuso America/Sao_Paulo.`);
+		console.info(
+			`[PeriodicStatus] Agenda ativa: ${statusSchedule.length} publicações semanais, fuso America/Sao_Paulo.`
+		);
 		const loop = async () => {
 			try {
 				await tick();
 			} catch (error) {
-				console.warn('[PeriodicStatus]', error instanceof Error ? error.message : 'Falha no agendamento');
+				console.warn(
+					'[PeriodicStatus]',
+					error instanceof Error ? error.message : 'Falha no agendamento'
+				);
 			} finally {
-				setTimeout(() => { void loop(); }, 60_000 - Date.now() % 60_000);
+				setTimeout(
+					() => {
+						void loop();
+					},
+					60_000 - (Date.now() % 60_000)
+				);
 			}
 		};
 		void loop();

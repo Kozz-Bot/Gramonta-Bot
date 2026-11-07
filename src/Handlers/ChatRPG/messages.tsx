@@ -1,11 +1,4 @@
-import {
-	Bold,
-	ForEach,
-	Line,
-	ListItem,
-	Monospace,
-	Render,
-} from 'kozz-module-maker';
+import { Bold, ForEach, Line, ListItem, Monospace, Render } from 'kozz-module-maker';
 import {
 	ChatRPGAttribute,
 	ChatRPGBaitEffects,
@@ -91,7 +84,10 @@ export const ChatRPGHelp = () => (
 			<Monospace>!loja iscas</Monospace> abre a loja de iscas
 		</Line>
 		<Line>
-			<Monospace>!comprar iscas {'{isca}'} {'{qtd}'}</Monospace> compra iscas
+			<Monospace>
+				!comprar iscas {'{isca}'} {'{qtd}'}
+			</Monospace>{' '}
+			compra iscas
 		</Line>
 		<Line>
 			<Monospace>!pescar [{'{isca}'}]</Monospace> tenta uma pescaria
@@ -100,7 +96,10 @@ export const ChatRPGHelp = () => (
 			<Monospace>!chances pesca [{'{isca}'}]</Monospace> mostra as odds da pesca
 		</Line>
 		<Line>
-			<Monospace>!vender {'{slot | item}'} [{'{qtd}'}]</Monospace> vende item
+			<Monospace>
+				!vender {'{slot | item}'} [{'{qtd}'}]
+			</Monospace>{' '}
+			vende item
 		</Line>
 	</>
 );
@@ -213,7 +212,10 @@ export const BuyUsage = () => (
 			<Bold>🛒 Compra de iscas</Bold>
 		</Line>
 		<Line>
-			Use <Monospace>!comprar iscas {'{nome da isca}'} {'{quantidade}'}</Monospace>
+			Use{' '}
+			<Monospace>
+				!comprar iscas {'{nome da isca}'} {'{quantidade}'}
+			</Monospace>
 		</Line>
 	</>
 );
@@ -249,7 +251,10 @@ export const NoBaitForFishing = () => (
 		<Line>Sem isca, nada de pescaria por enquanto.</Line>
 		<Line>
 			Veja a loja com <Monospace>!loja iscas</Monospace> e compre com{' '}
-			<Monospace>!comprar iscas {'{isca}'} {'{qtd}'}</Monospace>.
+			<Monospace>
+				!comprar iscas {'{isca}'} {'{qtd}'}
+			</Monospace>
+			.
 		</Line>
 	</>
 );
@@ -266,7 +271,11 @@ export const MultipleBaitsForFishing = ({
 			<Bold>🎣 Escolha uma isca</Bold>
 		</Line>
 		<Line>
-			Voce tem mais de um tipo. Use <Monospace>{command} {'{nome da isca}'}</Monospace>.
+			Voce tem mais de um tipo. Use{' '}
+			<Monospace>
+				{command} {'{nome da isca}'}
+			</Monospace>
+			.
 		</Line>
 		<Line />
 		<Line>
@@ -416,12 +425,8 @@ export const FishingProbabilitiesMessage = ({
 				)}
 			/>
 			<Line />
-			<Line>
-				Evento aleatorio: {percent(1 - probabilities.randomEvents.none)}
-			</Line>
-			<Line>
-				Qualidades e eventos tambem entram no calculo final da pescaria.
-			</Line>
+			<Line>Evento aleatorio: {percent(1 - probabilities.randomEvents.none)}</Line>
+			<Line>Qualidades e eventos tambem entram no calculo final da pescaria.</Line>
 		</>
 	);
 };
@@ -505,7 +510,8 @@ export const InventoryMessage = ({
 				data={inventory}
 				render={slot => (
 					<ListItem>
-						slot {slot.slotNumber ?? slot.id}: {itemName(slot, items)} x{slot.quantity}
+						slot {slot.slotNumber ?? slot.id}: {itemName(slot, items)} x
+						{slot.quantity}
 					</ListItem>
 				)}
 			/>
@@ -573,7 +579,10 @@ export const SellUsage = () => (
 			<Bold>💰 Venda de item</Bold>
 		</Line>
 		<Line>
-			Use <Monospace>!vender {'{slot | nome do item}'} [{'{quantidade}'}]</Monospace>
+			Use{' '}
+			<Monospace>
+				!vender {'{slot | nome do item}'} [{'{quantidade}'}]
+			</Monospace>
 		</Line>
 	</>
 );

@@ -39,7 +39,11 @@ const queryWeather = createMethod('fallback', async requester => {
 
 		return requester.reply(
 			<Weather
-				location={[weather.location.name, weather.location.region, weather.location.country]
+				location={[
+					weather.location.name,
+					weather.location.region,
+					weather.location.country,
+				]
 					.filter(Boolean)
 					.join(', ')}
 				description={weather.current.condition.text}

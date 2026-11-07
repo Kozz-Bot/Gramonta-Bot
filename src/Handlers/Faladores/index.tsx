@@ -306,9 +306,7 @@ const muted = createMethod('mudos', async requester => {
 	const period = parsePeriod(requester.rawCommand?.immediateArg);
 	if (!period) {
 		return requester.reply(
-			<InvalidPeriod
-				period={requester.rawCommand?.immediateArg ?? 'desconhecido'}
-			/>
+			<InvalidPeriod period={requester.rawCommand?.immediateArg ?? 'desconhecido'} />
 		);
 	}
 

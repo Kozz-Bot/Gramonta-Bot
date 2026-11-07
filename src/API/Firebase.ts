@@ -23,7 +23,7 @@ const app = getApps().length
 	: initializeApp({
 			credential: applicationDefault(),
 			storageBucket: bucketName, // <-- set default bucket here
-	  });
+		});
 
 // Now you can omit the name because we set storageBucket above
 export const bucket = getStorage(app).bucket();

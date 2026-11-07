@@ -34,11 +34,15 @@ const instance = () => {
 		fileName: string,
 		dataInB64: string
 	) => {
-		const { data } = await api.post<UploadFileResponse>('/file/upload', {
-			userspace,
-			fileName,
-			data: dataInB64,
-		});
+		const { data } = await api.post<UploadFileResponse>(
+			'/file/upload',
+			{
+				userspace,
+				fileName,
+				data: dataInB64,
+			},
+			{ timeout: 30000 }
+		);
 
 		return normalizeFileUrl(data.fileUrl);
 	};

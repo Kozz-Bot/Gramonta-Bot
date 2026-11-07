@@ -24,7 +24,7 @@ export type ChatGPTResponse = {
 			};
 			finish_reason: 'stop';
 			index: 0;
-		}
+		},
 	];
 };
 
@@ -92,12 +92,18 @@ export type ChatCompletionPayload = {
 	metadata?: Record<string, unknown>;
 };
 
+export type ResponseTool = ChatCompletionTool | { type: 'web_search' };
+
 type FuelIXResponseOutput = {
 	type: string;
 	call_id?: string;
 	name?: string;
 	arguments?: string;
-	content?: Array<{ type: string; text?: string }>;
+	content?: Array<{
+		type: string;
+		text?: string;
+		annotations?: Array<{ type: string; url?: string; title?: string }>;
+	}>;
 };
 
 type FuelIXResponse = {
@@ -113,8 +119,9 @@ type FuelIXResponse = {
 
 type ToolResponsePayload = {
 	messages: Array<Record<string, unknown>>;
-	tools: ChatCompletionTool[];
+	tools: ResponseTool[];
 	previousResponseId?: string;
+	timeoutMs?: number;
 	metadata?: Record<string, unknown>;
 };
 
@@ -135,7 +142,7 @@ type TranscriptionChannel = {
 	alternatives: [
 		{
 			transcript: string;
-		}
+		},
 	];
 };
 
@@ -171,6 +178,13 @@ const getImageBytes = async (media: Media): Promise<Buffer> => {
 };
 
 const toResponseInput = (message: Record<string, unknown>) => {
+	if (message.type === 'function_call')
+		return {
+			type: 'function_call',
+			call_id: message.call_id,
+			name: message.name,
+			arguments: message.arguments,
+		};
 	if (message.role === 'tool') {
 		return {
 			type: 'function_call_output',
@@ -225,10 +239,7 @@ const getImagePartCount = (content: unknown): number => {
 
 	return content.filter(
 		part =>
-			part &&
-			typeof part === 'object' &&
-			'type' in part &&
-			part.type === 'image_url'
+			part && typeof part === 'object' && 'type' in part && part.type === 'image_url'
 	).length;
 };
 
@@ -310,6 +321,7 @@ export default class FuelIXApi {
 			form,
 			{
 				headers: form.getHeaders(),
+				timeout: 60000,
 			}
 		);
 
@@ -402,6 +414,7 @@ export default class FuelIXApi {
 		messages,
 		tools,
 		previousResponseId,
+		timeoutMs,
 		metadata,
 	}: ToolResponsePayload) {
 		const startedAt = Date.now();
@@ -409,26 +422,34 @@ export default class FuelIXApi {
 		const requestMetadata = {
 			...metadata,
 			messageSummary: summarizeMessages(messages),
-			tools: tools.map(tool => tool.function.name),
+			tools: tools.map(tool =>
+				tool.type === 'function' ? tool.function.name : tool.type
+			),
 			previousResponseId,
 		};
 
 		try {
-			const { data } = await FuelIXApi.api.post<FuelIXResponse>('/responses', {
-				model,
-				input: messages.map(toResponseInput),
-				tools: tools.map(tool => ({ type: 'function', ...tool.function })),
-				tool_choice: 'auto',
-				...(previousResponseId
-					? { previous_response_id: previousResponseId }
-					: {}),
-			});
+			const { data } = await FuelIXApi.api.post<FuelIXResponse>(
+				'/responses',
+				{
+					model,
+					input: messages.map(toResponseInput),
+					tools: tools.map(tool =>
+						tool.type === 'function' ? { type: 'function', ...tool.function } : tool
+					),
+					tool_choice: 'auto',
+					...(previousResponseId
+						? { previous_response_id: previousResponseId }
+						: {}),
+					// Always reset the socket timeout when reusing the transcription
+					// connection. An omitted Axios timeout inherits the agent's short idle
+					// timeout and follow-redirects can destroy that active socket.
+				},
+				{ timeout: timeoutMs ?? 120000 }
+			);
 			const toolCalls: ChatCompletionToolCall[] = data.output
 				.filter(
-					item =>
-						item.type === 'function_call' &&
-						!!item.call_id &&
-						!!item.name
+					item => item.type === 'function_call' && !!item.call_id && !!item.name
 				)
 				.map(item => ({
 					id: item.call_id!,
@@ -438,12 +459,30 @@ export default class FuelIXApi {
 						arguments: item.arguments ?? '{}',
 					},
 				}));
-			const content = data.output
+			const textParts = data.output
 				.filter(item => item.type === 'message')
 				.flatMap(item => item.content ?? [])
-				.filter(part => part.type === 'output_text' && !!part.text)
-				.map(part => part.text)
-				.join('\n');
+				.filter(part => part.type === 'output_text' && !!part.text);
+			const text = textParts.map(part => part.text).join('\n');
+			// WhatsApp must receive clickable sources even when the provider only
+			// includes citations in annotations instead of writing URLs in the text.
+			const sourceUrls = [
+				...new Set(
+					textParts.flatMap(part =>
+						(part.annotations ?? [])
+							.filter(
+								annotation =>
+									annotation.type === 'url_citation' &&
+									annotation.url &&
+									/^https?:\/\//i.test(annotation.url)
+							)
+							.map(annotation => annotation.url!)
+					)
+				),
+			].filter(url => !text.includes(url));
+			const content = sourceUrls.length
+				? `${text}\n\nFontes:\n${sourceUrls.join('\n')}`
+				: text;
 
 			await logAiUsage({
 				event: 'chat_completion',
@@ -460,11 +499,23 @@ export default class FuelIXApi {
 					...requestMetadata,
 					id: data.id,
 					responseToolCalls: toolCalls.map(call => call.function.name),
+					webSearchCalls: data.output.filter(item => item.type === 'web_search_call')
+						.length,
 					responseTextChars: content.length,
 				},
 			});
 
-			return { responseId: data.id, content, tool_calls: toolCalls };
+			return {
+				responseId: data.id,
+				content,
+				tool_calls: toolCalls,
+				text,
+				webSearchCalls: data.output.filter(
+					item =>
+						item.type === 'web_search_call' &&
+						(item as { status?: string }).status === 'completed'
+				).length,
+			};
 		} catch (e) {
 			const error = normalizeAiError(e);
 			await logAiUsage({
@@ -556,7 +607,11 @@ export default class FuelIXApi {
 		return response.content ?? '';
 	}
 
-	static async generateImage(prompt: string, referenceImages: Media[] = []) {
+	static async generateImage(
+		prompt: string,
+		referenceImages: Media[] = [],
+		timeoutMs?: number
+	) {
 		const startedAt = Date.now();
 		const model = process.env.IMAGE_GENERATION_MODEL ?? 'gemini-3.1-flash-image';
 		const size = '1024x1024';
@@ -583,12 +638,13 @@ export default class FuelIXApi {
 				({ data } = await FuelIXApi.api.post<FuelIXImageGenerationResponse>(
 					'/images/edits',
 					form,
-					{ headers: form.getHeaders() }
+					{ headers: form.getHeaders(), timeout: timeoutMs }
 				));
 			} else {
 				({ data } = await FuelIXApi.api.post<FuelIXImageGenerationResponse>(
 					'/images/generations',
-					{ model, prompt, n: 1, size }
+					{ model, prompt, n: 1, size },
+					{ timeout: timeoutMs }
 				));
 			}
 

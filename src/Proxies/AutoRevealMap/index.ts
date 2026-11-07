@@ -41,11 +41,7 @@ export const createAutoRevealMap = ({ from, to, boundaryId }: RevealMapProxy) =>
 							media
 						);
 					} else {
-						return requester.sendMessage.withMedia(
-							to,
-							caption,
-							media
-						);
+						return requester.sendMessage.withMedia(to, caption, media);
 					}
 				}
 			},

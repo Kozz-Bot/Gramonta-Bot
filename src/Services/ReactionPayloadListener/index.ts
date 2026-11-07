@@ -3,7 +3,11 @@ import path from 'node:path';
 import mime from 'mime-types';
 import { createModule } from 'kozz-module-maker';
 import { createMessageObject } from 'kozz-module-maker/dist/Message';
-import { reactionActionForEmoji, readReactionPayload, type ReactionAction } from 'src/Utils/ReactionPayload';
+import {
+	reactionActionForEmoji,
+	readReactionPayload,
+	type ReactionAction,
+} from 'src/Utils/ReactionPayload';
 
 type ReactionEvent = {
 	boundaryName?: string;
@@ -22,7 +26,9 @@ type ReactionActionContext = {
 	requester: ReturnType<typeof createMessageObject>;
 };
 
-type ReactionActionHandler = (context: ReactionActionContext) => unknown | Promise<unknown>;
+type ReactionActionHandler = (
+	context: ReactionActionContext
+) => unknown | Promise<unknown>;
 
 const actionHandlers = new Map<string, ReactionActionHandler>();
 const savedMediaDirectory = path.resolve(process.cwd(), 'media', 'saved');
@@ -34,21 +40,33 @@ const saveFireMedia = async (message: any) => {
 	const extension = mime.extension(message.media.mimeType || '') || 'bin';
 	const fileName = `${message.id}.${extension}`;
 	await mkdir(savedMediaDirectory, { recursive: true });
-	await writeFile(path.join(savedMediaDirectory, fileName), Buffer.from(message.media.data, 'base64'));
+	await writeFile(
+		path.join(savedMediaDirectory, fileName),
+		Buffer.from(message.media.data, 'base64')
+	);
 	return fileName;
 };
 
 /** Registers an action that a zero-width reaction payload may invoke. */
-export const registerReactionAction = (name: string, handler: ReactionActionHandler) => {
-	if (!/^[a-zA-Z0-9._:-]{1,96}$/.test(name)) throw new Error(`Invalid reaction action name: ${name}`);
-	if (actionHandlers.has(name)) throw new Error(`Reaction action already registered: ${name}`);
+export const registerReactionAction = (
+	name: string,
+	handler: ReactionActionHandler
+) => {
+	if (!/^[a-zA-Z0-9._:-]{1,96}$/.test(name))
+		throw new Error(`Invalid reaction action name: ${name}`);
+	if (actionHandlers.has(name))
+		throw new Error(`Reaction action already registered: ${name}`);
 	actionHandlers.set(name, handler);
 };
 
 // A useful built-in action, while feature handlers can register richer actions
 // with registerReactionAction during their startup.
 registerReactionAction('reply', ({ action, requester }) => {
-	if (!action.data || typeof action.data !== 'object' || typeof (action.data as { body?: unknown }).body !== 'string') {
+	if (
+		!action.data ||
+		typeof action.data !== 'object' ||
+		typeof (action.data as { body?: unknown }).body !== 'string'
+	) {
 		throw new Error('Reaction action "reply" requires data.body');
 	}
 	requester.reply((action.data as { body: string }).body);
@@ -65,7 +83,14 @@ export const startReactionPayloadListener = () => {
 	const handleReaction = async (reaction: ReactionEvent) => {
 		if (!reaction.messageId || !reaction.chatId || !reaction.emoji) return;
 		if (reaction.emoji === '🔥') {
-			console.info('[ReactionPayload] 🔥 event', JSON.stringify({ messageId: reaction.messageId, chatId: reaction.chatId, hasMedia: Boolean(reaction.message?.media) }));
+			console.info(
+				'[ReactionPayload] 🔥 event',
+				JSON.stringify({
+					messageId: reaction.messageId,
+					chatId: reaction.chatId,
+					hasMedia: Boolean(reaction.message?.media),
+				})
+			);
 		}
 		const now = Date.now();
 		const dedupeKey = `${reaction.messageId}:${reaction.from || ''}:${reaction.emoji}`;
@@ -82,17 +107,23 @@ export const startReactionPayloadListener = () => {
 
 		const boundaryName = reaction.boundaryName || 'kozz-zapo';
 		try {
-			const needsMedia = reaction.fromHostAccount && reaction.emoji === '🔥' && !reaction.message?.media;
-			const result = reaction.message && !needsMedia
-				? undefined
-				: await instance.ask.boundary(boundaryName, 'message_by_id', {
-					messageId: reaction.messageId,
-					chatId: reaction.chatId,
-				});
+			const needsMedia =
+				reaction.fromHostAccount &&
+				reaction.emoji === '🔥' &&
+				!reaction.message?.media;
+			const result =
+				reaction.message && !needsMedia
+					? undefined
+					: await instance.ask.boundary(boundaryName, 'message_by_id', {
+							messageId: reaction.messageId,
+							chatId: reaction.chatId,
+						});
 			const message = (result as any)?.response || reaction.message;
 			if (!message) {
 				recentlyHandled.delete(dedupeKey);
-				console.warn(`[ReactionPayload] target message not found for reaction: ${reaction.messageId}`);
+				console.warn(
+					`[ReactionPayload] target message not found for reaction: ${reaction.messageId}`
+				);
 				return;
 			}
 			if (reaction.emoji === '🔥') {
@@ -104,9 +135,10 @@ export const startReactionPayloadListener = () => {
 					...message,
 					boundaryId: boundaryName,
 					boundaryName,
-					namespace: process.env.KOZZ_NAMESPACE || process.env.NAMESPACE || 'default',
+					namespace:
+						process.env.KOZZ_NAMESPACE || process.env.NAMESPACE || 'default',
 				},
-				'reaction-payload-listener',
+				'reaction-payload-listener'
 			);
 
 			if (reaction.fromHostAccount && reaction.emoji === '🔥') {
@@ -116,7 +148,9 @@ export const startReactionPayloadListener = () => {
 					const fileName = await saveFireMedia(message);
 					console.info(`[ReactionPayload] 🔥 saved media: ${fileName}`);
 					await requester.reply.withMedia(message.media);
-					console.info(`[ReactionPayload] 🔥 reveal sent for: ${reaction.messageId}`);
+					console.info(
+						`[ReactionPayload] 🔥 reveal sent for: ${reaction.messageId}`
+					);
 				} else {
 					recentlyHandled.delete(dedupeKey);
 					console.warn(

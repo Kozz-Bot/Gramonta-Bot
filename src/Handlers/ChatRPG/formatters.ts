@@ -109,7 +109,9 @@ export const formatItemCategory = (category?: ChatRPGItemCategory | string) => {
 		return 'Categoria';
 	}
 
-	return itemCategoryLabels[category as ChatRPGItemCategory] ?? titleCaseWords(category);
+	return (
+		itemCategoryLabels[category as ChatRPGItemCategory] ?? titleCaseWords(category)
+	);
 };
 
 export const formatItemRarity = (rarity?: ChatRPGItemRarity | string) => {

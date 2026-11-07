@@ -1,0 +1,66 @@
+.mcp-connect {
+	max-width: 760px;
+	margin: 40px auto;
+	padding: 32px;
+}
+.mcp-connect h1 {
+	font-size: 2rem;
+}
+.mcp-connect p {
+	margin: 16px 0;
+	line-height: 1.6;
+}
+.mcp-connect dl {
+	margin: 20px 0;
+}
+.mcp-connect dt {
+	font-weight: 700;
+	margin-top: 12px;
+}
+.mcp-connect dd {
+	margin: 4px 0;
+	overflow-wrap: anywhere;
+}
+.mcp-connect fieldset {
+	padding: 16px;
+	margin: 20px 0;
+	border: 1px solid #ddd;
+	border-radius: 12px;
+}
+.mcp-connect label {
+	display: block;
+	margin: 12px 0;
+}
+.mcp-connect input[type='checkbox'] {
+	width: auto;
+	margin-right: 8px;
+}
+.mcp-connect textarea,
+.mcp-connect select,
+.mcp-connect input:not([type='checkbox']) {
+	width: 100%;
+	padding: 10px;
+	margin-bottom: 12px;
+}
+.mcp-connect pre {
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+	padding: 16px;
+	background: #f1f3ed;
+	border-radius: 8px;
+}
+.mcp-connect .button {
+	margin: 8px 8px 8px 0;
+}
+.mcp-connect [hidden] {
+	display: none !important;
+}
+.mcp-connect img {
+	max-width: 100%;
+}
+@media (max-width: 800px) {
+	.mcp-connect {
+		margin: 16px;
+		padding: 20px;
+	}
+}

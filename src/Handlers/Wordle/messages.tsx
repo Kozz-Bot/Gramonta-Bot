@@ -37,7 +37,13 @@ export const Win = ({ tries, history }: { tries: number; history: string }) => (
 	</>
 );
 
-export const GuessResult = ({ tries, history }: { tries: number; history: string }) => (
+export const GuessResult = ({
+	tries,
+	history,
+}: {
+	tries: number;
+	history: string;
+}) => (
 	<>
 		<Line>
 			<Bold>Wordle</Bold>
@@ -53,8 +59,17 @@ export const Help = () => (
 			<Bold>Wordle</Bold>
 		</Line>
 		<Line>Digite `!wordle {'{palavra}'}` para jogar.</Line>
-		<Line>Caso precise, digite `!wordle resend` para que o bot reenvie o status do seu jogo.</Line>
-		<Line>Voce possui uma palavra por grupo por dia. Apenas um jogo por dia em cada um dos grupos que estiver.</Line>
-		<Line>Caso voce queira saber como jogar o jogo, https://canaltech.com.br/jogos-para-pc/o-que-e-wordle-como-jogar-205876/</Line>
+		<Line>
+			Caso precise, digite `!wordle resend` para que o bot reenvie o status do seu
+			jogo.
+		</Line>
+		<Line>
+			Voce possui uma palavra por grupo por dia. Apenas um jogo por dia em cada um
+			dos grupos que estiver.
+		</Line>
+		<Line>
+			Caso voce queira saber como jogar o jogo,
+			https://canaltech.com.br/jogos-para-pc/o-que-e-wordle-como-jogar-205876/
+		</Line>
 	</>
 );
