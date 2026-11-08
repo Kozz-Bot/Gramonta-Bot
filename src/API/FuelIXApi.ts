@@ -610,7 +610,7 @@ export default class FuelIXApi {
 	static async generateImage(
 		prompt: string,
 		referenceImages: Media[] = [],
-		timeoutMs?: number
+		timeoutMs = 240_000
 	) {
 		const startedAt = Date.now();
 		const model = process.env.IMAGE_GENERATION_MODEL ?? 'gemini-3.1-flash-image';

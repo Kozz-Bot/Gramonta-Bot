@@ -10,6 +10,8 @@ const local = new Set([
 	'debug',
 	'ping',
 	'yt',
+	'video',
+	'audio',
 	'ofenda',
 	'horoscopo',
 	'clima',

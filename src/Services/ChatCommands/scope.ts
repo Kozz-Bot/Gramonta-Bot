@@ -1,6 +1,16 @@
 import { AsyncLocalStorage } from 'node:async_hooks';
 import { AiToolInputError } from '../OwnerAI/contracts';
 
+export type CommandOutput = {
+	type: 'text' | 'media' | 'sticker';
+	text?: string;
+	media?: {
+		mimeType?: string;
+		sizeInBytes?: number;
+		duration?: number;
+		asVoiceNote?: boolean;
+	};
+};
 export type ChatScope = {
 	updateGroupsControl?: boolean;
 	chatId: string;
@@ -10,6 +20,7 @@ export type ChatScope = {
 	personIds: Set<string>;
 	violation?: string;
 	replies?: string[];
+	outputs?: CommandOutput[];
 };
 const storage = new AsyncLocalStorage<ChatScope>();
 export const currentChatScope = () => storage.getStore();
@@ -127,13 +138,40 @@ const checkEmission = (
 			fail(scope, 'Envio para outra conexão bloqueado.');
 		if (payload.quoteId && !scope.messageIds.has(payload.quoteId))
 			fail(scope, 'Citação fora do chat de origem bloqueada.');
-		if (
-			scope.replies &&
-			typeof payload.body === 'string' &&
-			payload.body &&
-			scope.replies.length < 4
-		)
-			scope.replies.push(payload.body.slice(0, 1200));
+		const text = typeof payload.body === 'string' ? payload.body.slice(0, 2000) : '';
+		if (scope.replies && text) {
+			if (scope.replies.length >= 8) scope.replies.shift();
+			scope.replies.push(text);
+		}
+		if (scope.outputs) {
+			if (scope.outputs.length >= 8) scope.outputs.shift();
+			scope.outputs.push({
+				type:
+					event === 'reply_with_sticker'
+						? 'sticker'
+						: payload.media
+							? 'media'
+							: 'text',
+				...(text ? { text } : {}),
+				...(payload.media
+					? {
+							media: {
+								mimeType:
+									typeof payload.media.mimeType === 'string'
+										? payload.media.mimeType.slice(0, 100)
+										: undefined,
+								sizeInBytes: Number.isFinite(payload.media.sizeInBytes)
+									? payload.media.sizeInBytes
+									: undefined,
+								duration: Number.isFinite(payload.media.duration)
+									? payload.media.duration
+									: undefined,
+								asVoiceNote: payload.media.asVoiceNote === true,
+							},
+						}
+					: {}),
+			});
+		}
 		return;
 	}
 	if (['react_message', 'delete_message', 'edit_message'].includes(event)) {

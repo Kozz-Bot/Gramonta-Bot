@@ -461,6 +461,7 @@ export const executeChatTool = async (
 			personIds: new Set(ctx.personIds),
 			messageIds: new Set(ctx.messages),
 			replies: [],
+			outputs: [],
 		};
 		try {
 			const result = await inChatScope(scope, () => invokeModule(command));
@@ -484,6 +485,8 @@ export const executeChatTool = async (
 				method,
 				outcome,
 				replies: scope.replies,
+				outputs: scope.outputs,
+				handlerCompleted: result?.handlerCompleted === true,
 				error:
 					scope.violation ||
 					outcome?.error ||
@@ -502,6 +505,8 @@ export const executeChatTool = async (
 				module,
 				method,
 				replies: scope.replies,
+				outputs: scope.outputs,
+				handlerCompleted: false,
 				error:
 					'Não foi possível confirmar o resultado. Não repita esta ação automaticamente; confira o chat.',
 			};

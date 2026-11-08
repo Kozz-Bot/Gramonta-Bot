@@ -7,8 +7,8 @@ export const hostAccountOnly =
 	) =>
 	(requester: MessageObj, args: T) => {
 		if (!requester.rawCommand!.message.fromHostAccount) {
-			requester.reply(errorMessage);
+			return requester.reply(errorMessage);
 		} else {
-			callback(requester, args);
+			return callback(requester, args);
 		}
 	};

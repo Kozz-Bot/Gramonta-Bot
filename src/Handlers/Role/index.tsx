@@ -126,9 +126,9 @@ export const startRoleHandler = () => {
 			const task = previous
 				.catch(() => {})
 				.then(async () => {
-					// The gateway forwards an alias's full query as immediateArg. Recover the
-					// original text so title words and explicit subcommands are not duplicated.
-					const aliasText = /^[!\/](?:evento|rolê)(?:\s+|$)([\s\S]*)$/i.exec(
+					// Recover canonical/alias text to preserve titles and location URLs;
+					// aliases also repeat the full query in immediateArg.
+					const aliasText = /^[!\/](?:role|evento|rolê)(?:\s+|$)([\s\S]*)$/i.exec(
 						r.message.body || ''
 					);
 					const query = aliasText

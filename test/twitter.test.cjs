@@ -1,9 +1,5 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { readFileSync } = require('node:fs');
-const path = require('node:path');
-const { createRequire } = require('node:module');
-const vm = require('node:vm');
 const {
 	normalizeTweetUrl,
 	downloadTwitterVideo,
@@ -34,27 +30,12 @@ test('rejects other hosts, credentials, profiles and extra arguments before down
 	}
 });
 
+const { downloadHarness } = require('./helpers/download-harness.cjs');
 function handler(download, platform = 'twitter') {
-	const file = path.resolve(__dirname, '../dist/Handlers/SocialVideo/handler.js');
-	const localRequire = createRequire(file),
-		exports = {};
-	vm.runInNewContext(readFileSync(file, 'utf8'), {
-		exports,
-		process,
-		Buffer,
-		require: name =>
-			name === 'kozz-module-maker'
-				? {
-						createMethod: (name, fn) => ({ [name]: fn }),
-						createModule: options => ({
-							resources: { upsertResource: () => options },
-						}),
-					}
-				: name === '../../Services/SocialVideo/download'
-					? { downloadSocialVideo: download }
-					: localRequire(name),
-	});
-	return exports.createSocialVideoHandler(platform, () => '').commands.methods;
+	return downloadHarness(async url => ({
+		...(await download(url, platform)),
+		mimeType: 'video/mp4',
+	})).social(platform);
 }
 function requester(query, from = 'user') {
 	const replies = [],
@@ -79,7 +60,7 @@ test('requires link and sends downloaded video through origin reply', async () =
 		const req = requester(query);
 		await methods.default(req);
 		assert.equal(req.sent.length, 0);
-		assert.equal(req.replies.length, 1);
+		assert.equal(req.replies.length, 2);
 	}
 	assert.equal(calls, 0);
 	const req = requester('https://x.com/test/status/123');
@@ -98,7 +79,7 @@ test('limits concurrency and releases slots after failures', async () => {
 	for (const from of ['a', 'c']) {
 		const req = requester('https://x.com/test/status/123', from);
 		await run(req);
-		assert.equal(req.replies.length, 1);
+		assert.equal(req.replies.length, 2);
 		assert.equal(req.sent.length, 0);
 	}
 	assert.equal(pending.length, 2);
@@ -161,6 +142,44 @@ test('explicit link takes precedence over quote and shared text works as argumen
 	assert.equal(bad.sent.length, 0);
 });
 
+test('actual handler preserves case-sensitive Facebook, Instagram and TikTok codes despite gateway normalization', async () => {
+	for (const [platform, command, url] of [
+		['facebook', '!fb', 'https://www.facebook.com/share/v/19tFAqdJz8/'],
+		['facebook', '/FB', 'https://www.facebook.com/share/r/AbC123/'],
+		['instagram', '!ig', 'https://www.instagram.com/reel/AbC_123/'],
+		['tiktok', '!tt', 'https://vt.tiktok.com/ZSgHweQy2/'],
+	]) {
+		const methods = handler(async actual => {
+			assert.equal(actual, url);
+			return { data: Buffer.from('video'), duration: 1 };
+		}, platform);
+		const req = requester(`Veja ${url.toLowerCase()} Compartilhado`);
+		req.message.body = `${command} Veja ${url} Compartilhado`;
+		req.message.quotedMessage = { body: 'https://www.facebook.com/reel/999' };
+		await methods.fallback(req);
+		assert.equal(req.sent.length, 1);
+	}
+});
+
+test('original explicit invalid input does not fall back to a quote or unrelated message body', async () => {
+	let downloaded;
+	const methods = handler(async url => {
+		downloaded = url;
+		return { data: Buffer.from('video'), duration: 1 };
+	}, 'facebook');
+	const invalid = requester('https://example.com');
+	invalid.message.body = '!fb https://example.com';
+	invalid.message.quotedMessage = { body: 'https://www.facebook.com/reel/999' };
+	await methods.fallback(invalid);
+	assert.equal(downloaded, undefined);
+	assert.equal(invalid.sent.length, 0);
+	const synthetic = requester('https://www.facebook.com/share/v/19tFAqdJz8/');
+	synthetic.message.body = '!ai analise https://www.facebook.com/reel/999';
+	await methods.fallback(synthetic);
+	assert.equal(downloaded, 'https://www.facebook.com/share/v/19tFAqdJz8/');
+	assert.equal(synthetic.sent.length, 1);
+});
+
 test('recovers missing quoted body from the origin boundary only', async () => {
 	const run = handler(async url => {
 		assert.equal(url, 'https://twitter.com/i/status/123');
@@ -200,7 +219,7 @@ test('reports quote with no valid video link, unavailable body and recovery fail
 		req.ask = { boundary: async () => ({ response: undefined }) };
 		await run(req);
 		assert.equal(req.sent.length, 0);
-		assert.equal(req.replies.length, 1);
+		assert.equal(req.replies.length, 2);
 	}
 	const failed = requester('');
 	failed.message.quotedMessage = { id: 'quoted' };
@@ -211,7 +230,7 @@ test('reports quote with no valid video link, unavailable body and recovery fail
 	};
 	await run(failed);
 	assert.equal(failed.sent.length, 0);
-	assert.equal(failed.replies.length, 1);
+	assert.equal(failed.replies.length, 2);
 	assert.equal(calls, 0);
 });
 
@@ -231,49 +250,28 @@ test('new commands validate their own platforms and reply with MP4', async () =>
 		const good = requester(query);
 		await methods.fallback(good);
 		assert.equal(good.sent.length, 1);
-		assert.equal(good.sent[0].fileName, `${platform}.mp4`);
+		assert.equal(good.sent[0].fileName, `video.mp4`);
 		assert.equal(good.sent[0].sizeInBytes, 10);
 	}
 });
 
 test('download slots are shared across different platform commands', async () => {
-	const file = path.resolve(__dirname, '../dist/Handlers/SocialVideo/handler.js');
-	const localRequire = createRequire(file),
-		exports = {},
-		pending = [];
-	vm.runInNewContext(readFileSync(file, 'utf8'), {
-		exports,
-		process,
-		Buffer,
-		require: name =>
-			name === 'kozz-module-maker'
-				? {
-						createMethod: (name, fn) => ({ [name]: fn }),
-						createModule: options => ({
-							resources: { upsertResource: () => options },
-						}),
-					}
-				: name === '../../Services/SocialVideo/download'
-					? {
-							downloadSocialVideo: () =>
-								new Promise(resolve => pending.push(resolve)),
-						}
-					: localRequire(name),
-	});
-	const ig = exports.createSocialVideoHandler('instagram', () => '').commands.methods
-		.fallback;
-	const fb = exports.createSocialVideoHandler('facebook', () => '').commands.methods
-		.fallback;
+	const pending = [];
+	const harness = downloadHarness(
+		() => new Promise(resolve => pending.push(resolve))
+	);
+	const ig = harness.social('instagram').fallback;
+	const fb = harness.social('facebook').fallback;
 	const first = ig(requester('https://instagram.com/reel/Code/', 'a'));
 	const duplicate = requester('https://facebook.com/reel/123', 'a');
 	await fb(duplicate);
 	assert.equal(pending.length, 1);
-	assert.equal(duplicate.replies.length, 1);
+	assert.equal(duplicate.replies.length, 2);
 	const second = fb(requester('https://facebook.com/reel/123', 'b'));
 	const busy = requester('https://instagram.com/reel/Code/', 'c');
 	await ig(busy);
 	assert.equal(pending.length, 2);
-	assert.equal(busy.replies.length, 1);
+	assert.equal(busy.replies.length, 2);
 	pending.forEach(resolve => resolve({ data: Buffer.from('video'), duration: 1 }));
 	await Promise.all([first, second]);
 });

@@ -1,5 +1,14 @@
 # Comandos da IA no próprio chat
 
+Em 2026-11-08 foi corrigida a propagação da Promise do middleware de dono e a
+espera da ajuda/cobrança. O executor aguarda o handler e devolve
+`handlerCompleted`, `replies`, `outputs` de texto/mídia/figurinha e `outcome`
+quando informado pelo comando. A conclusão do handler não substitui o resultado
+funcional nem confirma entrega de mídia. O laço da IA lê os retornos antes da
+próxima rodada, permite vários comandos no mesmo pedido e preserva as respostas
+finais após mensagens de progresso.
+[Detalhes e regressão](../AiExecution/README.md).
+
 Exceção autorizada em 2026-11-07: somente o dono pode controlar pelo módulo
 `updates` a lista global de grupos que recebem novidades após nossos pushes.
 Permite listar/buscar/adicionar/remover, sem enviar avisos durante a configuração.

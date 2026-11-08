@@ -159,6 +159,18 @@ test('handler publishes only a native event, rejects invalid artwork and keeps s
 			'Churrasco'
 		);
 		const aliasEvent = store.list('kozz-zapo', '123@g.us').at(-1);
+		const mapLink = 'https://maps.example/LocalAbC?Token=XyZ';
+		const mapQuery = `Encontro | ${future} 14h | ${mapLink}`;
+		await run(
+			'fallback',
+			mapQuery.toLowerCase().slice(9),
+			{ body: `!role ${mapQuery}` },
+			mapQuery.toLowerCase()
+		);
+		assert.equal(
+			requests.filter(r => r[0] === 'group_event').at(-1)[1].location,
+			mapLink
+		);
 		await run('editar', `editar ${aliasEvent.id} ${query}`, {
 			body: `!evento editar ${aliasEvent.id} ${query}`,
 		});

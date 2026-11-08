@@ -15,6 +15,7 @@ import {
 } from '../../Services/BackgroundRemoval';
 import { registerStickerContract } from './ai';
 import { reportCommandOutcome } from '../../Services/OwnerAI/contracts';
+import { originalCommandQuery } from '../../Utils/commandText';
 
 const activeBackgroundRequests = new Set<string>();
 const withoutBackground = async (r: MessageObj, tags?: string) => {
@@ -146,7 +147,7 @@ const toImg = createMethod('toimg', message => {
 });
 
 const fromLink = createMethod('from-link', requester => {
-	const link = requester.rawCommand?.immediateArg;
+	const link = originalCommandQuery(requester, 's', 'from-link');
 	if (!link) {
 		return requester.reply('Por favor envie um link');
 	}

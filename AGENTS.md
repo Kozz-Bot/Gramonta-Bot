@@ -37,3 +37,13 @@ novidade geral. O mapa não cadastra grupos e não permite enviar a destinos for
 da seleção do dono. Consulte o README para o formato.
 
 Uso, testes e limites em `src/Services/Updates/README.md`.
+
+## Links nos comandos
+
+O gateway normaliza `rawCommand.query` e `immediateArg` para minúsculas. URLs,
+IDs e assinaturas não podem ser extraídos desses campos quando o texto original
+está disponível. Use `originalCommandQuery` de `src/Utils/commandText.ts`, com o
+nome do comando e, quando houver, o subcomando. O helper confere a origem antes
+de recuperar o texto e preserva o fallback estruturado de chamadas sintéticas.
+Não altere o parser geral para resolver um consumidor específico. URLs vindas
+de metadados de mídia/citações já preservam sua grafia; não as normalize.

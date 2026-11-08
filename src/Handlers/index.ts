@@ -47,3 +47,4 @@ export * from './Lembrete';
 export * from './Ban';
 export * from './EightBall';
 export * from './Updates';
+export * from './MediaDownload';

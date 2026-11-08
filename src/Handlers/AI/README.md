@@ -65,3 +65,24 @@ o texto não basta, mantendo autoria, relações de resposta e escopo do chat.
 O histórico não baixa mídias automaticamente. A ferramenta fica disponível
 somente no !ai do WhatsApp; não amplia permissões de painel/MCP.
 [Limites, formatos, exemplos e operação](../../Services/MediaUnderstanding/README.md).
+
+## Geração e edição de imagens — 2026-11-08
+
+Corrigida queda `socket hang up` após cerca de 5 segundos no `generate_image`.
+As tentativas recentes de geração/edição no Baguncinha falharam entre 5002 e
+5049 ms. A chamada sem timeout explícito reutilizava uma conexão de `/responses`
+com listener de timeout do Axios/follow-redirects e herdava os 5s do agente HTTP.
+`FuelIXApi.generateImage` agora define 240 segundos por padrão para ambos os
+endpoints; prazos explícitos dos chamadores continuam respeitados. Não há
+repetição automática de requisições após falha.
+
+Regressão: `test/fuelix-image-timeout.test.cjs` usa servidor HTTP local, exige
+reutilização do mesmo socket, devolve a imagem após 5,5s e verifica também prazo
+explícito de 100ms. Antes da mudança os dois casos falhavam com `ECONNRESET` em
+5s; depois, ambos passam. Build, TypeScript e regressões de Responses/pesquisa/
+fluxo de ferramentas devem passar. Reiniciar somente `kozz-bot`.
+
+Validação de 2026-11-08: build e TypeScript aprovados, 16 testes passaram.
+Uma geração real com pedido genérico de barco, após uma chamada a `/responses`,
+retornou PNG válido (1408 × 768); fluxo completo em 12,8s, sem envio ao grupo.
+Reiniciado somente `kozz-bot`; sessão WhatsApp preservada.

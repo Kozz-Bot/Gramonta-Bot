@@ -14,8 +14,8 @@ const getHelp = createMethod('default', async requester => {
 		help: string;
 	}>[];
 
-	Promise.allSettled(allHelps).then(allHelpTexts => {
-		requester.reply(
+	return Promise.allSettled(allHelps).then(allHelpTexts => {
+		return requester.reply(
 			`________________\n\n` +
 				allHelpTexts
 					.filter(promiseIsFulfilled)

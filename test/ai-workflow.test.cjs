@@ -73,7 +73,7 @@ const fixture = t => {
 		delete require.cache[file];
 	}
 	global.setInterval = () => ({ unref() {} });
-	Module._load = function (request, parent, main) {
+	const mockLoad = function (request, parent, main) {
 		if (request === 'kozz-module-maker')
 			return {
 				...maker,
@@ -105,6 +105,7 @@ const fixture = t => {
 			};
 		return original.call(this, request, parent, main);
 	};
+	Module._load = mockLoad;
 	let ai;
 	try {
 		registerOwnerAiModule(require(files[0]).startRoleHandler());
@@ -167,6 +168,14 @@ const fixture = t => {
 		store,
 		event,
 		reminder,
+		loadHandler: (modulePath, starter) => {
+			Module._load = mockLoad;
+			try {
+				registerOwnerAiModule(require(modulePath)[starter]());
+			} finally {
+				Module._load = original;
+			}
+		},
 		run: () => ai.commandMethods.fallback.func(r),
 	};
 };
@@ -535,4 +544,167 @@ test('direct quoted video is interpreted before provider call and replay retains
 	await f.run();
 	assert.equal(interpreted, 1);
 	assert.equal(round, 2);
+});
+
+test('one AI request waits for a real owner command, inspects its reply, runs two downloads, checks media results and schedules a reminder', async t => {
+	const f = fixture(t);
+	const coins = require('../dist/API/CoinsApi');
+	const downloads = require('../dist/Services/MediaDownload/download');
+	const previous = {
+		assert: coins.assertUserExists,
+		add: coins.addCoinsToUser,
+		get: coins.getUserData,
+		download: downloads.downloadMedia,
+	};
+	t.after(() => {
+		coins.assertUserExists = previous.assert;
+		coins.addCoinsToUser = previous.add;
+		coins.getUserData = previous.get;
+		downloads.downloadMedia = previous.download;
+	});
+	let releaseCoins, releaseDownload, coinsStarted, downloadStarted;
+	const coinGate = new Promise(resolve => {
+		releaseCoins = resolve;
+	});
+	const downloadGate = new Promise(resolve => {
+		releaseDownload = resolve;
+	});
+	const coinStart = new Promise(resolve => {
+		coinsStarted = resolve;
+	});
+	const downloadStart = new Promise(resolve => {
+		downloadStarted = resolve;
+	});
+	coins.assertUserExists = async () => ({ userExists: true });
+	coins.addCoinsToUser = async () => {
+		coinsStarted();
+		await coinGate;
+	};
+	coins.getUserData = async () => ({ coins: 37 });
+	const modes = [];
+	downloads.downloadMedia = async (_url, mode) => {
+		modes.push(mode);
+		if (mode === 'video') {
+			downloadStarted();
+			await downloadGate;
+		}
+		return {
+			data: Buffer.from('private-media-bytes'),
+			duration: 3,
+			mimeType: mode === 'video' ? 'video/mp4' : 'audio/ogg; codecs=opus',
+		};
+	};
+	f.loadHandler('../dist/Handlers/CalvoCoins', 'startCoinsHandler');
+	f.loadHandler('../dist/Handlers/MediaDownload', 'startVideoDownloadHandler');
+	f.loadHandler('../dist/Handlers/MediaDownload', 'startAudioDownloadHandler');
+	f.r.message.fromHostAccount = true;
+	f.state.resources = (name, data) =>
+		name === 'contact_info'
+			? { id: data.id, publicName: 'Ana', isHostAccount: false }
+			: undefined;
+	let round = 0;
+	const command = (module, immediateArg, method = 'default') => ({
+		module,
+		method,
+		immediateArg,
+		namedArgs: '{}',
+		recipientIds: module === 'coins' ? ['11@lid'] : [],
+	});
+	Fuel.createToolResponseCompletion = async options => {
+		round++;
+		if (round === 1)
+			return {
+				responseId: 'wait-owner',
+				tool_calls: [
+					call(
+						'owner-command',
+						'chat_execute_command',
+						command('coins', '5', 'add')
+					),
+				],
+			};
+		const results = options.messages
+			.filter(m => m.role === 'tool')
+			.map(m => JSON.parse(m.content));
+		if (round === 2) {
+			assert.equal(results[0].handlerCompleted, true);
+			assert.match(results[0].replies.join(''), /37/);
+			assert.equal(results[0].outputs.at(-1).type, 'text');
+			return {
+				responseId: 'wait-media',
+				tool_calls: [
+					call(
+						'video',
+						'chat_execute_command',
+						command('video', 'https://example.com/VideoAbC')
+					),
+					call(
+						'audio',
+						'chat_execute_command',
+						command('audio', 'https://example.com/VideoAbC')
+					),
+				],
+			};
+		}
+		if (round === 3) {
+			assert.equal(results.length, 2);
+			assert.ok(
+				results.every(
+					r => r.handlerCompleted && r.status === 'submitted' && r.outcome.success
+				)
+			);
+			assert.deepEqual(
+				results.map(r => r.outputs.at(-1).media.mimeType),
+				['video/mp4', 'audio/ogg; codecs=opus']
+			);
+			assert.doesNotMatch(
+				JSON.stringify(results),
+				/private-media-bytes|cHJpdmF0ZS1tZWRpYS1ieXRlcw/
+			);
+			assert.ok(results.every(r => !Object.hasOwn(r.outputs.at(-1).media, 'data')));
+			return {
+				responseId: 'reminder',
+				tool_calls: [
+					call('next', 'chat_create_reminder', {
+						...f.reminder,
+						text: 'Conferir os arquivos baixados',
+					}),
+				],
+			};
+		}
+		assert.equal(results[0].status, 'scheduled');
+		return {
+			content:
+				'Saldo conferido, vídeo e áudio enviados para envio e lembrete agendado.',
+			tool_calls: [],
+		};
+	};
+	let finished = false;
+	const running = f.run().then(() => {
+		finished = true;
+	});
+	await Promise.race([
+		coinStart,
+		running.then(() => {
+			throw new Error('AI ended before the owner command started');
+		}),
+	]);
+	await new Promise(resolve => setImmediate(resolve));
+	assert.equal(round, 1);
+	assert.equal(finished, false);
+	releaseCoins();
+	await Promise.race([
+		downloadStart,
+		running.then(() => {
+			throw new Error('AI ended before the download started');
+		}),
+	]);
+	await new Promise(resolve => setImmediate(resolve));
+	assert.equal(round, 2);
+	assert.deepEqual(modes, ['video']);
+	releaseDownload();
+	await running;
+	assert.equal(round, 4);
+	assert.deepEqual(modes, ['video', 'audio']);
+	assert.equal(f.store.list('kozz-zapo', '123@g.us').length, 1);
 });

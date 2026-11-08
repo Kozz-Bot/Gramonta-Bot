@@ -1,5 +1,12 @@
 # Downloads de vídeos públicos
 
+Desde 2026-11-08, prefira `!video LINK` e `!audio LINK`. Os atalhos abaixo
+continuam funcionando com aviso de remoção, usando o mesmo fluxo unificado:
+yt-dlp direto → Cobalt; YouTube somente na API HTTPS remota.
+[Operação atual, limites e testes](../MediaDownload/README.md).
+As seções técnicas abaixo documentam a implementação anterior e as correções
+de links que os atalhos preservam.
+
 | Comando    | Plataforma | Links aceitos                                                                                                                      |
 | ---------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | `/tw link` | Twitter/X  | Posts `/usuario/status/id`, `/i/status/id`, `/i/web/status/id`                                                                     |
@@ -12,6 +19,27 @@ Também aceita prefixo `!`. Cada comando registra ajuda em `help`, acessível pe
 Também é possível responder à mensagem que contém o link usando apenas `!tt`, `!tw`, `!ig` ou `!fb`. O comando extrai o primeiro link de vídeo válido da sua plataforma do texto ou legenda citada, ignorando links de outros sites. Se o texto citado não veio no evento, consulta `message_by_id` na boundary de origem usando o ID citado e o chat atual. Mensagens sem link válido recebem orientação para citar a mensagem correta ou colar o link.
 
 Um link ou texto compartilhado escrito depois do comando tem prioridade sobre a mensagem citada. Aceita títulos, quebras de linha e pontuação junto do link, preservando letras maiúsculas nos códigos. Por exemplo: `!tt Olha esse vídeo https://vt.tiktok.com/ZSgHweQy2/ Compartilhado via TikTok`. Também aceita formatos móveis `/v/id.html` e de embed do TikTok, normalizados para o extractor oficial.
+
+Correção de 2026-11-07: argumentos recebidos pelo gateway podem estar em
+minúsculas. Os comandos de vídeo agora recuperam o argumento da mensagem original
+quando ela corresponde ao comando, preservando códigos sensíveis a maiúsculas
+do Facebook, Instagram e TikTok. Pedidos sintéticos sem esse texto continuam
+usando `rawCommand.query`. Link explícito inválido não usa a citação como fallback.
+O exemplo `https://www.facebook.com/share/v/19tFAqdJz8/` resolveu para o Reel
+`2495759980907609` e foi baixado/inspecionado no servidor sem cookies ou login:
+658.906 bytes, aproximadamente 6,63 segundos. Não representa envio no WhatsApp.
+Validação: build, TypeScript, formatação e 18 testes de downloads/handlers
+aprovados. A reprodução real passou pelo parser do gateway (argumento convertido
+em minúsculas) e pelo handler corrigido com download verdadeiro; somente a
+resposta ao WhatsApp foi simulada. Ativação exige apenas reiniciar `kozz-bot`.
+
+A leitura original foi centralizada em `Utils/commandText.ts` e aplicada também
+a `!yt video`, `!yt song` e `!s from-link`. Ela preserva o caminho, IDs e
+parâmetros assinados, incluindo trechos `--` dentro da URL. `!role` também lê
+o texto original, como seus aliases `!evento`/`!rolê`, para preservar links de
+localização. A IA já recebe o texto original no contexto; `!lembrete` já o
+recupera. Links de mídias/citações e respostas de APIs não usam argumentos
+normalizados. Buscas por texto e argumentos ausentes continuam suportados.
 
 ## Dependências e operação
 

@@ -1,13 +1,14 @@
 import { MessageObj } from 'kozz-module-maker/dist/Message';
 import { MessageReceived } from 'kozz-types';
 import { extractSocialUrl, Platform, platforms, SocialVideoError } from './urls';
+import { originalCommandQuery } from '../../Utils/commandText';
 
 export const videoUrlFromRequest = async (
 	requester: MessageObj,
 	platform: Platform
 ): Promise<string | undefined> => {
-	const query = requester.rawCommand?.query?.trim();
 	const config = platforms[platform];
+	const query = originalCommandQuery(requester, config.command);
 	// An explicit argument takes priority; a bad argument must not silently
 	// download a different link from the quote.
 	if (query) {

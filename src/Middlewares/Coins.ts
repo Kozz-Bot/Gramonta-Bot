@@ -46,7 +46,7 @@ export const usePremiumCommand =
 			if (shouldDeductCoins === false) {
 				return;
 			} else {
-				CoinsApi.spendCoins(
+				await CoinsApi.spendCoins(
 					userId,
 					amount,
 					await uploadAllMediaToBucket(requester.message)

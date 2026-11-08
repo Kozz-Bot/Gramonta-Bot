@@ -1,5 +1,32 @@
 # Pedidos com várias etapas no !ai
 
+Revisão de 2026-11-08: o laço de ferramentas já aguardava `executeCommand`,
+mas havia operações que escapavam da Promise devolvida pelo handler.
+`hostAccountOnly` agora retorna a chamada interna (incluindo sua Promise e
+rejeição); a cobrança de comandos premium é aguardada; `!help` só termina depois
+de reunir as ajudas e emitir a resposta. Permissões e identidade permanecem as
+mesmas. Comandos futuros devem retornar/aguardar todas as operações que compõem
+seu resultado; timers/agendas de efeitos futuros não são a conclusão do efeito.
+
+O retorno de `chat_execute_command` agora distingue `handlerCompleted` do
+resultado funcional `outcome`. `outputs` descreve texto, mídia ou figurinha e,
+para arquivos, MIME, tamanho, duração e envio como voz, sem bytes nem URL de
+origem da mídia. A IA recebe essa informação mesmo quando não há legenda.
+`replies`/`outputs` conservam os últimos oito registros; textos de até 2.000
+caracteres por item. Isso evita que mensagens de progresso ocupem todo o retorno
+e escondam a resposta final. Estado `submitted` continua significando emissão,
+nunca entrega no WhatsApp ou inspeção do conteúdo do arquivo.
+
+O prompt orienta conferir esse retorno, executar as próximas ações pertinentes
+no mesmo pedido e só então responder. Sequências continuam limitadas pelo laço
+existente e pela deduplicação: não há repetição automática de ações incertas.
+Regressão de ponta a ponta usa o handler real de moedas (API simulada com uma
+Promise bloqueada), depois dois handlers reais de download no mesmo lote,
+verifica seus resultados e só depois agenda um lembrete real em armazenamento
+temporário. Sem operações em contas reais ou mensagens no WhatsApp.
+Testes adicionais cobrem espera da ajuda/cobrança, falha da cobrança, preservação
+da resposta final e ausência de dados/URLs de mídia no feedback estruturado.
+
 Correção de 2026-10-31: ferramentas locais que enviavam uma resposta retornavam
 `terminal: true`, encerrando todo o pedido e ignorando outras chamadas do mesmo
 lote. Agora comandos locais, imagens, áudios e mensagens de tia devolvem um
@@ -76,3 +103,9 @@ a ajuda com múltiplas etapas e o parâmetro de referência de arte gerada.
 Gramonta conectado, registrado e sem QR pendente. Nenhum evento, lembrete ou
 envio real foi feito para validação; testes usam agendas/bancos temporários,
 provedor e transporte simulados. Sessões e credenciais preservadas.
+
+Ativação de 2026-11-08: build, TypeScript e Prettier aprovados; 37 testes
+de regressão passaram (workflow, comandos locais, conclusão assíncrona,
+permissões da IA e downloads). Reiniciado somente `kozz-bot`, com os handlers
+`ai`, `coins`, `help`, `video`, `audio` e `lembrete` registrados no gateway.
+WhatsApp confirmado conectado, registrado, pronto e sem QR pendente.

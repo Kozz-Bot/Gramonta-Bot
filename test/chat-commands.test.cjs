@@ -622,3 +622,64 @@ test('structured event invokes the actual handler with original artwork only in 
 	assert.equal(events[0].args.title, 'Futebol');
 	assert.equal(events[0].args.artwork.data, media.data);
 });
+
+test('AI runs unified video/audio handlers only in the source chat and reports download failures', async t => {
+	const f = fixture(t);
+	const downloads = require('../dist/Services/MediaDownload/download');
+	const previous = downloads.downloadMedia;
+	t.after(() => {
+		downloads.downloadMedia = previous;
+	});
+	const calls = [],
+		media = [];
+	downloads.downloadMedia = async (query, mode) => {
+		calls.push([query, mode]);
+		return {
+			data: Buffer.from('media'),
+			duration: 1,
+			mimeType: mode === 'audio' ? 'audio/ogg; codecs=opus' : 'video/mp4',
+		};
+	};
+	f.loadHandler('../dist/Handlers/MediaDownload', 'startVideoDownloadHandler');
+	f.loadHandler('../dist/Handlers/MediaDownload', 'startAudioDownloadHandler');
+	f.socket.on('reply_with_media', payload => media.push(payload));
+	const args = module => ({
+		module,
+		method: 'default',
+		immediateArg: 'https://example.com/VideoAbC?sig=XyZ',
+		namedArgs: '{}',
+		recipientIds: [],
+	});
+	for (const mode of ['video', 'audio']) {
+		const result = await executeChatTool(
+			f.requester(),
+			'chat_execute_command',
+			args(mode)
+		);
+		assert.equal(JSON.parse(result.content).status, 'submitted');
+		assert.deepEqual(calls.at(-1), [args(mode).immediateArg, mode]);
+	}
+	assert.equal(media.length, 2);
+	assert.ok(
+		media.every(p => p.chatId === '123@g.us' && p.boundaryId === 'boundary-test')
+	);
+	const count = calls.length;
+	await assert.rejects(
+		executeChatTool(f.requester(), 'chat_execute_command', {
+			...args('audio'),
+			chatId: '999@g.us',
+		}),
+		/destino|extras/
+	);
+	assert.equal(calls.length, count);
+	downloads.downloadMedia = async () => {
+		throw new Error('private provider failure');
+	};
+	const failed = await executeChatTool(
+		f.requester({ id: 'failed-download' }),
+		'chat_execute_command',
+		args('video')
+	);
+	assert.equal(JSON.parse(failed.content).success, false);
+	assert.doesNotMatch(failed.content, /private provider/);
+});

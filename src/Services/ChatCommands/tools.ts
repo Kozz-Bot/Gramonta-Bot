@@ -44,7 +44,7 @@ export const chatTools: ResponseTool[] = [
 	),
 	tool(
 		'chat_execute_command',
-		'Executa imediatamente um método do catálogo, sem confirmação, com a identidade e permissões de quem pediu. Primeiro consulte chat_list_commands. Respostas ficam neste chat. Exceções exclusivas do dono: módulo ban bloqueia/libera acesso global ao bot; módulo updates controla os grupos dos avisos de novidades após nossos pushes, sem enviar avisos agora. Preserva mídia/citação. Não aceita destino ou identidade. Demais automações globais, recursão ai e avisos em outros chats são bloqueados.',
+		'Executa um método do catálogo e aguarda o handler terminar, sem confirmação, com a identidade e permissões de quem pediu. Retorna replies, outputs (textos e metadados de mídia, sem bytes/URLs) e outcome quando disponível. Confira o resultado e continue chamando comandos pertinentes ao mesmo pedido antes da resposta final. Primeiro consulte chat_list_commands. Respostas ficam neste chat. Exceções exclusivas do dono: módulo ban bloqueia/libera acesso global ao bot; módulo updates controla os grupos dos avisos de novidades após nossos pushes, sem enviar avisos agora. Preserva mídia/citação. Não aceita destino ou identidade. Demais automações globais, recursão ai e avisos em outros chats são bloqueados.',
 		{
 			module: string('Módulo do catálogo'),
 			method: string(

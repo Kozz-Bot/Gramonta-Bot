@@ -29,6 +29,11 @@ export const invokeModule = async (command: Command) => {
 	const result = await runtime.executeCommand(command);
 	const outcome = commandOutcome(command);
 	return outcome
-		? { ...result, executed: result?.executed === true && outcome.success, outcome }
-		: result;
+		? {
+				...result,
+				handlerCompleted: result?.executed === true,
+				executed: result?.executed === true && outcome.success,
+				outcome,
+			}
+		: { ...result, handlerCompleted: result?.executed === true };
 };

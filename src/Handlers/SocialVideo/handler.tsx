@@ -1,65 +1,17 @@
 import { createMethod, createModule } from 'kozz-module-maker';
-import { MessageObj } from 'kozz-module-maker/dist/Message';
-import { downloadSocialVideo } from '../../Services/SocialVideo/download';
-import {
-	Platform,
-	platforms,
-	SocialVideoError,
-} from '../../Services/SocialVideo/urls';
-import { videoUrlFromRequest } from '../../Services/SocialVideo/request';
-import { ErrorMessage, Processing } from './messages';
+import { Platform, platforms } from '../../Services/SocialVideo/urls';
+import { executeDownload } from '../MediaDownload/handler';
+import { Help, Migration } from '../MediaDownload/messages';
 
-// Shared across all four commands, including /tw.
-const activeRequests = new Set<string>();
-
-export const createSocialVideoHandler = (platform: Platform, Help: () => any) => {
-	const config = platforms[platform];
-	const download = async (requester: MessageObj) => {
-		let url: string | undefined;
-		try {
-			url = await videoUrlFromRequest(requester, platform);
-		} catch (error) {
-			return requester.reply(<ErrorMessage message={(error as Error).message} />);
-		}
-		if (!url) return requester.reply(<Help />);
-		const key = `${requester.message.boundaryId}:${requester.message.from}`;
-		if (activeRequests.has(key))
-			return requester.reply(
-				<ErrorMessage message="Você já tem um download em andamento. Aguarde a conclusão." />
-			);
-		if (activeRequests.size >= 2)
-			return requester.reply(
-				<ErrorMessage message="O serviço de download está ocupado. Tente novamente em instantes." />
-			);
-		activeRequests.add(key);
-		try {
-			requester.reply(<Processing label={config.label} />);
-			const video = await downloadSocialVideo(url, platform);
-			return requester.reply.withMedia({
-				data: video.data.toString('base64'),
-				transportType: 'b64',
-				mimeType: 'video/mp4',
-				fileName: `${platform}.mp4`,
-				sizeInBytes: video.data.length,
-				duration: video.duration,
-				stickerTags: undefined,
-			});
-		} catch (error) {
-			return requester.reply(
-				<ErrorMessage
-					message={
-						error instanceof SocialVideoError
-							? error.message
-							: 'Não consegui processar o vídeo agora. Tente novamente mais tarde.'
-					}
-				/>
-			);
-		} finally {
-			activeRequests.delete(key);
-		}
-	};
+export const createSocialVideoHandler = (
+	platform: Platform,
+	_oldHelp: () => any
+) => {
+	const command = platforms[platform].command;
+	const download = (requester: Parameters<typeof executeDownload>[0]) =>
+		executeDownload(requester, 'video', command, undefined, true, platform);
 	return createModule({
-		name: config.command,
+		name: command,
 		address: `${process.env.GATEWAY_URL}`,
 		customSocketPath: process.env.SOCKET_PATH,
 		commands: {
@@ -67,8 +19,20 @@ export const createSocialVideoHandler = (platform: Platform, Help: () => any) =>
 			methods: {
 				...createMethod('default', download),
 				...createMethod('fallback', download),
-				...createMethod('help', requester => requester.reply(<Help />)),
+				...createMethod('help', r =>
+					r.reply(
+						<>
+							<Migration />
+							<Help mode="video" />
+						</>
+					)
+				),
 			},
 		},
-	}).resources.upsertResource('help', () => <Help />);
+	}).resources.upsertResource('help', () => (
+		<>
+			<Migration />
+			<Help mode="video" />
+		</>
+	));
 };

@@ -1,6 +1,8 @@
 import axios, { AxiosResponse } from 'axios';
 import oldFs from 'fs';
 import path from 'path';
+import { fetchPublicMedia } from '../Services/MediaDownload/network';
+import { DownloadError, MAX_BYTES } from '../Services/MediaDownload/urls';
 
 type DownloadType = 'video' | 'audio';
 type HttpMethod = 'GET' | 'POST';
@@ -39,6 +41,7 @@ const API = axios.create({
 		process.env.YOUTUBE_API_BASE_URL || 'https://dev.gramont.digital/ytb'
 	),
 	timeout: Number(process.env.YOUTUBE_API_TIMEOUT_MS || 120000),
+	maxRedirects: 0,
 });
 
 const getMethod = (method: string | undefined, fallback: HttpMethod): HttpMethod =>
@@ -50,20 +53,42 @@ const videoPath = process.env.YOUTUBE_API_VIDEO_PATH || 'youtube/download';
 const searchMethod = getMethod(process.env.YOUTUBE_API_SEARCH_METHOD, 'GET');
 const downloadMethod = getMethod(process.env.YOUTUBE_API_DOWNLOAD_METHOD, 'POST');
 
+// New unified commands never download YouTube locally or share output paths.
+export const downloadYoutubeMedia = async (
+	url: string,
+	type: DownloadType
+): Promise<Buffer> => {
+	if (new URL(API.defaults.baseURL!).protocol !== 'https:')
+		throw new DownloadError('A API do YouTube precisa estar configurada em HTTPS.');
+	const response = await API.request<Buffer>({
+		url: type === 'audio' ? audioPath : videoPath,
+		method: downloadMethod,
+		params: downloadMethod === 'GET' ? { url, type } : undefined,
+		data: downloadMethod === 'POST' ? { url, type } : undefined,
+		responseType: 'arraybuffer',
+		maxContentLength: MAX_BYTES,
+		maxRedirects: 0,
+	});
+	const json = parseJsonBuffer(response);
+	if (!json) return Buffer.from(response.data);
+	const mediaUrl = getMediaUrl(json);
+	if (mediaUrl) return fetchPublicMedia(mediaUrl, MAX_BYTES);
+	const base64 = getBase64(json);
+	if (base64 && base64.length <= Math.ceil(MAX_BYTES / 3) * 4)
+		return Buffer.from(base64, 'base64');
+	throw new DownloadError('A API do YouTube não retornou um arquivo disponível.');
+};
+
 const warnRequestError = (context: string, error: unknown) => {
 	if (axios.isAxiosError(error)) {
-		const responseData = Buffer.isBuffer(error.response?.data)
-			? error.response?.data.toString('utf8')
-			: error.response?.data;
 		console.warn(context, {
 			status: error.response?.status,
-			message: error.message,
-			response: responseData,
+			code: error.code,
 		});
 		return;
 	}
 
-	console.warn(context, error);
+	console.warn(context, { name: (error as Error)?.name });
 };
 
 /**
@@ -256,6 +281,10 @@ const normalizeSearchResponse = (data: any): YoutubeSearchResponse => {
 
 export const searchResults = async (query: string, _?: string, maxResults = 1) => {
 	try {
+		if (new URL(API.defaults.baseURL!).protocol !== 'https:')
+			throw new DownloadError(
+				'A API do YouTube precisa estar configurada em HTTPS.'
+			);
 		const { data } = await API.request({
 			url: searchPath,
 			method: searchMethod,
