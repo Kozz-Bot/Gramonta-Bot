@@ -94,20 +94,23 @@ const makeQuote = async (requester: MessageObj, includeQuotedMessage?: boolean) 
 
 const defaultMethod = createMethod(
 	'default',
-	(requester, { tags, 'sem-fundo': semFundo, sf }) => {
+	(requester, { tags, 'sem-fundo': semFundo, sf, 'sem-som': semSom }) => {
 		if (semFundo || sf) return withoutBackground(requester, tags);
 		const { quotedMessage, media } = requester.message;
+		const stickerMedia = (source: Media): Media => ({
+			...source,
+			stickerSound: !semSom,
+			...(semSom ? { stickerAudio: undefined } : {}),
+			stickerTags: tags?.split('') ?? source.stickerTags ?? [],
+		});
 
 		if (media) {
-			return requester.reply.withSticker({
-				...media,
-				stickerTags: tags?.split('') ?? [],
-			});
+			return requester.reply.withSticker(stickerMedia(media));
 		}
 
 		if (quotedMessage?.media) {
 			if (quotedMessage.messageType === 'STICKER') {
-				return requester.reply.withSticker(quotedMessage.media);
+				return requester.reply.withSticker(stickerMedia(quotedMessage.media));
 			}
 
 			if (
@@ -117,7 +120,7 @@ const defaultMethod = createMethod(
 				console.log('Entrou');
 				return requester.reply('Não sei como fazer figurinha desse tipo de mídia');
 			} else {
-				return requester.reply.withSticker(quotedMessage.media);
+				return requester.reply.withSticker(stickerMedia(quotedMessage.media));
 			}
 		}
 
@@ -131,6 +134,7 @@ const defaultMethod = createMethod(
 		tags: 'string?',
 		'sem-fundo': 'boolean?',
 		sf: 'boolean?',
+		'sem-som': 'boolean?',
 	}
 );
 

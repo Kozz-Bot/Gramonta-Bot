@@ -229,6 +229,50 @@ test('real sticker handler supports the parsed flag and local AI execution, pres
 	);
 	assert.match(catalog.description, /sem-fundo/);
 	assert.equal(
+		catalog.methods.find(m => m.method === 'default').args['sem-som'],
+		'boolean?'
+	);
+	// Exercise the real handler via parser and via the chat AI, using simulated
+	// transport. Both direct attachments and quoted videos must keep the choice.
+	const beforeVideos = sent.length;
+	const videoMedia = {
+		data: 'dmlkZW8=',
+		transportType: 'b64',
+		mimeType: 'video/mp4',
+	};
+	for (const silent of [false, true]) {
+		const parsedVideo = parse(silent ? '!s --sem-som' : '!s').result;
+		await invokeModule({
+			...parsedVideo,
+			boundaryId: 'b',
+			boundaryName: 'kozz-zapo',
+			namespace: 'default',
+			taggedContacts: [],
+			message: { ...baseMessage, media: videoMedia, messageType: 'VIDEO' },
+		});
+		assert.equal(sent.at(-1).media.stickerSound, !silent);
+		await executeChatTool(
+			{
+				...r,
+				message: {
+					...r.message,
+					quotedMessage: {
+						...baseMessage,
+						id: 'video',
+						messageType: 'VIDEO',
+						media: videoMedia,
+					},
+				},
+			},
+			'chat_execute_command',
+			{ ...args, namedArgs: silent ? '{"sem-som":true}' : '{}' }
+		);
+		assert.equal(sent.at(-1).media.stickerSound, !silent);
+		assert.equal(sent.at(-1).chatId, '123@g.us');
+	}
+	assert.equal(sent.length, beforeVideos + 4);
+	sent.splice(beforeVideos);
+	assert.equal(
 		JSON.parse((await executeChatTool(r, 'chat_execute_command', args)).content)
 			.status,
 		'submitted'

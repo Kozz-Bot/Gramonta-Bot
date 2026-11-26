@@ -10,6 +10,10 @@ export const DefaultInstructions = () => (
 			imagem com _*!s*_.
 		</Line>
 		<Line>
+			Vídeos viram figurinhas com o som original. Para tirar o som, use{' '}
+			<Monospace>!s --sem-som</Monospace>.
+		</Line>
+		<Line>
 			Para recortar uma foto e deixar o fundo transparente, use{' '}
 			<Monospace>!s --sem-fundo</Monospace> ou <Monospace>!s --sf</Monospace>.
 		</Line>
@@ -37,6 +41,20 @@ export const Help = () => (
 		</Line>
 		<Line />
 		<Line>
+			<Bold>Vídeos com som 🔊</Bold>
+		</Line>
+		<Line>
+			Envie um vídeo com <Monospace>!s</Monospace> na legenda ou responda ao vídeo
+			com esse comando. A figurinha mantém até 10 segundos do vídeo e do áudio
+			original.
+		</Line>
+		<Line>
+			Para uma figurinha animada sem áudio, use <Monospace>!s --sem-som</Monospace>.
+			Vídeos que já não têm áudio continuam silenciosos. Toque no ícone de som da
+			figurinha para ouvir; é preciso uma versão do WhatsApp compatível.
+		</Line>
+		<Line />
+		<Line>
 			<Bold>Com fundo transparente ✂️</Bold>
 		</Line>
 		<Line>
@@ -60,7 +78,11 @@ export const Help = () => (
 		<Line>
 			<Bold>Outras opções</Bold>
 		</Line>
-		<Line>Responda uma figurinha com _*!s*_ para transforma-la em imagem.</Line>
+		<Line>
+			Responda uma figurinha com <Monospace>!s</Monospace> para reenviá-la, ou{' '}
+			<Monospace>!s --sem-som</Monospace> para retirar seu áudio. Para transformar em
+			imagem ou vídeo, use <Monospace>!s toimg</Monospace>.
+		</Line>
 		<Line>
 			Responda uma mensagem de texto com _*!s full*_ para criar a figurinha incluindo
 			a mensagem citada por ela.
